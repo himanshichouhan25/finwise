@@ -38,11 +38,18 @@ def build_system_prompt(snapshot: FinancialSnapshot | None = None, persona_name:
     if snapshot:
         goals_summary = "None configured yet"
         if snapshot.goals_with_plans:
-            goals_summary = "; ".join(
-                f"{gp.goal.name}: Target ₹{float(gp.goal.target_amount):,.0f} by {gp.goal.target_date} "
-                f"(Saved: ₹{float(gp.goal.current_amount):,.0f}, {float(gp.goal.progress_pct):.1f}%, Plan: ₹{float(gp.plan.required_monthly_savings):,.0f}/mo)"
-                for gp in snapshot.goals_with_plans
-            )
+            goals_parts = []
+            for gp in snapshot.goals_with_plans:
+                pct = (
+                    (float(gp.goal.current_saved) / float(gp.goal.target_amount) * 100.0)
+                    if gp.goal.target_amount and float(gp.goal.target_amount) > 0
+                    else 0.0
+                )
+                goals_parts.append(
+                    f"{gp.goal.name}: Target ₹{float(gp.goal.target_amount):,.0f} by {gp.goal.target_date or 'flexible'} "
+                    f"(Saved: ₹{float(gp.goal.current_saved):,.0f}, {pct:.1f}%, Plan: ₹{float(gp.plan.required_monthly_savings):,.0f}/mo)"
+                )
+            goals_summary = "; ".join(goals_parts)
 
         tier = snapshot.profile.tier if snapshot.profile else "Standard"
         b = snapshot.budget_summary
