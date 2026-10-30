@@ -11,8 +11,15 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-import app.models  # noqa: F401
+from app.api.v1.budget import router as budget_router
+from app.api.v1.dashboard import router as dashboard_router
+from app.api.v1.expenses import router as expenses_router
+from app.api.v1.goals import router as goals_router
 from app.api.v1.health import router as health_router
+from app.api.v1.health_score import router as health_score_router
+from app.api.v1.income import router as income_router
+from app.api.v1.profile import router as profile_router
+from app.api.v1.simulations import router as simulations_router
 from app.core.config import get_settings
 from app.core.errors import (
     FinWiseError,
@@ -71,6 +78,14 @@ def create_app() -> FastAPI:
 
     # 4. Mount API v1 Routers
     application.include_router(health_router, prefix="/api/v1")
+    application.include_router(profile_router, prefix="/api/v1")
+    application.include_router(income_router, prefix="/api/v1")
+    application.include_router(expenses_router, prefix="/api/v1")
+    application.include_router(budget_router, prefix="/api/v1")
+    application.include_router(goals_router, prefix="/api/v1")
+    application.include_router(simulations_router, prefix="/api/v1")
+    application.include_router(health_score_router, prefix="/api/v1")
+    application.include_router(dashboard_router, prefix="/api/v1")
 
     return application
 
