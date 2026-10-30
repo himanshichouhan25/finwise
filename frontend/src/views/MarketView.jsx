@@ -7,8 +7,6 @@ import {
   Trash2,
   RefreshCw,
   AlertCircle,
-  AlertTriangle,
-  Info,
   Clock,
   ShieldCheck,
   Sparkles,
@@ -70,8 +68,6 @@ export default function MarketView() {
   const [watchlistLoading, setWatchlistLoading] = useState(false);
   const [watchlistAdding, setWatchlistAdding] = useState(false);
 
-  // General Notification / Error
-  const [bannerError, setBannerError] = useState(null);
   const [hoveredPoint, setHoveredPoint] = useState(null);
 
   // ================= Loaders =================
@@ -84,7 +80,6 @@ export default function MarketView() {
       setOverview(res);
     } catch (err) {
       console.error('Failed to load market overview', err);
-      setBannerError(err.message || 'Market overview unavailable');
     } finally {
       setOverviewLoading(false);
     }
@@ -95,8 +90,8 @@ export default function MarketView() {
     try {
       setNewsLoading(true);
       const res = await getMarketNews(symbol);
-      setNews(res.articles || []);
-      setNewsAttribution(res.attribution || null);
+      setNews(res?.items || res?.articles || []);
+      setNewsAttribution(res?.attribution || null);
     } catch (err) {
       console.error('Failed to load market news', err);
     } finally {
@@ -249,11 +244,12 @@ export default function MarketView() {
     return `${prefix}${num.toLocaleString('en-IN', { maximumFractionDigits: decimals })}${suffix}`;
   };
 
-  // SVG Chart Calculation
+  // SVG Chart Calculation based on history.series
   const chartPoints = useMemo(() => {
-    if (!history || !history.data_points || history.data_points.length === 0) return null;
-    const pts = history.data_points;
-    const closes = pts.map((p) => Number(p.close));
+    const rawSeries = history?.series || history?.data_points;
+    if (!rawSeries || rawSeries.length === 0) return null;
+
+    const closes = rawSeries.map((p) => Number(p.close));
     const min = Math.min(...closes);
     const max = Math.max(...closes);
     const range = max - min || 1;
@@ -262,8 +258,8 @@ export default function MarketView() {
     const height = 220;
     const padding = 20;
 
-    const coords = pts.map((p, idx) => {
-      const x = padding + (idx / (pts.length - 1)) * (width - 2 * padding);
+    const coords = rawSeries.map((p, idx) => {
+      const x = padding + (idx / (rawSeries.length - 1)) * (width - 2 * padding);
       const y = height - padding - ((Number(p.close) - min) / range) * (height - 2 * padding);
       return { x, y, ...p };
     });
@@ -274,6 +270,13 @@ export default function MarketView() {
 
     return { coords, min, max, isPositive, pathD, areaD, width, height };
   }, [history]);
+
+  // Derived attribution limitations
+  const attributionLimitations = useMemo(() => {
+    const lims = overview?.attribution?.limitations;
+    if (Array.isArray(lims)) return lims.join(' • ');
+    return lims || '';
+  }, [overview]);
 
   return (
     <div style={{ padding: '1.5rem', maxWidth: '1440px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -289,9 +292,9 @@ export default function MarketView() {
           <div style={{ fontSize: '0.85rem', color: '#E2E8F0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {news.length > 0 ? (
               <span>
-                <strong style={{ color: '#F8FAFC' }}>{news[0].source}:</strong> {news[0].headline}
-                {news[0].ai_summary && (
-                  <span style={{ color: '#94A3B8', marginLeft: '0.5rem' }}>— {news[0].ai_summary}</span>
+                <strong style={{ color: '#F8FAFC' }}>{news[0].source}:</strong> {news[0].title || news[0].headline}
+                {(news[0].ai_takeaway || news[0].ai_summary) && (
+                  <span style={{ color: '#94A3B8', marginLeft: '0.5rem' }}>— {news[0].ai_takeaway || news[0].ai_summary}</span>
                 )}
               </span>
             ) : (
@@ -302,7 +305,7 @@ export default function MarketView() {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', whiteSpace: 'nowrap' }}>
           {overview?.attribution && (
-            <span className="badge badge-slate" title={overview.attribution.limitations} style={{ fontSize: '0.7rem' }}>
+            <span className="badge badge-slate" title={attributionLimitations} style={{ fontSize: '0.7rem' }}>
               <ShieldCheck size={12} color="#14B8A6" />
               {overview.attribution.provider.toUpperCase()} ({overview.attribution.data_mode})
             </span>
@@ -329,11 +332,13 @@ export default function MarketView() {
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <span>Indian Market Indices</span>
             <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#94A3B8' }}>
-              (Status: <strong style={{ color: overview?.market_status === 'OPEN' ? '#34D399' : '#FBBF24' }}>{overview?.market_status || 'CLOSED'}</strong>)
+              (Status: <strong style={{ color: (overview?.status?.is_open ?? overview?.market_status === 'OPEN') ? '#34D399' : '#FBBF24' }}>
+                {overview?.status?.trading_session || overview?.market_status || 'Regular Trading'}
+              </strong>)
             </span>
           </h2>
           <span style={{ fontSize: '0.75rem', color: '#64748B' }}>
-            Updated: {overview?.last_updated ? new Date(overview.last_updated).toLocaleTimeString('en-IN') : 'Live'}
+            Updated: {overview?.attribution?.timestamp ? new Date(overview.attribution.timestamp).toLocaleTimeString('en-IN') : 'Live'}
           </span>
         </div>
 
@@ -346,13 +351,20 @@ export default function MarketView() {
             ))
           ) : (
             overview?.indices?.map((idx) => {
-              const isUp = Number(idx.change) >= 0;
+              const currentVal = Number(idx.current_price ?? idx.value ?? 0);
+              const changeVal = Number(idx.change_amount ?? idx.change ?? 0);
+              const isUp = Number(idx.change_pct ?? 0) >= 0;
+              const highVal = Number(idx.high_price ?? idx.high ?? currentVal);
+              const lowVal = Number(idx.low_price ?? idx.low ?? currentVal);
+
               return (
                 <div key={idx.name} className="glass-card glass-card-hover" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div>
                       <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#FFFFFF' }}>{idx.name}</h3>
-                      <span style={{ fontSize: '0.7rem', color: '#64748B', textTransform: 'uppercase' }}>{idx.exchange}</span>
+                      <span style={{ fontSize: '0.7rem', color: '#64748B', textTransform: 'uppercase' }}>
+                        {idx.symbol || 'NSE'}
+                      </span>
                     </div>
                     <span className={`badge ${isUp ? 'badge-teal' : 'badge-crimson'}`} style={{ fontSize: '0.75rem' }}>
                       {isUp ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
@@ -362,16 +374,16 @@ export default function MarketView() {
 
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', marginTop: '0.25rem' }}>
                     <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#F8FAFC' }}>
-                      ₹{Number(idx.value).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                      ₹{currentVal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                     </span>
                     <span style={{ fontSize: '0.8rem', fontWeight: 600, color: isUp ? '#34D399' : '#F87171' }}>
-                      {isUp ? '+' : ''}{Number(idx.change).toFixed(2)}
+                      {isUp ? '+' : ''}{changeVal.toFixed(2)}
                     </span>
                   </div>
 
                   <div style={{ fontSize: '0.7rem', color: '#64748B', display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '0.4rem', marginTop: '0.25rem' }}>
-                    <span>Day High: ₹{Number(idx.high || idx.value).toLocaleString('en-IN')}</span>
-                    <span>Day Low: ₹{Number(idx.low || idx.value).toLocaleString('en-IN')}</span>
+                    <span>Day High: ₹{highVal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
+                    <span>Day Low: ₹{lowVal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
                   </div>
                 </div>
               );
@@ -380,7 +392,7 @@ export default function MarketView() {
         </div>
       </div>
 
-      {/* Navigation Sub-Tabs: Explorer & Charts / Market News / Watchlist */}
+      {/* Navigation Sub-Tabs */}
       <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem' }}>
         <button
           className={`btn ${activeTab === 'explorer' ? 'btn-teal' : 'btn-outline'}`}
@@ -476,15 +488,11 @@ export default function MarketView() {
                     >
                       <div>
                         <span style={{ fontWeight: 700, color: '#2DD4BF', marginRight: '0.5rem' }}>{item.symbol}</span>
-                        <span style={{ color: '#E2E8F0', fontSize: '0.85rem' }}>{item.company_name}</span>
+                        <span style={{ color: '#E2E8F0', fontSize: '0.85rem' }}>{item.name || item.company_name}</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span className="badge badge-slate" style={{ fontSize: '0.65rem' }}>{item.exchange}</span>
-                        {item.current_price && (
-                          <span style={{ fontWeight: 600, color: '#F8FAFC', fontSize: '0.85rem' }}>
-                            ₹{Number(item.current_price).toLocaleString('en-IN')}
-                          </span>
-                        )}
+                        <span className="badge badge-slate" style={{ fontSize: '0.65rem' }}>{item.exchange || 'NSE'}</span>
+                        <span className="badge badge-teal" style={{ fontSize: '0.65rem' }}>{item.instrument_type || 'Equity'}</span>
                       </div>
                     </div>
                   ))}
@@ -529,7 +537,7 @@ export default function MarketView() {
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.25rem', fontSize: '0.85rem', fontWeight: 600, color: Number(quote.change_pct) >= 0 ? '#34D399' : '#F87171' }}>
                         {Number(quote.change_pct) >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                         <span>
-                          {Number(quote.change_pct) >= 0 ? '+' : ''}{Number(quote.change).toFixed(2)} ({Number(quote.change_pct) >= 0 ? '+' : ''}{Number(quote.change_pct).toFixed(2)}%)
+                          {Number(quote.change_pct) >= 0 ? '+' : ''}{Number(quote.change_amount ?? quote.change ?? 0).toFixed(2)} ({Number(quote.change_pct) >= 0 ? '+' : ''}{Number(quote.change_pct).toFixed(2)}%)
                         </span>
                       </div>
                     )}
@@ -563,7 +571,9 @@ export default function MarketView() {
 
                 <div style={{ fontSize: '0.7rem', color: '#64748B', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <Clock size={12} />
-                  <span>Attribution: {history?.attribution?.provider || 'Tapetide'} ({history?.attribution?.data_mode || 'delayed'})</span>
+                  <span>
+                    Attribution: {history?.attribution?.provider?.toUpperCase() || 'TAPETIDE'} ({history?.attribution?.data_mode || 'delayed'})
+                  </span>
                 </div>
               </div>
 
@@ -606,7 +616,7 @@ export default function MarketView() {
                           key={i}
                           cx={pt.x}
                           cy={pt.y}
-                          r={hoveredPoint?.date === pt.date ? 5 : 3}
+                          r={hoveredPoint?.timestamp === pt.timestamp ? 5 : 3}
                           fill={chartPoints.isPositive ? '#2DD4BF' : '#F87171'}
                           stroke="#080C14"
                           strokeWidth="2"
@@ -634,7 +644,7 @@ export default function MarketView() {
                           pointerEvents: 'none',
                         }}
                       >
-                        <div><strong>Date:</strong> {hoveredPoint.date}</div>
+                        <div><strong>Date:</strong> {hoveredPoint.timestamp}</div>
                         <div><strong>Close:</strong> ₹{Number(hoveredPoint.close).toLocaleString('en-IN')}</div>
                         <div><strong>Volume:</strong> {Number(hoveredPoint.volume).toLocaleString('en-IN')}</div>
                       </div>
@@ -651,15 +661,15 @@ export default function MarketView() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.5rem', background: 'rgba(255,255,255,0.02)', padding: '0.65rem', borderRadius: '8px', textAlign: 'center' }}>
                 <div>
                   <div style={{ fontSize: '0.65rem', color: '#64748B' }}>OPEN</div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#E2E8F0' }}>{formatVal(quote?.open, '₹')}</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#E2E8F0' }}>{formatVal(quote?.open_price ?? quote?.open, '₹')}</div>
                 </div>
                 <div>
                   <div style={{ fontSize: '0.65rem', color: '#64748B' }}>HIGH</div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#34D399' }}>{formatVal(quote?.high, '₹')}</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#34D399' }}>{formatVal(quote?.high_price ?? quote?.high, '₹')}</div>
                 </div>
                 <div>
                   <div style={{ fontSize: '0.65rem', color: '#64748B' }}>LOW</div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#F87171' }}>{formatVal(quote?.low, '₹')}</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#F87171' }}>{formatVal(quote?.low_price ?? quote?.low, '₹')}</div>
                 </div>
                 <div>
                   <div style={{ fontSize: '0.65rem', color: '#64748B' }}>PREV CLOSE</div>
@@ -680,7 +690,7 @@ export default function MarketView() {
                   <span>Company Fundamentals & Ratios</span>
                 </h3>
                 <span style={{ fontSize: '0.7rem', color: '#64748B' }}>
-                  No Zero-Fakes • Verified Financial Reporting
+                  Verified Public Metrics • Zero Fabrications
                 </span>
               </div>
 
@@ -701,7 +711,7 @@ export default function MarketView() {
 
                   {/* P/E Ratio */}
                   <div className="glass-card">
-                    <div style={{ fontSize: '0.7rem', color: '#94A3B8', marginBottom: '0.2rem' }}>P/E Ratio (Trailing)</div>
+                    <div style={{ fontSize: '0.7rem', color: '#94A3B8', marginBottom: '0.2rem' }}>P/E Ratio (Price to Earnings)</div>
                     <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#F8FAFC' }}>
                       {formatVal(fundamentals?.pe_ratio, '', 'x', 1)}
                     </div>
@@ -778,7 +788,7 @@ export default function MarketView() {
                   </div>
                   <div>
                     <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#FFFFFF' }}>AI Stock Analyst</h3>
-                    <p style={{ fontSize: '0.7rem', color: '#94A3B8' }}>Powered by Groq Llama-3 & Strict Math</p>
+                    <p style={{ fontSize: '0.7rem', color: '#94A3B8' }}>Powered by Groq & Deterministic Financial Math</p>
                   </div>
                 </div>
 
@@ -805,10 +815,10 @@ export default function MarketView() {
                   {/* Plain English Summary */}
                   <div style={{ padding: '0.85rem', borderRadius: '10px', background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(255,255,255,0.06)' }}>
                     <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#2DD4BF', textTransform: 'uppercase', marginBottom: '0.4rem', letterSpacing: '0.04em' }}>
-                      Executive Takeaway
+                      Executive Takeaway ({aiAnalysis.model_used || 'Groq'})
                     </div>
                     <p style={{ fontSize: '0.85rem', color: '#F1F5F9', lineHeight: 1.55 }}>
-                      {aiAnalysis.summary}
+                      {aiAnalysis.summary_explanation || aiAnalysis.summary}
                     </p>
                   </div>
 
@@ -835,12 +845,12 @@ export default function MarketView() {
                   {/* Pros & Cons Grid */}
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
                     
-                    {/* Strengths */}
+                    {/* Strengths / Pros */}
                     <div style={{ padding: '0.75rem', borderRadius: '8px', background: 'rgba(20, 184, 166, 0.06)', border: '1px solid rgba(20, 184, 166, 0.2)' }}>
                       <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#2DD4BF', marginBottom: '0.4rem' }}>Key Strengths</div>
                       <ul style={{ paddingLeft: '1rem', margin: 0, fontSize: '0.75rem', color: '#CBD5E1', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                        {aiAnalysis.strengths?.length > 0 ? (
-                          aiAnalysis.strengths.map((s, i) => <li key={i}>{s}</li>)
+                        {(aiAnalysis.pros || aiAnalysis.strengths)?.length > 0 ? (
+                          (aiAnalysis.pros || aiAnalysis.strengths).map((s, i) => <li key={i}>{s}</li>)
                         ) : (
                           <li style={{ color: '#64748B' }}>Neutral financial metrics.</li>
                         )}
@@ -851,10 +861,10 @@ export default function MarketView() {
                     <div style={{ padding: '0.75rem', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.06)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
                       <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#F87171', marginBottom: '0.4rem' }}>Risks & Watchouts</div>
                       <ul style={{ paddingLeft: '1rem', margin: 0, fontSize: '0.75rem', color: '#CBD5E1', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                        {aiAnalysis.risks?.length > 0 ? (
-                          aiAnalysis.risks.map((r, i) => <li key={i}>{r}</li>)
+                        {(aiAnalysis.cons || aiAnalysis.risks)?.length > 0 ? (
+                          (aiAnalysis.cons || aiAnalysis.risks).map((r, i) => <li key={i}>{r}</li>)
                         ) : (
-                          <li style={{ color: '#64748B' }}>Standard equity volatility.</li>
+                          <li style={{ color: '#64748B' }}>Standard market fluctuations.</li>
                         )}
                       </ul>
                     </div>
@@ -865,7 +875,7 @@ export default function MarketView() {
                     <ShieldCheck size={16} color="#F59E0B" style={{ flexShrink: 0, marginTop: '2px' }} />
                     <div>
                       <strong>SEBI Educational Guardrail: </strong>
-                      {aiAnalysis.disclaimer}
+                      {aiAnalysis.sebi_disclaimer || aiAnalysis.disclaimer}
                     </div>
                   </div>
 
@@ -919,7 +929,7 @@ export default function MarketView() {
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1rem' }}>
               {news.map((item, idx) => (
-                <div key={idx} className="glass-card glass-card-hover" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '0.75rem' }}>
+                <div key={item.id || idx} className="glass-card glass-card-hover" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '0.75rem' }}>
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                       <span className="badge badge-teal" style={{ fontSize: '0.65rem' }}>{item.source}</span>
@@ -928,11 +938,11 @@ export default function MarketView() {
                       </span>
                     </div>
                     <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#FFFFFF', lineHeight: 1.4, marginBottom: '0.5rem' }}>
-                      {item.headline}
+                      {item.title || item.headline}
                     </h4>
-                    {item.ai_summary && (
+                    {(item.ai_takeaway || item.ai_summary) && (
                       <div style={{ padding: '0.5rem 0.75rem', borderRadius: '6px', background: 'rgba(20, 184, 166, 0.08)', border: '1px solid rgba(20, 184, 166, 0.2)', fontSize: '0.75rem', color: '#2DD4BF', lineHeight: 1.4 }}>
-                        <strong>AI Takeaway: </strong>{item.ai_summary}
+                        <strong>AI Takeaway: </strong>{item.ai_takeaway || item.ai_summary}
                       </div>
                     )}
                   </div>
@@ -1025,7 +1035,7 @@ export default function MarketView() {
 
                     <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
                       <span style={{ fontSize: '1.3rem', fontWeight: 800, color: '#FFFFFF' }}>
-                        {item.latest_price ? `₹${Number(item.latest_price).toLocaleString('en-IN')}` : '—'}
+                        {item.current_price || item.latest_price ? `₹${Number(item.current_price || item.latest_price).toLocaleString('en-IN')}` : '—'}
                       </span>
                       {item.change_pct !== null && item.change_pct !== undefined && (
                         <span className={`badge ${isUp ? 'badge-teal' : 'badge-crimson'}`}>
