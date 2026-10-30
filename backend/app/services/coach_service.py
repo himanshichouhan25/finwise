@@ -32,18 +32,18 @@ from app.services.snapshot_service import build_financial_snapshot
 logger = logging.getLogger("finwise.ai.coach_service")
 
 # In-memory sliding-window rate limiter: max 20 requests per 60 seconds per user
-_user_request_timestamps: dict[str, list[float]] = defaultdict(list)
+_user_request_timestamps: dict[int, list[float]] = defaultdict(list)
 RATE_LIMIT_MAX_REQUESTS = 20
 RATE_LIMIT_WINDOW_SECONDS = 60.0
 
 
-def _check_rate_limit(user_id: str) -> None:
+def _check_rate_limit(user_id: int) -> None:
     """Enforce per-user in-memory sliding-window request throttling."""
     now = time.time()
     cutoff = now - RATE_LIMIT_WINDOW_SECONDS
     timestamps = [t for t in _user_request_timestamps[user_id] if t > cutoff]
     if len(timestamps) >= RATE_LIMIT_MAX_REQUESTS:
-        logger.warning("User '%s' exceeded AI chat rate limit (%d/min)", user_id, RATE_LIMIT_MAX_REQUESTS)
+        logger.warning("User %d exceeded AI chat rate limit (%d/min)", user_id, RATE_LIMIT_MAX_REQUESTS)
         raise ValidationFailure(
             message=f"You are sending messages too quickly. Limit is {RATE_LIMIT_MAX_REQUESTS} requests per minute."
         )
@@ -51,24 +51,22 @@ def _check_rate_limit(user_id: str) -> None:
     _user_request_timestamps[user_id] = timestamps
 
 
-def _get_or_create_user(db: Session, username: str) -> User:
+def _get_user_or_raise(db: Session, user_id: int) -> User:
     """Ensure user record exists in database."""
-    user = db.scalar(select(User).where(User.username == username))
+    user = db.scalar(select(User).where(User.id == user_id))
     if not user:
-        user = User(username=username, email=f"{username}@example.com")
-        db.add(user)
-        db.flush()
+        raise NotFoundError(f"User with ID {user_id} not found")
     return user
 
 
 def send_coach_message(
     db: Session,
-    user_id: str,
+    user_id: int,
     request: ChatRequest,
 ) -> ChatResponse:
     """Process a user message through the FinWise AI Coach pipeline."""
     _check_rate_limit(user_id)
-    user = _get_or_create_user(db, user_id)
+    user = _get_user_or_raise(db, user_id)
 
     # 1. Resolve or create chat session
     if request.session_id:
@@ -81,7 +79,6 @@ def send_coach_message(
         if not session:
             raise NotFoundError(f"Chat session #{request.session_id} not found.")
     else:
-        # Title snippet from first message
         title_snippet = request.message.strip()
         if len(title_snippet) > 40:
             title_snippet = title_snippet[:37] + "..."
@@ -117,7 +114,7 @@ def send_coach_message(
     past_messages = list(reversed(past_messages))
 
     # 4. Ingest authoritative financial snapshot
-    snapshot = build_financial_snapshot(user_id, db)
+    snapshot = build_financial_snapshot(db=db, user_id=user_id)
     persona_name = user.profile.full_name if user.profile else user.username
     system_prompt = build_system_prompt(snapshot=snapshot, persona_name=persona_name)
 
@@ -148,7 +145,6 @@ def send_coach_message(
             break
 
         # Process tool calls
-        # Append assistant tool call message
         tool_call_dicts = [
             {
                 "id": tc.id,
@@ -213,9 +209,9 @@ def send_coach_message(
     )
 
 
-def list_user_sessions(db: Session, user_id: str) -> list[ChatSessionSummary]:
+def list_user_sessions(db: Session, user_id: int) -> list[ChatSessionSummary]:
     """Retrieve all chat sessions for the active persona."""
-    user = _get_or_create_user(db, user_id)
+    user = _get_user_or_raise(db, user_id)
     sessions = (
         db.query(
             ChatSession.id,
@@ -241,9 +237,9 @@ def list_user_sessions(db: Session, user_id: str) -> list[ChatSessionSummary]:
     ]
 
 
-def get_session_detail(db: Session, user_id: str, session_id: int) -> ChatSessionDetail:
+def get_session_detail(db: Session, user_id: int, session_id: int) -> ChatSessionDetail:
     """Retrieve complete message history for a specific conversation session."""
-    user = _get_or_create_user(db, user_id)
+    user = _get_user_or_raise(db, user_id)
     session = db.scalar(
         select(ChatSession).where(
             ChatSession.id == session_id,
