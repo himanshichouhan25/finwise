@@ -46,8 +46,8 @@ def build_system_prompt(snapshot: FinancialSnapshot | None = None, persona_name:
 
         tier = snapshot.profile.tier if snapshot.profile else "Standard"
         b = snapshot.budget_summary
-        ef_factor = snapshot.health_score.factors.get("emergency_fund")
-        ef_months = ef_factor.actual_value if ef_factor else 0.0
+        ef_factor = next((f for f in snapshot.health_score.factors if "emergency" in f.name.lower()), None)
+        ef_info = ef_factor.explanation if ef_factor else "Not evaluated"
 
         context_sections.append(
             f"""
@@ -60,9 +60,9 @@ def build_system_prompt(snapshot: FinancialSnapshot | None = None, persona_name:
   * Needs (50% target): ₹{float(b.needs.actual_amount):,.2f} ({float(b.needs.percent_of_income):.1f}% of income - {b.needs.status})
   * Wants (30% target): ₹{float(b.wants.actual_amount):,.2f} ({float(b.wants.percent_of_income):.1f}% of income - {b.wants.status})
   * Savings/Investments (20% target): ₹{float(b.savings.actual_amount):,.2f} ({float(b.savings.percent_of_income):.1f}% of income - {b.savings.status})
-- Financial Health Score: {snapshot.health_score.score}/100 ({snapshot.health_score.grade} - {snapshot.health_score.band})
+- Financial Health Score: {snapshot.health_score.score}/100 ({snapshot.health_score.band})
 - Active Financial Goals: {goals_summary}
-- Emergency Fund Status: {float(ef_months):.1f} months of expenses saved
+- Emergency Fund Status: {ef_info}
 """
         )
     else:
