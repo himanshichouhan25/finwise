@@ -38,7 +38,7 @@ def _calculate_delay_for_entry(
     # Find earliest active goal
     goal = db.scalar(
         select(Goal)
-        .where(Goal.user_id == user_id, Goal.is_completed == False)  # noqa: E712
+        .where(Goal.user_id == user_id, Goal.status == "active")
         .order_by(Goal.target_date.asc())
     )
 
