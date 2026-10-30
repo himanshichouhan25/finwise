@@ -39,11 +39,19 @@ class Settings(BaseSettings):
         str | None,
         Field(
             default=None,
-            description="Groq API key for AI financial coach",
+            description="Primary Groq API key",
+        ),
+    ]
+    GROQ_API_KEYS: Annotated[
+        str,
+        Field(
+            default="",
+            description="Optional comma-separated pool of Groq API keys for automatic failover/rotation",
         ),
     ]
     LLM_PROVIDER: Annotated[str, Field(default="groq", description="LLM provider name")]
-    LLM_MODEL: Annotated[str, Field(default="llama-3.3-70b-versatile", description="Model identifier")]
+    LLM_MODEL: Annotated[str, Field(default="llama-3.3-70b-versatile", description="Primary model identifier")]
+    LLM_FALLBACK_MODEL: Annotated[str, Field(default="llama-3.1-8b-instant", description="Secondary fallback model")]
     LLM_TIMEOUT_SECONDS: Annotated[int, Field(default=20, ge=1, le=120, description="Timeout in seconds for AI calls")]
 
     # CORS
@@ -61,9 +69,22 @@ class Settings(BaseSettings):
         return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
 
     @property
+    def all_groq_keys(self) -> list[str]:
+        """Return consolidated unique list of all configured Groq API keys."""
+        keys: list[str] = []
+        if self.GROQ_API_KEY and self.GROQ_API_KEY.strip():
+            keys.append(self.GROQ_API_KEY.strip())
+        if self.GROQ_API_KEYS and self.GROQ_API_KEYS.strip():
+            for k in self.GROQ_API_KEYS.split(","):
+                k_clean = k.strip()
+                if k_clean and k_clean not in keys:
+                    keys.append(k_clean)
+        return keys
+
+    @property
     def is_ai_configured(self) -> bool:
-        """Check if AI provider is configured with an active API key."""
-        return bool(self.GROQ_API_KEY and self.GROQ_API_KEY.strip())
+        """Check if at least one AI API key is configured."""
+        return len(self.all_groq_keys) > 0
 
 
 @lru_cache
