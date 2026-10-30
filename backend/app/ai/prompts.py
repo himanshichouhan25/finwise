@@ -51,7 +51,7 @@ def build_system_prompt(snapshot: FinancialSnapshot | None = None, persona_name:
                 )
             goals_summary = "; ".join(goals_parts)
 
-        tier = snapshot.profile.tier if snapshot.profile else "Standard"
+        income_type = snapshot.profile.income_type if snapshot.profile else "fixed"
         b = snapshot.budget_summary
         ef_factor = next((f for f in snapshot.health_score.factors if "emergency" in f.name.lower()), None)
         ef_info = ef_factor.explanation if ef_factor else "Not evaluated"
@@ -59,7 +59,7 @@ def build_system_prompt(snapshot: FinancialSnapshot | None = None, persona_name:
         context_sections.append(
             f"""
 ### CURRENT USER FINANCIAL SNAPSHOT (AUTHORITATIVE SOURCE OF TRUTH):
-- Persona / Profile: {persona_name or 'Young Investor'} (Tier: {tier})
+- Persona / Profile: {persona_name or 'Young Investor'} (Income Type: {income_type})
 - Monthly Net Income: ₹{float(b.net_income):,.2f}
 - Monthly Total Expenses: ₹{float(b.total_expenses):,.2f}
 - Monthly Net Savings: ₹{float(b.net_savings):,.2f}
