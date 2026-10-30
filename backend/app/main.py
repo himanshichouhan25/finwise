@@ -11,6 +11,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+import app.models  # noqa: F401
 from app.api.v1.health import router as health_router
 from app.core.config import get_settings
 from app.core.errors import (
