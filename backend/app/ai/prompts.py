@@ -1,6 +1,6 @@
 """System prompts and context formatters for FinWise AI Financial Coach."""
 
-from app.schemas.dashboard import FinancialSnapshot
+from app.services.snapshot_service import FinancialSnapshot
 
 SYSTEM_BASE_PROMPT = """You are FinWise AI — an intelligent, empathetic, and disciplined personal financial coach designed for first-time young Indian investors, college students, and salaried professionals.
 
@@ -37,26 +37,32 @@ def build_system_prompt(snapshot: FinancialSnapshot | None = None, persona_name:
 
     if snapshot:
         goals_summary = "None configured yet"
-        if snapshot.active_goals:
+        if snapshot.goals_with_plans:
             goals_summary = "; ".join(
-                f"{g.name}: Target ₹{float(g.target_amount):,.0f} by {g.target_date} (Saved: ₹{float(g.current_amount):,.0f}, {float(g.progress_pct):.1f}%)"
-                for g in snapshot.active_goals
+                f"{gp.goal.name}: Target ₹{float(gp.goal.target_amount):,.0f} by {gp.goal.target_date} "
+                f"(Saved: ₹{float(gp.goal.current_amount):,.0f}, {float(gp.goal.progress_pct):.1f}%, Plan: ₹{float(gp.plan.required_monthly_savings):,.0f}/mo)"
+                for gp in snapshot.goals_with_plans
             )
+
+        tier = snapshot.profile.tier if snapshot.profile else "Standard"
+        b = snapshot.budget_summary
+        ef_factor = snapshot.health_score.factors.get("emergency_fund")
+        ef_months = ef_factor.actual_value if ef_factor else 0.0
 
         context_sections.append(
             f"""
 ### CURRENT USER FINANCIAL SNAPSHOT (AUTHORITATIVE SOURCE OF TRUTH):
-- Persona / Profile: {persona_name or 'Young Investor'} ({snapshot.tier})
-- Monthly Income: ₹{float(snapshot.monthly_income):,.2f}
-- Monthly Expenses: ₹{float(snapshot.monthly_expenses):,.2f}
-- Monthly Savings: ₹{float(snapshot.monthly_savings):,.2f} (Savings Rate: {float(snapshot.savings_rate_pct):.1f}%)
+- Persona / Profile: {persona_name or 'Young Investor'} (Tier: {tier})
+- Monthly Net Income: ₹{float(b.net_income):,.2f}
+- Monthly Total Expenses: ₹{float(b.total_expenses):,.2f}
+- Monthly Net Savings: ₹{float(b.net_savings):,.2f}
 - 50/30/20 Breakdown:
-  * Needs (50% target): ₹{float(snapshot.needs_total):,.2f} ({float(snapshot.needs_pct):.1f}% of income)
-  * Wants (30% target): ₹{float(snapshot.wants_total):,.2f} ({float(snapshot.wants_pct):.1f}% of income)
-  * Actual Savings (20% target): ₹{float(snapshot.savings_total):,.2f} ({float(snapshot.savings_pct):.1f}% of income)
-- Financial Health Score: {snapshot.health_score}/100 ({snapshot.health_grade})
+  * Needs (50% target): ₹{float(b.needs.actual_amount):,.2f} ({float(b.needs.percent_of_income):.1f}% of income - {b.needs.status})
+  * Wants (30% target): ₹{float(b.wants.actual_amount):,.2f} ({float(b.wants.percent_of_income):.1f}% of income - {b.wants.status})
+  * Savings/Investments (20% target): ₹{float(b.savings.actual_amount):,.2f} ({float(b.savings.percent_of_income):.1f}% of income - {b.savings.status})
+- Financial Health Score: {snapshot.health_score.score}/100 ({snapshot.health_score.grade} - {snapshot.health_score.band})
 - Active Financial Goals: {goals_summary}
-- Emergency Fund Status: {float(snapshot.emergency_fund_months):.1f} months of expenses saved
+- Emergency Fund Status: {float(ef_months):.1f} months of expenses saved
 """
         )
     else:
