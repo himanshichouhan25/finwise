@@ -50,8 +50,8 @@ async def get_stock_quote(
 @router.get("/stocks/{symbol}/history", response_model=StockHistoryResponse)
 async def get_stock_history(
     symbol: Annotated[str, Path(description="Ticker symbol, e.g. RELIANCE, TCS")],
-    timeframe: Annotated[str, Query(description="Candle series period: 1M, 6M, 1Y, 5Y")] = "1M",
     service: Annotated[MarketService, Depends(get_market_service)],
+    timeframe: Annotated[str, Query(description="Candle series period: 1M, 6M, 1Y, 5Y")] = "1M",
 ) -> StockHistoryResponse:
     """Retrieve historical OHLCV candle series for charting."""
     return await service.get_stock_history(symbol, timeframe=timeframe)
@@ -77,8 +77,8 @@ async def analyze_stock_with_ai(
 
 @router.get("/news", response_model=MarketNewsResponse)
 async def get_market_news(
-    symbol: Annotated[str | None, Query(description="Optional filter by ticker symbol")] = None,
     service: Annotated[MarketService, Depends(get_market_service)],
+    symbol: Annotated[str | None, Query(description="Optional filter by ticker symbol")] = None,
 ) -> MarketNewsResponse:
     """Retrieve financial market news headlines with AI-generated key takeaways."""
     return await service.get_market_news(symbol)
