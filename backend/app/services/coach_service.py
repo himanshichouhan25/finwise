@@ -115,7 +115,7 @@ def send_coach_message(
 
     # 4. Ingest authoritative financial snapshot
     snapshot = build_financial_snapshot(db=db, user_id=user_id)
-    persona_name = user.profile.full_name if user.profile else user.username
+    persona_name = user.name
     system_prompt = build_system_prompt(snapshot=snapshot, persona_name=persona_name)
 
     # 5. Build prompt message structure for LLM
