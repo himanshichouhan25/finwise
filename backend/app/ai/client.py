@@ -8,7 +8,7 @@ from typing import Any
 
 from groq import APIConnectionError, APIStatusError, Groq, InternalServerError, RateLimitError
 
-from app.core.config import settings
+from app.core.config import get_settings
 from app.core.errors import AIUnavailableError
 
 logger = logging.getLogger("finwise.ai.client")
@@ -43,6 +43,7 @@ class GroqLLMClient:
         fallback_model: str | None = None,
         timeout: int | None = None,
     ):
+        settings = get_settings()
         self.keys = keys if keys is not None else settings.all_groq_keys
         self.primary_model = primary_model or settings.LLM_MODEL
         self.fallback_model = fallback_model or settings.LLM_FALLBACK_MODEL
