@@ -1,0 +1,1062 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  TrendingUp,
+  TrendingDown,
+  Search,
+  Plus,
+  Trash2,
+  RefreshCw,
+  AlertCircle,
+  AlertTriangle,
+  Info,
+  Clock,
+  ShieldCheck,
+  Sparkles,
+  Newspaper,
+  Bookmark,
+  Check,
+  Building2,
+  BarChart2,
+  ArrowUpRight,
+  ArrowDownRight,
+  HelpCircle,
+} from 'lucide-react';
+import {
+  getMarketOverview,
+  searchStocks,
+  getStockQuote,
+  getStockHistory,
+  getStockFundamentals,
+  analyzeStockWithAi,
+  getMarketNews,
+  getWatchlist,
+  addToWatchlist,
+  removeFromWatchlist,
+} from '../api/client';
+
+export default function MarketView() {
+  // State: Market Overview
+  const [overview, setOverview] = useState(null);
+  const [overviewLoading, setOverviewLoading] = useState(true);
+
+  // State: Stock Search & Selection
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [selectedSymbol, setSelectedSymbol] = useState('RELIANCE');
+  const [activeTab, setActiveTab] = useState('explorer'); // 'explorer', 'news', 'watchlist'
+
+  // State: Selected Stock Data
+  const [quote, setQuote] = useState(null);
+  const [quoteLoading, setQuoteLoading] = useState(false);
+  const [history, setHistory] = useState(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [timeframe, setTimeframe] = useState('1M');
+  const [fundamentals, setFundamentals] = useState(null);
+  const [fundamentalsLoading, setFundamentalsLoading] = useState(false);
+
+  // State: AI Stock Analyst
+  const [aiAnalysis, setAiAnalysis] = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState(null);
+
+  // State: Market News
+  const [news, setNews] = useState([]);
+  const [newsAttribution, setNewsAttribution] = useState(null);
+  const [newsLoading, setNewsLoading] = useState(false);
+
+  // State: Watchlist
+  const [watchlist, setWatchlist] = useState([]);
+  const [watchlistLoading, setWatchlistLoading] = useState(false);
+  const [watchlistAdding, setWatchlistAdding] = useState(false);
+
+  // General Notification / Error
+  const [bannerError, setBannerError] = useState(null);
+  const [hoveredPoint, setHoveredPoint] = useState(null);
+
+  // ================= Loaders =================
+
+  // 1. Load Market Overview
+  const loadMarketOverview = async () => {
+    try {
+      setOverviewLoading(true);
+      const res = await getMarketOverview();
+      setOverview(res);
+    } catch (err) {
+      console.error('Failed to load market overview', err);
+      setBannerError(err.message || 'Market overview unavailable');
+    } finally {
+      setOverviewLoading(false);
+    }
+  };
+
+  // 2. Load Market News
+  const loadMarketNews = async (symbol = null) => {
+    try {
+      setNewsLoading(true);
+      const res = await getMarketNews(symbol);
+      setNews(res.articles || []);
+      setNewsAttribution(res.attribution || null);
+    } catch (err) {
+      console.error('Failed to load market news', err);
+    } finally {
+      setNewsLoading(false);
+    }
+  };
+
+  // 3. Load Watchlist
+  const loadWatchlist = async () => {
+    try {
+      setWatchlistLoading(true);
+      const res = await getWatchlist();
+      setWatchlist(res || []);
+    } catch (err) {
+      console.error('Failed to load watchlist', err);
+    } finally {
+      setWatchlistLoading(false);
+    }
+  };
+
+  // 4. Load Stock Data (Quote + Fundamentals + History)
+  const loadStockData = async (symbol) => {
+    if (!symbol) return;
+    const cleanSym = symbol.toUpperCase().trim();
+    setSelectedSymbol(cleanSym);
+    setAiAnalysis(null);
+    setAiError(null);
+
+    // Fetch Quote
+    setQuoteLoading(true);
+    getStockQuote(cleanSym)
+      .then((res) => setQuote(res))
+      .catch((err) => console.error(`Quote error for ${cleanSym}`, err))
+      .finally(() => setQuoteLoading(false));
+
+    // Fetch Fundamentals
+    setFundamentalsLoading(true);
+    getStockFundamentals(cleanSym)
+      .then((res) => setFundamentals(res))
+      .catch((err) => console.error(`Fundamentals error for ${cleanSym}`, err))
+      .finally(() => setFundamentalsLoading(false));
+
+    // Fetch History
+    loadStockHistory(cleanSym, timeframe);
+  };
+
+  const loadStockHistory = async (symbol, tf) => {
+    setHistoryLoading(true);
+    try {
+      const res = await getStockHistory(symbol, tf);
+      setHistory(res);
+    } catch (err) {
+      console.error(`History error for ${symbol}`, err);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  // 5. Trigger AI Stock Analysis
+  const handleTriggerAiAnalysis = async () => {
+    if (!selectedSymbol) return;
+    try {
+      setAiLoading(true);
+      setAiError(null);
+      const res = await analyzeStockWithAi(selectedSymbol);
+      setAiAnalysis(res);
+    } catch (err) {
+      setAiError(err.message || 'AI Stock Analysis unavailable. Please try again.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  // 6. Handle Search Input Debounce
+  useEffect(() => {
+    if (!searchQuery.trim() || searchQuery.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      try {
+        setSearchLoading(true);
+        const results = await searchStocks(searchQuery);
+        setSearchResults(results || []);
+      } catch (err) {
+        console.error('Search error', err);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Initial load
+  useEffect(() => {
+    loadMarketOverview();
+    loadMarketNews();
+    loadWatchlist();
+    loadStockData('RELIANCE');
+
+    const handlePersonaChange = () => {
+      loadWatchlist();
+      loadMarketOverview();
+    };
+    window.addEventListener('finwise_persona_changed', handlePersonaChange);
+    return () => window.removeEventListener('finwise_persona_changed', handlePersonaChange);
+  }, []);
+
+  // Timeframe change
+  const handleTimeframeChange = (tf) => {
+    setTimeframe(tf);
+    if (selectedSymbol) {
+      loadStockHistory(selectedSymbol, tf);
+    }
+  };
+
+  // Watchlist Toggle
+  const isSelectedInWatchlist = useMemo(() => {
+    return watchlist.some((item) => item.symbol.toUpperCase() === selectedSymbol.toUpperCase());
+  }, [watchlist, selectedSymbol]);
+
+  const handleToggleWatchlist = async () => {
+    if (!selectedSymbol || !quote) return;
+    try {
+      setWatchlistAdding(true);
+      if (isSelectedInWatchlist) {
+        await removeFromWatchlist(selectedSymbol);
+      } else {
+        await addToWatchlist({
+          symbol: selectedSymbol,
+          company_name: quote.company_name || selectedSymbol,
+          exchange: quote.exchange || 'NSE',
+          notes: 'Tracked from Market Explorer',
+        });
+      }
+      await loadWatchlist();
+    } catch (err) {
+      alert(`Watchlist action failed: ${err.message}`);
+    } finally {
+      setWatchlistAdding(false);
+    }
+  };
+
+  // Safe formatting helper: return "Data unavailable" for null / undefined
+  const formatVal = (val, prefix = '', suffix = '', decimals = 2) => {
+    if (val === null || val === undefined || isNaN(val)) {
+      return <span style={{ color: '#64748B', fontStyle: 'italic' }}>Data unavailable</span>;
+    }
+    const num = Number(val);
+    return `${prefix}${num.toLocaleString('en-IN', { maximumFractionDigits: decimals })}${suffix}`;
+  };
+
+  // SVG Chart Calculation
+  const chartPoints = useMemo(() => {
+    if (!history || !history.data_points || history.data_points.length === 0) return null;
+    const pts = history.data_points;
+    const closes = pts.map((p) => Number(p.close));
+    const min = Math.min(...closes);
+    const max = Math.max(...closes);
+    const range = max - min || 1;
+
+    const width = 640;
+    const height = 220;
+    const padding = 20;
+
+    const coords = pts.map((p, idx) => {
+      const x = padding + (idx / (pts.length - 1)) * (width - 2 * padding);
+      const y = height - padding - ((Number(p.close) - min) / range) * (height - 2 * padding);
+      return { x, y, ...p };
+    });
+
+    const isPositive = closes[closes.length - 1] >= closes[0];
+    const pathD = coords.reduce((acc, pt, idx) => `${acc} ${idx === 0 ? 'M' : 'L'} ${pt.x} ${pt.y}`, '');
+    const areaD = `${pathD} L ${coords[coords.length - 1].x} ${height - padding} L ${coords[0].x} ${height - padding} Z`;
+
+    return { coords, min, max, isPositive, pathD, areaD, width, height };
+  }, [history]);
+
+  return (
+    <div style={{ padding: '1.5rem', maxWidth: '1440px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      
+      {/* Top Banner: News Ticker & Market Context */}
+      <div className="glass-panel" style={{ padding: '0.875rem 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', borderLeft: '4px solid #14B8A6' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#2DD4BF', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>
+            <Newspaper size={16} />
+            <span>Market Pulse</span>
+          </div>
+          <div style={{ height: '14px', width: '1px', background: 'var(--border-subtle)' }} />
+          <div style={{ fontSize: '0.85rem', color: '#E2E8F0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {news.length > 0 ? (
+              <span>
+                <strong style={{ color: '#F8FAFC' }}>{news[0].source}:</strong> {news[0].headline}
+                {news[0].ai_summary && (
+                  <span style={{ color: '#94A3B8', marginLeft: '0.5rem' }}>— {news[0].ai_summary}</span>
+                )}
+              </span>
+            ) : (
+              <span style={{ color: '#94A3B8' }}>Indian financial markets open 09:15–15:30 IST. Verified educational intelligence enabled.</span>
+            )}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', whiteSpace: 'nowrap' }}>
+          {overview?.attribution && (
+            <span className="badge badge-slate" title={overview.attribution.limitations} style={{ fontSize: '0.7rem' }}>
+              <ShieldCheck size={12} color="#14B8A6" />
+              {overview.attribution.provider.toUpperCase()} ({overview.attribution.data_mode})
+            </span>
+          )}
+          <button
+            className="btn btn-outline"
+            onClick={() => {
+              loadMarketOverview();
+              loadMarketNews();
+              if (selectedSymbol) loadStockData(selectedSymbol);
+            }}
+            style={{ padding: '0.4rem 0.75rem', fontSize: '0.75rem' }}
+            title="Refresh Market Intelligence"
+          >
+            <RefreshCw size={13} className={overviewLoading ? 'animate-spin' : ''} />
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      {/* SECTION A: Market Overview Indices */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span>Indian Market Indices</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#94A3B8' }}>
+              (Status: <strong style={{ color: overview?.market_status === 'OPEN' ? '#34D399' : '#FBBF24' }}>{overview?.market_status || 'CLOSED'}</strong>)
+            </span>
+          </h2>
+          <span style={{ fontSize: '0.75rem', color: '#64748B' }}>
+            Updated: {overview?.last_updated ? new Date(overview.last_updated).toLocaleTimeString('en-IN') : 'Live'}
+          </span>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
+          {overviewLoading && !overview ? (
+            [1, 2, 3].map((n) => (
+              <div key={n} className="glass-card" style={{ height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ color: '#64748B', fontSize: '0.85rem' }}>Loading index metrics...</span>
+              </div>
+            ))
+          ) : (
+            overview?.indices?.map((idx) => {
+              const isUp = Number(idx.change) >= 0;
+              return (
+                <div key={idx.name} className="glass-card glass-card-hover" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                      <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#FFFFFF' }}>{idx.name}</h3>
+                      <span style={{ fontSize: '0.7rem', color: '#64748B', textTransform: 'uppercase' }}>{idx.exchange}</span>
+                    </div>
+                    <span className={`badge ${isUp ? 'badge-teal' : 'badge-crimson'}`} style={{ fontSize: '0.75rem' }}>
+                      {isUp ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+                      {isUp ? '+' : ''}{Number(idx.change_pct).toFixed(2)}%
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', marginTop: '0.25rem' }}>
+                    <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#F8FAFC' }}>
+                      ₹{Number(idx.value).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                    </span>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 600, color: isUp ? '#34D399' : '#F87171' }}>
+                      {isUp ? '+' : ''}{Number(idx.change).toFixed(2)}
+                    </span>
+                  </div>
+
+                  <div style={{ fontSize: '0.7rem', color: '#64748B', display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '0.4rem', marginTop: '0.25rem' }}>
+                    <span>Day High: ₹{Number(idx.high || idx.value).toLocaleString('en-IN')}</span>
+                    <span>Day Low: ₹{Number(idx.low || idx.value).toLocaleString('en-IN')}</span>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+
+      {/* Navigation Sub-Tabs: Explorer & Charts / Market News / Watchlist */}
+      <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem' }}>
+        <button
+          className={`btn ${activeTab === 'explorer' ? 'btn-teal' : 'btn-outline'}`}
+          onClick={() => setActiveTab('explorer')}
+          style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+        >
+          <BarChart2 size={16} />
+          Stock Explorer & Analysis
+        </button>
+        <button
+          className={`btn ${activeTab === 'news' ? 'btn-teal' : 'btn-outline'}`}
+          onClick={() => setActiveTab('news')}
+          style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+        >
+          <Newspaper size={16} />
+          Market News & AI Takeaways ({news.length})
+        </button>
+        <button
+          className={`btn ${activeTab === 'watchlist' ? 'btn-teal' : 'btn-outline'}`}
+          onClick={() => setActiveTab('watchlist')}
+          style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+        >
+          <Bookmark size={16} />
+          Personal Watchlist ({watchlist.length})
+        </button>
+      </div>
+
+      {/* =========================================================================
+          TAB 1: STOCK EXPLORER & AI ANALYSIS
+         ========================================================================= */}
+      {activeTab === 'explorer' && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.8fr) minmax(320px, 1.2fr)', gap: '1.5rem', alignItems: 'start' }}>
+          
+          {/* Left Column: Search Bar + Chart + Fundamentals */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            
+            {/* Search Input Box with Autocomplete Dropdown */}
+            <div style={{ position: 'relative' }}>
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <Search size={18} color="#94A3B8" style={{ position: 'absolute', left: '1rem' }} />
+                <input
+                  type="text"
+                  className="fin-input"
+                  placeholder="Search Indian NSE/BSE stocks by symbol or company (e.g., RELIANCE, TCS, INFY, HDFCBANK)..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ paddingLeft: '2.75rem', paddingRight: '1rem', height: '46px', fontSize: '0.95rem' }}
+                />
+                {searchLoading && (
+                  <div style={{ position: 'absolute', right: '1rem', color: '#14B8A6', fontSize: '0.8rem' }}>
+                    Searching...
+                  </div>
+                )}
+              </div>
+
+              {/* Autocomplete Results Dropdown */}
+              {searchResults.length > 0 && (
+                <div
+                  className="glass-panel"
+                  style={{
+                    position: 'absolute',
+                    top: '52px',
+                    left: 0,
+                    right: 0,
+                    zIndex: 40,
+                    background: '#0E1524',
+                    border: '1px solid var(--border-highlight)',
+                    borderRadius: '12px',
+                    boxShadow: '0 12px 30px rgba(0,0,0,0.6)',
+                    maxHeight: '280px',
+                    overflowY: 'auto',
+                  }}
+                >
+                  {searchResults.map((item) => (
+                    <div
+                      key={item.symbol}
+                      onClick={() => {
+                        setSearchQuery('');
+                        setSearchResults([]);
+                        loadStockData(item.symbol);
+                      }}
+                      style={{
+                        padding: '0.75rem 1rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        cursor: 'pointer',
+                        borderBottom: '1px solid rgba(255,255,255,0.04)',
+                        transition: 'background 0.15s ease',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(20, 184, 166, 0.1)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      <div>
+                        <span style={{ fontWeight: 700, color: '#2DD4BF', marginRight: '0.5rem' }}>{item.symbol}</span>
+                        <span style={{ color: '#E2E8F0', fontSize: '0.85rem' }}>{item.company_name}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span className="badge badge-slate" style={{ fontSize: '0.65rem' }}>{item.exchange}</span>
+                        {item.current_price && (
+                          <span style={{ fontWeight: 600, color: '#F8FAFC', fontSize: '0.85rem' }}>
+                            ₹{Number(item.current_price).toLocaleString('en-IN')}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Selected Stock Header & Chart Card */}
+            <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              
+              {/* Header: Title, Price, Watchlist Button */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                    <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#FFFFFF' }}>
+                      {quote?.company_name || selectedSymbol}
+                    </h2>
+                    <span className="badge badge-teal">{quote?.exchange || 'NSE'}</span>
+                    <span className="badge badge-slate">{quote?.symbol || selectedSymbol}</span>
+                  </div>
+                  <p style={{ fontSize: '0.8rem', color: '#94A3B8' }}>
+                    {fundamentals?.sector ? `${fundamentals.sector} • ${fundamentals.industry || ''}` : 'Indian Equity Market'}
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <button
+                    className={`btn ${isSelectedInWatchlist ? 'btn-gold' : 'btn-outline'}`}
+                    onClick={handleToggleWatchlist}
+                    disabled={watchlistAdding || quoteLoading}
+                    style={{ fontSize: '0.8rem', padding: '0.5rem 0.85rem' }}
+                  >
+                    {isSelectedInWatchlist ? <Check size={15} /> : <Plus size={15} />}
+                    {isSelectedInWatchlist ? 'In Watchlist' : 'Add to Watchlist'}
+                  </button>
+
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#F8FAFC' }}>
+                      ₹{quote?.current_price ? Number(quote.current_price).toLocaleString('en-IN', { maximumFractionDigits: 2 }) : '—'}
+                    </div>
+                    {quote?.change_pct !== undefined && (
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.25rem', fontSize: '0.85rem', fontWeight: 600, color: Number(quote.change_pct) >= 0 ? '#34D399' : '#F87171' }}>
+                        {Number(quote.change_pct) >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                        <span>
+                          {Number(quote.change_pct) >= 0 ? '+' : ''}{Number(quote.change).toFixed(2)} ({Number(quote.change_pct) >= 0 ? '+' : ''}{Number(quote.change_pct).toFixed(2)}%)
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Timeframe Selectors & Chart Metadata */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-subtle)', paddingTop: '0.75rem' }}>
+                <div style={{ display: 'flex', gap: '0.35rem' }}>
+                  {['1M', '6M', '1Y', '5Y'].map((tf) => (
+                    <button
+                      key={tf}
+                      onClick={() => handleTimeframeChange(tf)}
+                      style={{
+                        padding: '0.35rem 0.75rem',
+                        borderRadius: '6px',
+                        border: 'none',
+                        background: timeframe === tf ? 'rgba(20, 184, 166, 0.25)' : 'rgba(255, 255, 255, 0.04)',
+                        color: timeframe === tf ? '#2DD4BF' : '#94A3B8',
+                        fontWeight: timeframe === tf ? 700 : 500,
+                        fontSize: '0.75rem',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      {tf}
+                    </button>
+                  ))}
+                </div>
+
+                <div style={{ fontSize: '0.7rem', color: '#64748B', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Clock size={12} />
+                  <span>Attribution: {history?.attribution?.provider || 'Tapetide'} ({history?.attribution?.data_mode || 'delayed'})</span>
+                </div>
+              </div>
+
+              {/* Interactive SVG Stock Chart */}
+              <div style={{ position: 'relative', width: '100%', height: '240px', background: 'rgba(10, 16, 28, 0.5)', borderRadius: '10px', overflow: 'hidden', padding: '0.5rem' }}>
+                {historyLoading ? (
+                  <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94A3B8', fontSize: '0.85rem' }}>
+                    Loading OHLCV historical timeline...
+                  </div>
+                ) : chartPoints ? (
+                  <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                    <svg
+                      viewBox={`0 0 ${chartPoints.width} ${chartPoints.height}`}
+                      style={{ width: '100%', height: '100%', overflow: 'visible' }}
+                      preserveAspectRatio="none"
+                    >
+                      <defs>
+                        <linearGradient id="stockAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor={chartPoints.isPositive ? '#14B8A6' : '#EF4444'} stopOpacity="0.35" />
+                          <stop offset="100%" stopColor={chartPoints.isPositive ? '#14B8A6' : '#EF4444'} stopOpacity="0.0" />
+                        </linearGradient>
+                      </defs>
+
+                      {/* Area Fill */}
+                      <path d={chartPoints.areaD} fill="url(#stockAreaGrad)" />
+
+                      {/* Line Stroke */}
+                      <path
+                        d={chartPoints.pathD}
+                        fill="none"
+                        stroke={chartPoints.isPositive ? '#2DD4BF' : '#F87171'}
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+
+                      {/* Hover / Interactive Points */}
+                      {chartPoints.coords.map((pt, i) => (
+                        <circle
+                          key={i}
+                          cx={pt.x}
+                          cy={pt.y}
+                          r={hoveredPoint?.date === pt.date ? 5 : 3}
+                          fill={chartPoints.isPositive ? '#2DD4BF' : '#F87171'}
+                          stroke="#080C14"
+                          strokeWidth="2"
+                          style={{ cursor: 'pointer', transition: 'all 0.15s ease' }}
+                          onMouseEnter={() => setHoveredPoint(pt)}
+                          onMouseLeave={() => setHoveredPoint(null)}
+                        />
+                      ))}
+                    </svg>
+
+                    {/* Hover Tooltip Box */}
+                    {hoveredPoint && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '10px',
+                          left: '10px',
+                          background: '#0E1524',
+                          border: '1px solid var(--border-highlight)',
+                          borderRadius: '8px',
+                          padding: '0.4rem 0.65rem',
+                          fontSize: '0.75rem',
+                          color: '#FFFFFF',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                          pointerEvents: 'none',
+                        }}
+                      >
+                        <div><strong>Date:</strong> {hoveredPoint.date}</div>
+                        <div><strong>Close:</strong> ₹{Number(hoveredPoint.close).toLocaleString('en-IN')}</div>
+                        <div><strong>Volume:</strong> {Number(hoveredPoint.volume).toLocaleString('en-IN')}</div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B', fontSize: '0.85rem' }}>
+                    Historical price series currently unavailable for this symbol.
+                  </div>
+                )}
+              </div>
+
+              {/* Day OHLCV Summary Strip */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.5rem', background: 'rgba(255,255,255,0.02)', padding: '0.65rem', borderRadius: '8px', textAlign: 'center' }}>
+                <div>
+                  <div style={{ fontSize: '0.65rem', color: '#64748B' }}>OPEN</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#E2E8F0' }}>{formatVal(quote?.open, '₹')}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.65rem', color: '#64748B' }}>HIGH</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#34D399' }}>{formatVal(quote?.high, '₹')}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.65rem', color: '#64748B' }}>LOW</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#F87171' }}>{formatVal(quote?.low, '₹')}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.65rem', color: '#64748B' }}>PREV CLOSE</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#E2E8F0' }}>{formatVal(quote?.previous_close, '₹')}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.65rem', color: '#64748B' }}>VOLUME</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#E2E8F0' }}>{formatVal(quote?.volume, '', '', 0)}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION C: Verified Fundamentals Grid */}
+            <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Building2 size={18} color="#F59E0B" />
+                  <span>Company Fundamentals & Ratios</span>
+                </h3>
+                <span style={{ fontSize: '0.7rem', color: '#64748B' }}>
+                  No Zero-Fakes • Verified Financial Reporting
+                </span>
+              </div>
+
+              {fundamentalsLoading ? (
+                <div style={{ padding: '2rem', textAlign: 'center', color: '#94A3B8', fontSize: '0.85rem' }}>
+                  Loading balance sheet & financial ratios...
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
+                  
+                  {/* Market Cap */}
+                  <div className="glass-card">
+                    <div style={{ fontSize: '0.7rem', color: '#94A3B8', marginBottom: '0.2rem' }}>Market Capitalization</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#F8FAFC' }}>
+                      {formatVal(fundamentals?.market_cap_cr, '₹', ' Cr', 0)}
+                    </div>
+                  </div>
+
+                  {/* P/E Ratio */}
+                  <div className="glass-card">
+                    <div style={{ fontSize: '0.7rem', color: '#94A3B8', marginBottom: '0.2rem' }}>P/E Ratio (Trailing)</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#F8FAFC' }}>
+                      {formatVal(fundamentals?.pe_ratio, '', 'x', 1)}
+                    </div>
+                  </div>
+
+                  {/* P/B Ratio */}
+                  <div className="glass-card">
+                    <div style={{ fontSize: '0.7rem', color: '#94A3B8', marginBottom: '0.2rem' }}>P/B Ratio (Book Value)</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#F8FAFC' }}>
+                      {formatVal(fundamentals?.pb_ratio, '', 'x', 1)}
+                    </div>
+                  </div>
+
+                  {/* EPS */}
+                  <div className="glass-card">
+                    <div style={{ fontSize: '0.7rem', color: '#94A3B8', marginBottom: '0.2rem' }}>Earnings Per Share (EPS)</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#F8FAFC' }}>
+                      {formatVal(fundamentals?.eps, '₹', '', 2)}
+                    </div>
+                  </div>
+
+                  {/* Debt to Equity */}
+                  <div className="glass-card">
+                    <div style={{ fontSize: '0.7rem', color: '#94A3B8', marginBottom: '0.2rem' }}>Debt to Equity</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#F8FAFC' }}>
+                      {formatVal(fundamentals?.debt_to_equity, '', '', 2)}
+                    </div>
+                  </div>
+
+                  {/* Return on Equity (ROE) */}
+                  <div className="glass-card">
+                    <div style={{ fontSize: '0.7rem', color: '#94A3B8', marginBottom: '0.2rem' }}>Return on Equity (ROE)</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#F8FAFC' }}>
+                      {formatVal(fundamentals?.roe_pct, '', '%', 1)}
+                    </div>
+                  </div>
+
+                  {/* 52-Week Range */}
+                  <div className="glass-card">
+                    <div style={{ fontSize: '0.7rem', color: '#94A3B8', marginBottom: '0.2rem' }}>52-Week Range</div>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 600, color: '#F8FAFC' }}>
+                      {formatVal(fundamentals?.week_52_low, '₹')} – {formatVal(fundamentals?.week_52_high, '₹')}
+                    </div>
+                  </div>
+
+                  {/* Dividend Yield */}
+                  <div className="glass-card">
+                    <div style={{ fontSize: '0.7rem', color: '#94A3B8', marginBottom: '0.2rem' }}>Dividend Yield</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#F8FAFC' }}>
+                      {formatVal(fundamentals?.dividend_yield, '', '%', 2)}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Corporate Summary Profile */}
+              {fundamentals?.summary_profile && (
+                <div style={{ marginTop: '0.5rem', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', fontSize: '0.8rem', color: '#94A3B8', lineHeight: 1.5 }}>
+                  <strong style={{ color: '#E2E8F0' }}>Profile: </strong>
+                  {fundamentals.summary_profile}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right Column: SECTION D: AI Stock Analyst (Groq) */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div className="glass-panel" style={{ padding: '1.5rem', border: '1px solid rgba(20, 184, 166, 0.3)', background: 'linear-gradient(180deg, rgba(20, 184, 166, 0.05) 0%, rgba(14, 21, 36, 0.9) 100%)' }}>
+              
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(20, 184, 166, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Sparkles size={18} color="#2DD4BF" />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#FFFFFF' }}>AI Stock Analyst</h3>
+                    <p style={{ fontSize: '0.7rem', color: '#94A3B8' }}>Powered by Groq Llama-3 & Strict Math</p>
+                  </div>
+                </div>
+
+                <button
+                  className="btn btn-teal"
+                  onClick={handleTriggerAiAnalysis}
+                  disabled={aiLoading || !quote}
+                  style={{ fontSize: '0.8rem', padding: '0.45rem 0.85rem' }}
+                >
+                  <Sparkles size={14} className={aiLoading ? 'animate-spin' : ''} />
+                  {aiLoading ? 'Synthesizing...' : 'Analyze Stock'}
+                </button>
+              </div>
+
+              {aiError && (
+                <div style={{ padding: '0.75rem', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#F87171', fontSize: '0.8rem', marginBottom: '1rem' }}>
+                  {aiError}
+                </div>
+              )}
+
+              {aiAnalysis ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  
+                  {/* Plain English Summary */}
+                  <div style={{ padding: '0.85rem', borderRadius: '10px', background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#2DD4BF', textTransform: 'uppercase', marginBottom: '0.4rem', letterSpacing: '0.04em' }}>
+                      Executive Takeaway
+                    </div>
+                    <p style={{ fontSize: '0.85rem', color: '#F1F5F9', lineHeight: 1.55 }}>
+                      {aiAnalysis.summary}
+                    </p>
+                  </div>
+
+                  {/* Ratio Explanations */}
+                  {aiAnalysis.ratios_explained?.length > 0 && (
+                    <div>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                        Metric Interpretations
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                        {aiAnalysis.ratios_explained.map((r, i) => (
+                          <div key={i} style={{ padding: '0.5rem 0.75rem', borderRadius: '6px', background: 'rgba(255,255,255,0.02)', fontSize: '0.78rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, color: '#FFFFFF', marginBottom: '0.15rem' }}>
+                              <span>{r.metric}</span>
+                              <span style={{ color: '#F59E0B' }}>{r.value}</span>
+                            </div>
+                            <div style={{ color: '#94A3B8' }}>{r.interpretation}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Pros & Cons Grid */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                    
+                    {/* Strengths */}
+                    <div style={{ padding: '0.75rem', borderRadius: '8px', background: 'rgba(20, 184, 166, 0.06)', border: '1px solid rgba(20, 184, 166, 0.2)' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#2DD4BF', marginBottom: '0.4rem' }}>Key Strengths</div>
+                      <ul style={{ paddingLeft: '1rem', margin: 0, fontSize: '0.75rem', color: '#CBD5E1', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                        {aiAnalysis.strengths?.length > 0 ? (
+                          aiAnalysis.strengths.map((s, i) => <li key={i}>{s}</li>)
+                        ) : (
+                          <li style={{ color: '#64748B' }}>Neutral financial metrics.</li>
+                        )}
+                      </ul>
+                    </div>
+
+                    {/* Considerations / Risks */}
+                    <div style={{ padding: '0.75rem', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.06)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#F87171', marginBottom: '0.4rem' }}>Risks & Watchouts</div>
+                      <ul style={{ paddingLeft: '1rem', margin: 0, fontSize: '0.75rem', color: '#CBD5E1', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                        {aiAnalysis.risks?.length > 0 ? (
+                          aiAnalysis.risks.map((r, i) => <li key={i}>{r}</li>)
+                        ) : (
+                          <li style={{ color: '#64748B' }}>Standard equity volatility.</li>
+                        )}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* SEBI Compliance & Educational Disclaimer */}
+                  <div style={{ padding: '0.65rem 0.85rem', borderRadius: '8px', background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.25)', fontSize: '0.7rem', color: '#FDE68A', display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
+                    <ShieldCheck size={16} color="#F59E0B" style={{ flexShrink: 0, marginTop: '2px' }} />
+                    <div>
+                      <strong>SEBI Educational Guardrail: </strong>
+                      {aiAnalysis.disclaimer}
+                    </div>
+                  </div>
+
+                </div>
+              ) : (
+                <div style={{ padding: '2rem 1rem', textAlign: 'center', color: '#64748B', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                  <HelpCircle size={32} color="#334155" />
+                  <p style={{ fontSize: '0.85rem' }}>
+                    Click <strong>Analyze Stock</strong> to synthesize verified financial fundamentals into plain-English takeaways for first-time investors.
+                  </p>
+                  <p style={{ fontSize: '0.7rem', color: '#475569' }}>
+                    Strict guardrails: Zero hallucinated figures • Educational only • No buy/sell tips.
+                  </p>
+                </div>
+              )}
+
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          TAB 2: MARKET NEWS & AI TAKEAWAYS
+         ========================================================================= */}
+      {activeTab === 'news' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF' }}>Latest Financial Market News</h3>
+              <p style={{ fontSize: '0.8rem', color: '#94A3B8' }}>Verified business headlines paired with AI 1-line takeaways.</p>
+            </div>
+            {newsAttribution && (
+              <span className="badge badge-slate" style={{ fontSize: '0.7rem' }}>
+                Source: {newsAttribution.provider.toUpperCase()} ({newsAttribution.data_mode})
+              </span>
+            )}
+          </div>
+
+          {newsLoading ? (
+            <div style={{ padding: '3rem', textAlign: 'center', color: '#94A3B8' }}>
+              Loading financial news feed...
+            </div>
+          ) : news.length === 0 ? (
+            <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center', color: '#94A3B8' }}>
+              <AlertCircle size={32} color="#64748B" style={{ margin: '0 auto 0.75rem auto' }} />
+              <p>News provider currently unavailable or free tier limit reached.</p>
+              <p style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '0.25rem' }}>
+                FinWise AI transparently reports provider status instead of fabricating fake headlines.
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1rem' }}>
+              {news.map((item, idx) => (
+                <div key={idx} className="glass-card glass-card-hover" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '0.75rem' }}>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                      <span className="badge badge-teal" style={{ fontSize: '0.65rem' }}>{item.source}</span>
+                      <span style={{ fontSize: '0.7rem', color: '#64748B' }}>
+                        {item.published_at ? new Date(item.published_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recent'}
+                      </span>
+                    </div>
+                    <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#FFFFFF', lineHeight: 1.4, marginBottom: '0.5rem' }}>
+                      {item.headline}
+                    </h4>
+                    {item.ai_summary && (
+                      <div style={{ padding: '0.5rem 0.75rem', borderRadius: '6px', background: 'rgba(20, 184, 166, 0.08)', border: '1px solid rgba(20, 184, 166, 0.2)', fontSize: '0.75rem', color: '#2DD4BF', lineHeight: 1.4 }}>
+                        <strong>AI Takeaway: </strong>{item.ai_summary}
+                      </div>
+                    )}
+                  </div>
+
+                  {item.url && (
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '0.5rem' }}>
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: '#38BDF8', textDecoration: 'none' }}
+                      >
+                        Read Full Story
+                        <ArrowUpRight size={13} />
+                      </a>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* =========================================================================
+          TAB 3: PERSONAL USER WATCHLIST
+         ========================================================================= */}
+      {activeTab === 'watchlist' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF' }}>Personal Stock Watchlist</h3>
+              <p style={{ fontSize: '0.8rem', color: '#94A3B8' }}>
+                Securely isolated per user persona with real-time tracking.
+              </p>
+            </div>
+            <button
+              className="btn btn-outline"
+              onClick={loadWatchlist}
+              style={{ fontSize: '0.75rem', padding: '0.4rem 0.75rem' }}
+            >
+              <RefreshCw size={13} className={watchlistLoading ? 'animate-spin' : ''} />
+              Refresh Prices
+            </button>
+          </div>
+
+          {watchlistLoading && watchlist.length === 0 ? (
+            <div style={{ padding: '3rem', textAlign: 'center', color: '#94A3B8' }}>
+              Loading saved watchlist items...
+            </div>
+          ) : watchlist.length === 0 ? (
+            <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center', color: '#94A3B8' }}>
+              <Bookmark size={36} color="#64748B" style={{ margin: '0 auto 0.75rem auto' }} />
+              <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#F8FAFC', marginBottom: '0.25rem' }}>Your Watchlist is Empty</h4>
+              <p style={{ fontSize: '0.85rem', color: '#64748B', maxWidth: '400px', margin: '0 auto 1rem auto' }}>
+                Search for companies in the <strong>Stock Explorer</strong> tab and click <strong>Add to Watchlist</strong> to track prices here.
+              </p>
+              <button className="btn btn-teal" onClick={() => setActiveTab('explorer')}>
+                Explore Stocks
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+              {watchlist.map((item) => {
+                const isUp = Number(item.change_pct || 0) >= 0;
+                return (
+                  <div key={item.symbol} className="glass-card glass-card-hover" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '0.75rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                          <span style={{ fontWeight: 800, color: '#2DD4BF', fontSize: '1.05rem' }}>{item.symbol}</span>
+                          <span className="badge badge-slate" style={{ fontSize: '0.65rem' }}>{item.exchange}</span>
+                        </div>
+                        <div style={{ fontSize: '0.8rem', color: '#E2E8F0', marginTop: '0.15rem' }}>{item.company_name}</div>
+                      </div>
+
+                      <button
+                        onClick={async () => {
+                          await removeFromWatchlist(item.symbol);
+                          loadWatchlist();
+                        }}
+                        style={{ background: 'transparent', border: 'none', color: '#64748B', cursor: 'pointer', padding: '0.25rem' }}
+                        title="Remove from Watchlist"
+                        onMouseEnter={(e) => (e.currentTarget.style.color = '#F87171')}
+                        onMouseLeave={(e) => (e.currentTarget.style.color = '#64748B')}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: '1.3rem', fontWeight: 800, color: '#FFFFFF' }}>
+                        {item.latest_price ? `₹${Number(item.latest_price).toLocaleString('en-IN')}` : '—'}
+                      </span>
+                      {item.change_pct !== null && item.change_pct !== undefined && (
+                        <span className={`badge ${isUp ? 'badge-teal' : 'badge-crimson'}`}>
+                          {isUp ? '+' : ''}{Number(item.change_pct).toFixed(2)}%
+                        </span>
+                      )}
+                    </div>
+
+                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.7rem', color: '#64748B' }}>
+                        Saved: {item.added_at ? new Date(item.added_at).toLocaleDateString('en-IN') : 'Recently'}
+                      </span>
+                      <button
+                        className="btn btn-outline"
+                        onClick={() => {
+                          setActiveTab('explorer');
+                          loadStockData(item.symbol);
+                        }}
+                        style={{ padding: '0.25rem 0.5rem', fontSize: '0.7rem' }}
+                      >
+                        Analyze
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+    </div>
+  );
+}
