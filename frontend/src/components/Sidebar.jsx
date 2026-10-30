@@ -9,7 +9,8 @@ import {
   Hourglass, 
   Activity, 
   UserCircle2, 
-  Sparkles 
+  Sparkles,
+  BarChart3
 } from 'lucide-react';
 import { PERSONAS, getActiveUserId, setActiveUserId } from '../api/client';
 
@@ -18,6 +19,7 @@ export default function Sidebar({ currentTab, setTab }) {
 
   const NAV_ITEMS = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'market', label: 'Market Intel', icon: BarChart3, badge: 'NSE/BSE' },
     { id: 'budget', label: '50/30/20 Budget', icon: PieChart },
     { id: 'sip', label: 'SIP Simulator', icon: TrendingUp },
     { id: 'goals', label: 'Goals & Timeline', icon: Target },
