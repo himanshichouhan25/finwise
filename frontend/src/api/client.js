@@ -157,3 +157,39 @@ export const decideJournalEntry = (entryId, decision, outcomeNote = "") =>
   });
 
 export const getJournalSummary = () => apiFetch("/api/v1/journal/summary");
+
+// ================= Market Intelligence & Free APIs =================
+export const getMarketOverview = () => apiFetch("/api/v1/market/overview");
+
+export const searchStocks = (query) =>
+  apiFetch(`/api/v1/market/search?query=${encodeURIComponent(query || "")}`);
+
+export const getStockQuote = (symbol) =>
+  apiFetch(`/api/v1/market/stocks/${encodeURIComponent(symbol)}/quote`);
+
+export const getStockHistory = (symbol, timeframe = "1M") =>
+  apiFetch(`/api/v1/market/stocks/${encodeURIComponent(symbol)}/history?timeframe=${encodeURIComponent(timeframe)}`);
+
+export const getStockFundamentals = (symbol) =>
+  apiFetch(`/api/v1/market/stocks/${encodeURIComponent(symbol)}/fundamentals`);
+
+export const analyzeStockWithAi = (symbol) =>
+  apiFetch(`/api/v1/market/stocks/${encodeURIComponent(symbol)}/ai-analyze`, {
+    method: "POST",
+  });
+
+export const getMarketNews = (symbol = null) =>
+  apiFetch(symbol ? `/api/v1/market/news?symbol=${encodeURIComponent(symbol)}` : "/api/v1/market/news");
+
+export const getWatchlist = () => apiFetch("/api/v1/market/watchlist");
+
+export const addToWatchlist = (payload) =>
+  apiFetch("/api/v1/market/watchlist", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+export const removeFromWatchlist = (symbol) =>
+  apiFetch(`/api/v1/market/watchlist/${encodeURIComponent(symbol)}`, {
+    method: "DELETE",
+  });
