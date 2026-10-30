@@ -1,0 +1,1 @@
+"""FinWise AI Application Package."""
