@@ -12,6 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.api.v1.budget import router as budget_router
+from app.api.v1.claims import router as claims_router
 from app.api.v1.coach import router as coach_router
 from app.api.v1.dashboard import router as dashboard_router
 from app.api.v1.expenses import router as expenses_router
@@ -19,6 +20,7 @@ from app.api.v1.goals import router as goals_router
 from app.api.v1.health import router as health_router
 from app.api.v1.health_score import router as health_score_router
 from app.api.v1.income import router as income_router
+from app.api.v1.journal import router as journal_router
 from app.api.v1.profile import router as profile_router
 from app.api.v1.simulations import router as simulations_router
 from app.core.config import get_settings
@@ -88,6 +90,8 @@ def create_app() -> FastAPI:
     application.include_router(health_score_router, prefix="/api/v1")
     application.include_router(dashboard_router, prefix="/api/v1")
     application.include_router(coach_router, prefix="/api/v1")
+    application.include_router(claims_router, prefix="/api/v1")
+    application.include_router(journal_router, prefix="/api/v1")
 
     return application
 
