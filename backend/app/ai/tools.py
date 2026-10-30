@@ -10,9 +10,10 @@ from sqlalchemy.orm import Session
 from app.engine.goal_delay import calculate_goal_days_delayed
 from app.engine.goals import calculate_required_monthly_savings
 from app.engine.sip import calculate_sip
+from app.schemas.simulation import GoalDelayRequest
 from app.services.budget_service import get_budget_summary
-from app.services.health_score_service import get_user_health_score
-from app.services.simulation_service import simulate_goal_delay
+from app.services.health_score_service import get_and_snapshot_health_score
+from app.services.simulation_service import run_goal_delay_simulation
 
 logger = logging.getLogger("finwise.ai.tools")
 
@@ -162,14 +163,14 @@ FINANCIAL_TOOLS = [
 def execute_tool(
     name: str,
     arguments: dict[str, Any],
-    user_id: str,
+    user_id: int,
     db: Session,
 ) -> dict[str, Any]:
     """Execute a recognized financial calculation tool and return structured results."""
-    logger.info("Executing tool '%s' for user '%s' with args %s", name, user_id, arguments)
+    logger.info("Executing tool '%s' for user %d with args %s", name, user_id, arguments)
     try:
         if name == "get_budget_summary":
-            summary = get_budget_summary(db, user_id)
+            summary = get_budget_summary(db=db, user_id=user_id)
             return _sanitize_for_json(summary.model_dump())
 
         elif name == "project_sip":
@@ -186,7 +187,6 @@ def execute_tool(
                 step_up_pct=step_up,
                 inflation_rate_pct=inflation,
             )
-            # Exclude full yearly_breakdown series from tool output to save LLM context tokens
             return {
                 "monthly_investment": float(result.monthly_investment),
                 "total_invested": float(result.total_invested),
@@ -224,37 +224,28 @@ def execute_tool(
             goal_id = arguments.get("goal_id")
             monthly_contrib = arguments.get("monthly_contribution")
 
-            if goal_id is not None:
-                sim = simulate_goal_delay(
-                    db=db,
-                    user_id=user_id,
-                    spend_amount=spend_amount,
-                    goal_id=int(goal_id),
-                )
-                return _sanitize_for_json(sim.model_dump())
-            elif monthly_contrib is not None:
+            if monthly_contrib is not None and goal_id is None:
                 delay = calculate_goal_days_delayed(
-                    spend_amount=spend_amount,
+                    unnecessary_spend=spend_amount,
                     monthly_goal_contribution=Decimal(str(monthly_contrib)),
                 )
                 return {
                     "spend_amount": float(spend_amount),
                     "days_delayed": delay.days_delayed,
                     "daily_goal_rate": float(delay.daily_goal_rate),
-                    "insight_message": delay.insight_message,
+                    "insight_message": delay.message,
                 }
             else:
-                # If neither is passed, compute against user's highest priority goal
-                sim = simulate_goal_delay(
-                    db=db,
-                    user_id=user_id,
+                payload = GoalDelayRequest(
                     spend_amount=spend_amount,
-                    goal_id=None,
+                    goal_id=int(goal_id) if goal_id is not None else None,
+                    monthly_goal_contribution=Decimal(str(monthly_contrib)) if monthly_contrib is not None else None,
                 )
+                sim = run_goal_delay_simulation(db=db, user_id=user_id, payload=payload)
                 return _sanitize_for_json(sim.model_dump())
 
         elif name == "get_health_score":
-            score_data = get_user_health_score(db, user_id)
+            score_data = get_and_snapshot_health_score(db=db, user_id=user_id)
             return _sanitize_for_json(score_data.model_dump())
 
         else:
