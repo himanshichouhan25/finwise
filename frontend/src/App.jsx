@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import TopBar from './components/TopBar';
+import AuthModal from './components/AuthModal';
 import DashboardView from './views/DashboardView';
 import BudgetView from './views/BudgetView';
 import SipSimulatorView from './views/SipSimulatorView';
@@ -27,6 +28,7 @@ export default function App() {
   const [currentTab, setCurrentTab] = useState('dashboard');
   const [coachPrompt, setCoachPrompt] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const handleNavigateToCoach = (prompt = '') => {
     setCoachPrompt(prompt);
@@ -53,6 +55,7 @@ export default function App() {
           title={TAB_TITLES[currentTab] || 'FinWise AI'}
           onRefresh={handleRefresh}
           isRefreshing={isRefreshing}
+          onOpenAuth={() => setIsAuthModalOpen(true)}
         />
 
         <main style={{ flex: 1, overflowY: 'auto' }}>
@@ -72,6 +75,13 @@ export default function App() {
           {currentTab === 'health' && <HealthScoreView />}
         </main>
       </div>
+
+      {/* Real JWT Authentication Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={() => handleRefresh()}
+      />
     </div>
   );
 }

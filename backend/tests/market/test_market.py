@@ -1,6 +1,7 @@
 """Unit and API integration tests for Market Intelligence, caching, failover, and watchlists."""
 
 from decimal import Decimal
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session

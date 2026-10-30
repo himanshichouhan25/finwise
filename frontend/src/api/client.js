@@ -1,19 +1,75 @@
 /**
  * FinWise API Client
- * Manages HTTP communication, Persona headers (X-User-Id), and domain endpoints.
+ * Manages HTTP communication, Cryptographic JWT Authentication, and domain endpoints.
  */
 
 let activeUserId = 1;
+let activeAuthToken = localStorage.getItem("finwise_auth_token") || null;
+let activeUser = null;
+
+try {
+  const storedUser = localStorage.getItem("finwise_user");
+  if (storedUser) {
+    activeUser = JSON.parse(storedUser);
+  }
+} catch {
+  activeUser = null;
+}
 
 export const PERSONAS = [
-  { id: 1, name: "Aarav Sharma", role: "College Student", tier: "Student", stipend: "₹18,000/mo" },
-  { id: 2, name: "Priya Patel", role: "Software Engineer", tier: "First Jobber", stipend: "₹65,000/mo" },
-  { id: 3, name: "Rohan Verma", role: "Freelance Designer", tier: "Gig Worker", stipend: "₹48,000/mo" },
+  { id: 1, name: "Aarav Sharma", role: "College Student", tier: "Student", stipend: "₹18,000/mo", email: "aarav@finwise.ai" },
+  { id: 2, name: "Priya Patel", role: "Software Engineer", tier: "First Jobber", stipend: "₹65,000/mo", email: "priya@finwise.ai" },
+  { id: 3, name: "Rohan Verma", role: "Freelance Designer", tier: "Gig Worker", stipend: "₹48,000/mo", email: "rohan@finwise.ai" },
 ];
 
-export const setActiveUserId = (id) => {
+export const getAuthToken = () => {
+  return localStorage.getItem("finwise_auth_token") || activeAuthToken;
+};
+
+export const getAuthUser = () => {
+  if (activeUser) return activeUser;
+  try {
+    const stored = localStorage.getItem("finwise_user");
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
+};
+
+export const setAuthSession = (token, user) => {
+  activeAuthToken = token;
+  activeUser = user;
+  activeUserId = user?.id || 1;
+  if (token) {
+    localStorage.setItem("finwise_auth_token", token);
+  } else {
+    localStorage.removeItem("finwise_auth_token");
+  }
+  if (user) {
+    localStorage.setItem("finwise_user", JSON.stringify(user));
+    localStorage.setItem("finwise_user_id", String(user.id));
+  } else {
+    localStorage.removeItem("finwise_user");
+  }
+  window.dispatchEvent(new CustomEvent("finwise_auth_changed", { detail: { user, token } }));
+  window.dispatchEvent(new CustomEvent("finwise_persona_changed", { detail: activeUserId }));
+};
+
+export const setActiveUserId = async (id) => {
   activeUserId = Number(id);
   localStorage.setItem("finwise_user_id", String(activeUserId));
+
+  // Request authentic signed JWT for the selected demo persona
+  try {
+    const res = await apiFetch(`/api/v1/auth/demo-login/${activeUserId}`, { method: "POST" });
+    if (res?.access_token) {
+      setAuthSession(res.access_token, res.user);
+      return res;
+    }
+  } catch (err) {
+    console.warn("Fallback to persona header mode:", err.message);
+  }
+
   window.dispatchEvent(new CustomEvent("finwise_persona_changed", { detail: activeUserId }));
 };
 
@@ -30,9 +86,12 @@ getActiveUserId();
 
 export async function apiFetch(endpoint, options = {}) {
   const url = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const token = getAuthToken();
+
   const headers = {
     "Content-Type": "application/json",
     "X-User-Id": String(getActiveUserId()),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(options.headers || {}),
   };
 
@@ -55,6 +114,51 @@ export async function apiFetch(endpoint, options = {}) {
 
   return data;
 }
+
+// ================= Authentication =================
+export const registerUser = async (payload) => {
+  const res = await apiFetch("/api/v1/auth/register", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+  if (res?.access_token) {
+    setAuthSession(res.access_token, res.user);
+  }
+  return res;
+};
+
+export const loginUser = async (payload) => {
+  const res = await apiFetch("/api/v1/auth/login", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+  if (res?.access_token) {
+    setAuthSession(res.access_token, res.user);
+  }
+  return res;
+};
+
+export const demoLogin = async (personaId) => {
+  const res = await apiFetch(`/api/v1/auth/demo-login/${personaId}`, {
+    method: "POST",
+  });
+  if (res?.access_token) {
+    setAuthSession(res.access_token, res.user);
+  }
+  return res;
+};
+
+export const logoutUser = async () => {
+  try {
+    await apiFetch("/api/v1/auth/logout", { method: "POST" });
+  } catch {
+    // Ignore error on logout endpoint
+  } finally {
+    setAuthSession(null, null);
+  }
+};
+
+export const getCurrentUser = () => apiFetch("/api/v1/auth/me");
 
 // ================= Dashboard & Profile =================
 export const getDashboardData = () => apiFetch("/api/v1/dashboard");
@@ -162,7 +266,7 @@ export const getJournalSummary = () => apiFetch("/api/v1/journal/summary");
 export const getMarketOverview = () => apiFetch("/api/v1/market/overview");
 
 export const searchStocks = (query) =>
-  apiFetch(`/api/v1/market/search?query=${encodeURIComponent(query || "")}`);
+  apiFetch(`/api/v1/market/search?q=${encodeURIComponent(query || "")}`);
 
 export const getStockQuote = (symbol) =>
   apiFetch(`/api/v1/market/stocks/${encodeURIComponent(symbol)}/quote`);

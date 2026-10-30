@@ -1,8 +1,9 @@
 """BharatStock Indian Stock Market API provider (NSE & BSE)."""
 
+import logging
 from datetime import UTC, datetime
 from decimal import Decimal
-import logging
+
 import httpx
 
 from app.market.market_schemas import (

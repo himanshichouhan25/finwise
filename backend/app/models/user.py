@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, String, func
+from sqlalchemy import Boolean, DateTime, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -21,13 +21,16 @@ if TYPE_CHECKING:
 
 
 class User(Base):
-    """User entity supporting persona-based demo profiles."""
+    """User entity supporting persona-based demo profiles and full authentication."""
 
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    email: Mapped[str | None] = mapped_column(String(255), unique=True, index=True, nullable=True)
+    hashed_password: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    persona: Mapped[str] = mapped_column(String(50), nullable=False)  # student | first_job | gig_worker
+    persona: Mapped[str] = mapped_column(String(50), default="student", nullable=False)  # student | first_job | gig_worker
     language_pref: Mapped[str] = mapped_column(String(10), default="en", nullable=False)  # en | hinglish
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 

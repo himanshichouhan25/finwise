@@ -20,6 +20,30 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    # JWT Authentication & Security
+    JWT_SECRET_KEY: Annotated[
+        str,
+        Field(
+            default="finwise-super-secret-jwt-key-mnit-hackathon-2026-secure",
+            description="Secret key for signing JWT access tokens",
+        ),
+    ]
+    JWT_ALGORITHM: Annotated[
+        str,
+        Field(
+            default="HS256",
+            description="JWT signing algorithm",
+        ),
+    ]
+    ACCESS_TOKEN_EXPIRE_MINUTES: Annotated[
+        int,
+        Field(
+            default=1440,
+            ge=5,
+            description="JWT access token validity in minutes",
+        ),
+    ]
+
     # Application Environment
     APP_ENV: Annotated[str, Field(default="development", description="Environment: development, production, test")]
     LOG_LEVEL: Annotated[str, Field(default="INFO", description="Logging level")]

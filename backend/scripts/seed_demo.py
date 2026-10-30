@@ -18,6 +18,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 from sqlalchemy import select
 
+from app.core.security import hash_password
 from app.db.base import Base
 from app.db.session import SessionLocal, engine
 from app.models import (
@@ -46,6 +47,8 @@ def seed_demo_data():
         personas_data = [
             {
                 "name": "Aarav Sharma [Sample data]",
+                "email": "aarav@finwise.ai",
+                "password": "Password@123",
                 "persona": "student",
                 "language_pref": "hinglish",
                 "profile": {
@@ -146,6 +149,8 @@ def seed_demo_data():
             },
             {
                 "name": "Priya Patel [Sample data]",
+                "email": "priya@finwise.ai",
+                "password": "Password@123",
                 "persona": "first_job",
                 "language_pref": "en",
                 "profile": {
@@ -255,6 +260,8 @@ def seed_demo_data():
             },
             {
                 "name": "Rohan Verma [Sample data]",
+                "email": "rohan@finwise.ai",
+                "password": "Password@123",
                 "persona": "gig_worker",
                 "language_pref": "hinglish",
                 "profile": {
@@ -365,6 +372,9 @@ def seed_demo_data():
 
             # Create User
             user = User(
+                email=pdata.get("email"),
+                hashed_password=hash_password(pdata.get("password", "Password@123")),
+                is_active=True,
                 name=pdata["name"],
                 persona=pdata["persona"],
                 language_pref=pdata["language_pref"],

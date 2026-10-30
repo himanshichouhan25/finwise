@@ -1,8 +1,7 @@
 """Market Intelligence service orchestrator with provider cascading, caching, and AI analysis."""
 
-import json
 import logging
-from typing import Any
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -10,7 +9,6 @@ from app.ai.client import get_llm_client
 from app.core.config import get_settings
 from app.market.market_cache import get_market_cache
 from app.market.market_schemas import (
-    MarketNewsItem,
     MarketNewsResponse,
     MarketOverviewResponse,
     RatioExplanation,
@@ -73,7 +71,7 @@ class MarketService:
             chain.append(providers_map[preferred])
 
         # 2. Add other configured live providers in order of preference
-        for name, p in [("tapetide", self.tapetide), ("bharatstock", self.bharatstock), ("alphavantage", self.alphavantage)]:
+        for _name, p in [("tapetide", self.tapetide), ("bharatstock", self.bharatstock), ("alphavantage", self.alphavantage)]:
             if p.is_configured and p not in chain:
                 chain.append(p)
 

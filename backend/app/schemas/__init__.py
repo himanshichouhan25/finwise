@@ -1,5 +1,11 @@
 """Pydantic validation schemas package."""
 
+from app.schemas.auth import (
+    AuthResponse,
+    UserAuthProfile,
+    UserLoginRequest,
+    UserRegisterRequest,
+)
 from app.schemas.dashboard import (
     BudgetBucketSummarySchema,
     BudgetSummaryResponse,
@@ -38,6 +44,10 @@ from app.schemas.simulation import (
 )
 
 __all__ = [
+    "AuthResponse",
+    "UserAuthProfile",
+    "UserLoginRequest",
+    "UserRegisterRequest",
     "ProfileUpdate",
     "ProfileResponse",
     "IncomeCreate",

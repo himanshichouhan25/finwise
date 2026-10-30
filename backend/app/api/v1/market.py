@@ -1,6 +1,7 @@
 """Market Intelligence API router."""
 
 from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 from sqlalchemy.orm import Session
 
@@ -31,11 +32,13 @@ async def get_market_overview(
 
 @router.get("/search", response_model=list[StockSearchResult])
 async def search_indian_stocks(
-    q: Annotated[str, Query(min_length=1, max_length=50, description="Company name or ticker symbol")],
     service: Annotated[MarketService, Depends(get_market_service)],
+    q: Annotated[str | None, Query(max_length=50, description="Company name or ticker symbol")] = None,
+    query: Annotated[str | None, Query(max_length=50, description="Alternative parameter for search term")] = None,
 ) -> list[StockSearchResult]:
     """Search Indian listed equities across NSE and BSE."""
-    return await service.search_stocks(q)
+    search_term = q or query or ""
+    return await service.search_stocks(search_term)
 
 
 @router.get("/stocks/{symbol}/quote", response_model=StockQuoteResponse)

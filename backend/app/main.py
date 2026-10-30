@@ -11,6 +11,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from app.api.v1.auth import router as auth_router
 from app.api.v1.budget import router as budget_router
 from app.api.v1.claims import router as claims_router
 from app.api.v1.coach import router as coach_router
@@ -81,6 +82,7 @@ def create_app() -> FastAPI:
     application.add_exception_handler(Exception, generic_exception_handler)
 
     # 4. Mount API v1 Routers
+    application.include_router(auth_router, prefix="/api/v1")
     application.include_router(health_router, prefix="/api/v1")
     application.include_router(profile_router, prefix="/api/v1")
     application.include_router(income_router, prefix="/api/v1")

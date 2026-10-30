@@ -102,23 +102,28 @@ export default function Sidebar({ currentTab, setTab }) {
         })}
       </nav>
 
-      {/* Persona Switcher Footer */}
+      {/* Persona & Auth Footer */}
       <div style={{
         padding: '1rem',
         borderTop: '1px solid var(--border-subtle)',
         background: 'rgba(15, 23, 42, 0.4)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-          <UserCircle2 size={16} color="#F59E0B" />
-          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#F8FAFC' }}>
-            DEMO PERSONA
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <UserCircle2 size={15} color="#F59E0B" />
+            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#F8FAFC' }}>
+              DEMO PERSONA
+            </span>
+          </div>
+          <span style={{ fontSize: '0.65rem', color: '#14B8A6', fontWeight: 600 }}>
+            JWT Enabled
           </span>
         </div>
         <select
           className="fin-select"
           value={activeId}
           onChange={(e) => setActiveUserId(e.target.value)}
-          style={{ fontSize: '0.8rem', padding: '0.5rem' }}
+          style={{ fontSize: '0.8rem', padding: '0.45rem', width: '100%' }}
         >
           {PERSONAS.map((p) => (
             <option key={p.id} value={p.id} style={{ background: '#0F172A', color: '#F8FAFC' }}>
@@ -127,7 +132,7 @@ export default function Sidebar({ currentTab, setTab }) {
           ))}
         </select>
         <p style={{ fontSize: '0.65rem', color: '#64748B', marginTop: '0.4rem', textAlign: 'center' }}>
-          Simulates live zero-auth header <code>X-User-Id: {activeId}</code>
+          Signed HS256 Token • Persona ID: {activeId}
         </p>
       </div>
     </aside>
