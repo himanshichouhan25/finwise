@@ -212,7 +212,6 @@ def test_ai_chat_rate_limiting(client: TestClient, test_user: User):
             )
             assert res.status_code == 200
 
-        # 21st request should hit sliding-window limit
         res_blocked = client.post(
             "/api/v1/coach/chat",
             json={"message": "Too fast message"},
@@ -221,3 +220,44 @@ def test_ai_chat_rate_limiting(client: TestClient, test_user: User):
         assert res_blocked.status_code == 422
         data = res_blocked.json()
         assert "sending messages too quickly" in data["error"]["message"].lower()
+
+
+def test_build_system_prompt_with_active_goals_and_profile(db_session: Session):
+    """Ensure dynamic system prompt formatting works with active goals and profile."""
+    from datetime import date
+    from decimal import Decimal
+
+    from app.ai.prompts import build_system_prompt
+    from app.models.goal import Goal
+    from app.models.profile import FinancialProfile
+    from app.services.snapshot_service import build_financial_snapshot
+
+    user = User(id=99, name="Test Goals User", persona="student", language_pref="en")
+    db_session.add(user)
+    db_session.flush()
+
+    prof = FinancialProfile(
+        user_id=99,
+        monthly_income=Decimal("25000.00"),
+        income_type="fixed",
+        emergency_fund_saved=Decimal("10000.00"),
+    )
+    goal = Goal(
+        user_id=99,
+        name="MacBook Pro",
+        target_amount=Decimal("120000.00"),
+        current_saved=Decimal("30000.00"),
+        target_date=date(2027, 1, 1),
+        status="active",
+    )
+    db_session.add_all([prof, goal])
+    db_session.commit()
+
+    snapshot = build_financial_snapshot(db_session, user_id=99)
+    prompt = build_system_prompt(snapshot=snapshot, persona_name="Aarav")
+
+    assert "MacBook Pro" in prompt
+    assert "₹120,000" in prompt
+    assert "₹30,000" in prompt
+    assert "Income Type: fixed" in prompt
+    assert "SEBI" in prompt
