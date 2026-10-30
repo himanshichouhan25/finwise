@@ -51,6 +51,11 @@ class GroqLLMClient:
         self._key_index = 0
         self._lock = threading.Lock()
 
+    @property
+    def is_available(self) -> bool:
+        """True if at least one Groq API key is configured."""
+        return len(self.keys) > 0
+
     def _get_active_client(self) -> tuple[Groq, str, int]:
         """Return the current active Groq client and key index."""
         with self._lock:
