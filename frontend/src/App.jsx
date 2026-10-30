@@ -9,9 +9,11 @@ import CoachChatView from './views/CoachChatView';
 import ClaimsAuditView from './views/ClaimsAuditView';
 import DecisionJournalView from './views/DecisionJournalView';
 import HealthScoreView from './views/HealthScoreView';
+import MarketView from './views/MarketView';
 
 const TAB_TITLES = {
   dashboard: 'Executive Financial Intelligence',
+  market: 'Indian Market Intelligence & Stock Analysis',
   budget: '50/30/20 Budget & Expense Tracking',
   sip: 'Systematic Investment Plan (SIP) Simulator',
   goals: 'Financial Goals & Delayed Gratification',
@@ -60,6 +62,7 @@ export default function App() {
               onNavigateToTab={setCurrentTab}
             />
           )}
+          {currentTab === 'market' && <MarketView />}
           {currentTab === 'budget' && <BudgetView />}
           {currentTab === 'sip' && <SipSimulatorView />}
           {currentTab === 'goals' && <GoalsView />}
