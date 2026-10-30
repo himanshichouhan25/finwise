@@ -9,6 +9,7 @@ from app.models.income import IncomeRecord
 from app.models.journal import JournalEntry
 from app.models.profile import FinancialProfile
 from app.models.user import User
+from app.models.watchlist import WatchlistItem
 
 __all__ = [
     "User",
@@ -21,4 +22,5 @@ __all__ = [
     "ClaimCheck",
     "JournalEntry",
     "HealthScoreSnapshot",
+    "WatchlistItem",
 ]
