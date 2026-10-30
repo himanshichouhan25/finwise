@@ -54,6 +54,70 @@ class Settings(BaseSettings):
     LLM_FALLBACK_MODEL: Annotated[str, Field(default="llama-3.1-8b-instant", description="Secondary fallback model")]
     LLM_TIMEOUT_SECONDS: Annotated[int, Field(default=20, ge=1, le=120, description="Timeout in seconds for AI calls")]
 
+    # Market Intelligence & Free API Integration
+    MARKET_DATA_PROVIDER: Annotated[
+        str,
+        Field(
+            default="tapetide",
+            description="Primary market data provider: 'tapetide', 'bharatstock', 'alphavantage', or 'demo'",
+        ),
+    ]
+    TAPETIDE_API_KEY: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description="API key/bearer token for Tapetide Indian market data",
+        ),
+    ]
+    BHARATSTOCK_API_KEY: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description="API key for BharatStock Indian market data",
+        ),
+    ]
+    ALPHA_VANTAGE_API_KEY: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description="API key for Alpha Vantage financial data & sentiment",
+        ),
+    ]
+    MARKET_DATA_CACHE_TTL: Annotated[
+        int,
+        Field(
+            default=300,
+            ge=10,
+            le=86400,
+            description="Cache TTL in seconds for market data responses to conserve free tier quotas",
+        ),
+    ]
+    MARKET_DATA_TIMEOUT: Annotated[
+        int,
+        Field(
+            default=15,
+            ge=2,
+            le=60,
+            description="HTTP request timeout in seconds for market data provider APIs",
+        ),
+    ]
+    MARKET_DATA_RETRY_COUNT: Annotated[
+        int,
+        Field(
+            default=2,
+            ge=0,
+            le=5,
+            description="Number of retries on transient network/rate-limit errors",
+        ),
+    ]
+    MARKET_NEWS_PROVIDER: Annotated[
+        str,
+        Field(
+            default="alphavantage",
+            description="Provider for financial market news: 'alphavantage' or 'demo'",
+        ),
+    ]
+
     # CORS
     CORS_ORIGINS: Annotated[
         str,
