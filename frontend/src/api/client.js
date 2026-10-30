@@ -8,7 +8,7 @@ let activeUserId = 1;
 export const PERSONAS = [
   { id: 1, name: "Aarav Sharma", role: "College Student", tier: "Student", stipend: "₹18,000/mo" },
   { id: 2, name: "Priya Patel", role: "Software Engineer", tier: "First Jobber", stipend: "₹65,000/mo" },
-  { id: 3, name: "Vikram Singh", role: "Freelance Designer", tier: "Gig Worker", stipend: "₹45,000/mo" },
+  { id: 3, name: "Rohan Verma", role: "Freelance Designer", tier: "Gig Worker", stipend: "₹48,000/mo" },
 ];
 
 export const setActiveUserId = (id) => {
