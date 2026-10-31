@@ -1,22 +1,20 @@
 <div align="center">
 
-<!-- Banner: add docs/assets/banner.png and uncomment the next line
-<img src="docs/assets/banner.png" alt="FinWise AI banner" width="100%" />
--->
+<img src="docs/assets/banner.png" alt="FinWise AI banner: Plan Smarter. Live Freer." width="100%" />
 
 # 🪙 FinWise AI
 
 ### Plan Smarter. Live Freer.
 
-**AI financial coach and expense intelligence for first-time investors in India.**
+**AI financial coach and expense intelligence for first-time investors in India.**  
 *Built for the MNIT Jaipur 24-Hour Hackathon 2026.*
 
-![Python](https://img.shields.io/badge/Python-3.12+-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
-![Groq](https://img.shields.io/badge/Groq-Llama_3.3_70B-F55036?style=for-the-badge)
+[![Python](https://img.shields.io/badge/Python-3.12+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev)
+[![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://sqlite.org)
+[![Groq](https://img.shields.io/badge/Groq-Llama_3.3_70B-F55036?style=for-the-badge)](https://groq.com)
 
 [Features](#-key-features) · [Architecture](#-system-architecture) · [AI Coach](#-ai-architecture) · [Financial Engine](#-financial-calculation-engine) · [Setup (Windows)](#-installation-windows)
 
@@ -63,11 +61,14 @@ FinWise AI is a personal finance platform for young Indian earners. It helps use
 **Problem.** Many first-time earners start investing from social-media promises and impulse spending, without a budget, an emergency fund, or a way to check whether a promised return is realistic.
 
 **Solution.** FinWise combines two things:
-
 1. **Deterministic engines** written in pure Python do all financial math: budget split, SIP growth, goal timelines, health score and claim CAGR.
 2. **An LLM coach** (Groq, Llama 3.3 70B) explains the results in English or Hinglish. It receives verified numbers and is instructed not to invent figures or give individual stock tips.
 
 This is the **Zero-Financial-Hallucination principle**: the model explains, the code calculates.
+
+<p align="center">
+  <img src="docs/assets/zero-hallucination.png" alt="Python engine calculates, LLM explains" width="90%" />
+</p>
 
 ## 👥 Target Audience
 
@@ -79,6 +80,10 @@ This is the **Zero-Financial-Hallucination principle**: the model explains, the 
 | 📈 First-time investors | Unsure which claims and returns are realistic |
 
 ## ✨ Key Features
+
+<p align="center">
+  <img src="docs/assets/features-overview.png" alt="FinWise AI feature overview" width="85%" />
+</p>
 
 | Feature | What it does |
 |---|---|
@@ -98,6 +103,10 @@ This is the **Zero-Financial-Hallucination principle**: the model explains, the 
 <summary><b>Feature details</b></summary>
 
 **Finfluencer Claim Reality Check.** Benchmarks used:
+
+<p align="center">
+  <img src="docs/assets/benchmarks.png" alt="Benchmark annual returns: FD 7%, Gold 10.5%, Nifty 50 12.5%, Buffett 20%" width="75%" />
+</p>
 
 | Benchmark | Annual return |
 |---|---:|
@@ -136,6 +145,13 @@ Red flags detected: promised "guaranteed" returns, urgency / FOMO language, and 
 
 ## 🏗 System Architecture
 
+<p align="center">
+  <img src="docs/assets/system-architecture.png" alt="System architecture of FinWise AI" width="90%" />
+</p>
+
+<details>
+<summary>Text version</summary>
+
 ```text
 User
  │
@@ -143,7 +159,7 @@ User
 React + Vite frontend
  │   HTTP /api/v1
  ▼
-FastAPI backend   (request logging, JSON error envelope)
+FastAPI backend (request logging, JSON error envelope)
  │
  ├──► Services layer ──► Pure-Python financial engine
  │         │               budget · sip · goals · goal_delay
@@ -158,7 +174,16 @@ FastAPI backend   (request logging, JSON error envelope)
  └──► Market data providers: tapetide · bharatstock · alphavantage · demo
 ```
 
+</details>
+
 ## 🧭 User Journey
+
+<p align="center">
+  <img src="docs/assets/user-journey.png" alt="Application user journey" width="90%" />
+</p>
+
+<details>
+<summary>Text version</summary>
 
 ```text
 Sign in, or pick a demo persona
@@ -179,6 +204,8 @@ Decision Journal: 24h / 48h cooling-off timer
 AI Coach (English / Hinglish) ──► answer with real numbers + disclaimer
 ```
 
+</details>
+
 ## 🤖 AI Architecture
 
 | Item | Value |
@@ -192,6 +219,13 @@ AI Coach (English / Hinglish) ──► answer with real numbers + disclaimer
 | Guardrails | Refuses individual stock tips and speculative promises; ends with a SEBI-style disclaimer |
 | Languages | English and Hinglish |
 | Offline mode | Without an API key the backend still boots; AI endpoints return `AI_UNAVAILABLE` |
+
+<p align="center">
+  <img src="docs/assets/ai-chatbot-workflow.png" alt="AI chatbot workflow" width="90%" />
+</p>
+
+<details>
+<summary>Text version</summary>
 
 ```text
 User question (English / Hinglish)
@@ -216,9 +250,18 @@ Failure handling
    • no API key     → AI endpoints return AI_UNAVAILABLE
 ```
 
+</details>
+
 ## 🧮 Financial Calculation Engine
 
 All numbers come from modules in `backend/app/engine/`: `budget.py`, `sip.py`, `goals.py`, `goal_delay.py`, `claim_math.py`, `red_flags.py`, `health_score.py`.
+
+<p align="center">
+  <img src="docs/assets/calculation-workflow.png" alt="Financial calculation workflow" width="90%" />
+</p>
+
+<details>
+<summary>Text version</summary>
 
 ```text
 API request
@@ -234,6 +277,8 @@ Pure-Python engine function ──► Typed result ──► JSON response
                                     │
                                     └──► (optional) LLM explains the result, never calculates
 ```
+
+</details>
 
 <details>
 <summary><b>Reference formulas</b></summary>
@@ -256,6 +301,13 @@ Projections depend entirely on user inputs and constant-return assumptions. They
 
 SQLite through SQLAlchemy 2. Core entities: **Users, Profiles, Incomes, Expenses, Goals, Claims, Chat Sessions, Journal**. Full schemas are in `backend/app/models/`.
 
+<p align="center">
+  <img src="docs/assets/er-diagram.png" alt="Database entity relationship diagram" width="90%" />
+</p>
+
+<details>
+<summary>Text version</summary>
+
 ```text
 USERS
  ├── 1 : 0..1   PROFILES
@@ -267,9 +319,18 @@ USERS
  └── 1 : many   JOURNAL
 ```
 
+</details>
+
 ## 🔐 Authentication
 
 FinWise supports user registration and login. For demos, three seeded personas can be selected with the `X-User-Id` header (`1`, `2`, `3`). Authentication endpoints are listed in the Swagger docs at `/docs`.
+
+<p align="center">
+  <img src="docs/assets/auth-flow.png" alt="Authentication flow" width="90%" />
+</p>
+
+<details>
+<summary>Text version</summary>
 
 ```text
 Frontend ── request + X-User-Id (demo mode) ──► FastAPI
@@ -277,6 +338,8 @@ FastAPI  ── load that user's data ──────────────
 SQLite   ── persona data ─────────────────────────► FastAPI
 FastAPI  ── JSON response ────────────────────────► Frontend
 ```
+
+</details>
 
 ## 📈 Market Data Integration
 
@@ -330,7 +393,7 @@ finwise/
 ├── frontend/
 │   └── src/            # Views, components, API client, design tokens
 ├── docs/               # API.md, DECISIONS.md, FINANCE_SPEC.md, DOCUMENTATION_AUDIT.md
-│   └── assets/         # Optional diagram images (PNG) and Mermaid sources
+│   └── assets/         # Banner, diagrams (PNG) and Mermaid sources
 ├── image/
 └── .env.example
 ```
