@@ -136,19 +136,48 @@ Red flags detected: promised "guaranteed" returns, urgency / FOMO language, and 
 
 ## 🏗 System Architecture
 
-<p align="center">
-  <img src="docs/assets/system-architecture.png" alt="System architecture of FinWise AI" width="90%" />
-</p>
-
-<sub>Editable Mermaid source: <code>docs/assets/src/system-architecture.mmd</code></sub>
+```text
+User
+ │
+ ▼
+React + Vite frontend
+ │   HTTP /api/v1
+ ▼
+FastAPI backend   (request logging, JSON error envelope)
+ │
+ ├──► Services layer ──► Pure-Python financial engine
+ │         │               budget · sip · goals · goal_delay
+ │         │               claim_math · red_flags · health_score
+ │         ▼
+ │      SQLite (SQLAlchemy)
+ │
+ ├──► AI coach (Groq client, guardrails, tools)
+ │         ├──► Groq: llama-3.3-70b-versatile
+ │         └──► tool calls ──► Pure-Python financial engine
+ │
+ └──► Market data providers: tapetide · bharatstock · alphavantage · demo
+```
 
 ## 🧭 User Journey
 
-<p align="center">
-  <img src="docs/assets/user-journey.png" alt="Application user journey" width="90%" />
-</p>
-
-<sub>Editable Mermaid source: <code>docs/assets/src/user-journey.mmd</code></sub>
+```text
+Sign in, or pick a demo persona
+        │
+        ▼
+Dashboard: 50/30/20 budget + Health Score
+        │
+        ▼
+Goals: enter an impulse spend ──► Goal-Days Delayed result
+        │
+        ▼
+Finfluencer Audit: paste a claim ──► CAGR vs benchmarks + red flags
+        │
+        ▼
+Decision Journal: 24h / 48h cooling-off timer
+        │
+        ▼
+AI Coach (English / Hinglish) ──► answer with real numbers + disclaimer
+```
 
 ## 🤖 AI Architecture
 
@@ -164,21 +193,47 @@ Red flags detected: promised "guaranteed" returns, urgency / FOMO language, and 
 | Languages | English and Hinglish |
 | Offline mode | Without an API key the backend still boots; AI endpoints return `AI_UNAVAILABLE` |
 
-<p align="center">
-  <img src="docs/assets/ai-chatbot-workflow.png" alt="AI chatbot workflow" width="90%" />
-</p>
+```text
+User question (English / Hinglish)
+   │
+   ▼
+Build the user's financial snapshot
+   │
+   ▼
+System prompt + SEBI guardrails + snapshot + question
+   │
+   ▼
+Groq LLM (llama-3.3-70b-versatile) ◄─────────────┐
+   │                                             │ tool result
+   ├── needs a calculation? ──► tool call ──► Python engine
+   │        project_sip · plan_goal · get_budget_summary
+   │
+   └── done ──► response using verified numbers + SEBI-style disclaimer
 
-<sub>Editable Mermaid source: <code>docs/assets/src/ai-chatbot-workflow.mmd</code></sub>
+Failure handling
+   • HTTP 429       → rotate to the next API key
+   • model failure  → fall back to llama-3.1-8b-instant
+   • no API key     → AI endpoints return AI_UNAVAILABLE
+```
 
 ## 🧮 Financial Calculation Engine
 
 All numbers come from modules in `backend/app/engine/`: `budget.py`, `sip.py`, `goals.py`, `goal_delay.py`, `claim_math.py`, `red_flags.py`, `health_score.py`.
 
-<p align="center">
-  <img src="docs/assets/calculation-workflow.png" alt="Financial calculation workflow" width="90%" />
-</p>
-
-<sub>Editable Mermaid source: <code>docs/assets/src/calculation-workflow.mmd</code></sub>
+```text
+API request
+   │
+   ▼
+Pydantic v2 validation
+   │
+   ▼
+Service layer
+   │
+   ▼
+Pure-Python engine function ──► Typed result ──► JSON response
+                                    │
+                                    └──► (optional) LLM explains the result, never calculates
+```
 
 <details>
 <summary><b>Reference formulas</b></summary>
@@ -201,21 +256,27 @@ Projections depend entirely on user inputs and constant-return assumptions. They
 
 SQLite through SQLAlchemy 2. Core entities: **Users, Profiles, Incomes, Expenses, Goals, Claims, Chat Sessions, Journal**. Full schemas are in `backend/app/models/`.
 
-<p align="center">
-  <img src="docs/assets/er-diagram.png" alt="Database entity relationship diagram" width="90%" />
-</p>
-
-<sub>Editable Mermaid source: <code>docs/assets/src/er-diagram.mmd</code></sub>
+```text
+USERS
+ ├── 1 : 0..1   PROFILES
+ ├── 1 : many   INCOMES
+ ├── 1 : many   EXPENSES
+ ├── 1 : many   GOALS
+ ├── 1 : many   CLAIMS
+ ├── 1 : many   CHAT_SESSIONS
+ └── 1 : many   JOURNAL
+```
 
 ## 🔐 Authentication
 
 FinWise supports user registration and login. For demos, three seeded personas can be selected with the `X-User-Id` header (`1`, `2`, `3`). Authentication endpoints are listed in the Swagger docs at `/docs`.
 
-<p align="center">
-  <img src="docs/assets/auth-flow.png" alt="Authentication flow" width="90%" />
-</p>
-
-<sub>Editable Mermaid source: <code>docs/assets/src/auth-flow.mmd</code></sub>
+```text
+Frontend ── request + X-User-Id (demo mode) ──► FastAPI
+FastAPI  ── load that user's data ────────────────► SQLite
+SQLite   ── persona data ─────────────────────────► FastAPI
+FastAPI  ── JSON response ────────────────────────► Frontend
+```
 
 ## 📈 Market Data Integration
 
@@ -269,10 +330,25 @@ finwise/
 ├── frontend/
 │   └── src/            # Views, components, API client, design tokens
 ├── docs/               # API.md, DECISIONS.md, FINANCE_SPEC.md, DOCUMENTATION_AUDIT.md
-│   └── assets/         # Diagram images (PNG) and Mermaid sources (src/)
+│   └── assets/         # Optional diagram images (PNG) and Mermaid sources
 ├── image/
 └── .env.example
 ```
+
+| Folder | Purpose |
+|---|---|
+| `backend/app/ai/` | Groq client, prompts, guardrails, coach tools, claim extractor |
+| `backend/app/api/v1/` | HTTP route modules |
+| `backend/app/engine/` | Pure-Python financial calculations |
+| `backend/app/models/` | SQLAlchemy ORM models |
+| `backend/app/schemas/` | Pydantic v2 request/response schemas |
+| `backend/app/services/` | Business logic between routes and engine |
+| `backend/app/core/` | Config, error handling, request logging |
+| `backend/app/db/` | Database engine and session |
+| `backend/scripts/` | `seed_demo.py` for demo personas |
+| `backend/tests/` | pytest suites: ai, api, engine, models |
+| `frontend/src/` | React views, components, API client |
+| `docs/` | Project documentation |
 
 ## 🧰 Technology Stack
 
