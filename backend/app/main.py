@@ -46,6 +46,11 @@ async def lifespan(app: FastAPI):
     settings = get_settings()
     if settings.APP_ENV != "testing":
         Base.metadata.create_all(bind=engine)
+        try:
+            from scripts.seed_demo import seed_demo_data
+            seed_demo_data()
+        except Exception:
+            pass
     yield
 
 
@@ -73,6 +78,7 @@ def create_app() -> FastAPI:
     application.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins_list,
+        allow_origin_regex=r"https://.*\.vercel\.app|http://localhost:\d+|http://127\.0\.0\.1:\d+",
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
