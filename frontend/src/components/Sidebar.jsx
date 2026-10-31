@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { PERSONAS, getActiveUserId, setActiveUserId } from '../api/client';
 
-export default function Sidebar({ currentTab, setTab }) {
+export default function Sidebar({ currentTab, setTab, onGoToLanding }) {
   const activeId = getActiveUserId();
 
   const NAV_ITEMS = [

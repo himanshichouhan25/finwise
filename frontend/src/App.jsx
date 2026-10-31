@@ -13,6 +13,8 @@ import HealthScoreView from './views/HealthScoreView';
 import MarketView from './views/MarketView';
 import ProfileView from './views/ProfileView';
 import LoanView from './views/LoanView';
+import LandingView from './views/LandingView';
+import { getAuthToken } from './api/client';
 
 const TAB_TITLES = {
   dashboard: 'Executive Financial Intelligence',
@@ -29,6 +31,7 @@ const TAB_TITLES = {
 };
 
 export default function App() {
+  const [isLanding, setIsLanding] = useState(!getAuthToken());
   const [currentTab, setCurrentTab] = useState('dashboard');
   const [coachPrompt, setCoachPrompt] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -48,10 +51,25 @@ export default function App() {
     }, 400);
   };
 
+  if (isLanding) {
+    return (
+      <LandingView
+        onAuthSuccess={(_user) => {
+          setIsLanding(false);
+          handleRefresh();
+        }}
+        onExploreDemo={() => {
+          setIsLanding(false);
+          handleRefresh();
+        }}
+      />
+    );
+  }
+
   return (
     <div className="app-container">
       {/* Sidebar Navigation */}
-      <Sidebar currentTab={currentTab} setTab={setCurrentTab} />
+      <Sidebar currentTab={currentTab} setTab={setCurrentTab} onGoToLanding={() => setIsLanding(true)} />
 
       {/* Main Content Area */}
       <div className="main-content">
@@ -60,6 +78,7 @@ export default function App() {
           onRefresh={handleRefresh}
           isRefreshing={isRefreshing}
           onOpenAuth={() => setIsAuthModalOpen(true)}
+          onGoToLanding={() => setIsLanding(true)}
         />
 
         <main style={{ flex: 1, overflowY: 'auto' }}>

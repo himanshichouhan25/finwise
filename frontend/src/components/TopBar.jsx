@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, RefreshCw, KeyRound, LogOut, UserCheck } from 'lucide-react';
+import { ShieldCheck, RefreshCw, KeyRound, LogOut, UserCheck, Home } from 'lucide-react';
 import { PERSONAS, getActiveUserId, getAuthToken, getAuthUser, logoutUser } from '../api/client';
 
-export default function TopBar({ title, onRefresh, isRefreshing, onOpenAuth }) {
+export default function TopBar({ title, onRefresh, isRefreshing, onOpenAuth, onGoToLanding }) {
   const [activeId, setActiveId] = useState(getActiveUserId());
   const [authUser, setAuthUser] = useState(getAuthUser());
   const [token, setToken] = useState(getAuthToken());
@@ -84,6 +84,17 @@ export default function TopBar({ title, onRefresh, isRefreshing, onOpenAuth }) {
             </span>
           </div>
 
+          {/* Landing Page Link */}
+          <button
+            className="btn btn-outline"
+            onClick={onGoToLanding}
+            style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem', color: '#2DD4BF', borderColor: 'rgba(20, 184, 166, 0.3)' }}
+            title="Go to Landing & Auth Page"
+          >
+            <Home size={13} />
+            <span>Landing Page</span>
+          </button>
+
           {/* Auth Button */}
           {authUser && token ? (
             <button
@@ -91,6 +102,7 @@ export default function TopBar({ title, onRefresh, isRefreshing, onOpenAuth }) {
               onClick={async () => {
                 await logoutUser();
                 onRefresh();
+                onGoToLanding?.();
               }}
               style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem', borderColor: 'rgba(239, 68, 68, 0.3)', color: '#FCA5A5' }}
               title="Log out of session"
