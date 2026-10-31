@@ -70,6 +70,10 @@ class MarketService:
         if preferred in providers_map and providers_map[preferred].is_configured:
             chain.append(providers_map[preferred])
 
+        # If explicitly set to demo mode, return immediately without network overhead
+        if preferred in ("demo", "demo_fallback"):
+            return chain
+
         # 2. Add other configured live providers in order of preference
         for _name, p in [("tapetide", self.tapetide), ("bharatstock", self.bharatstock), ("alphavantage", self.alphavantage)]:
             if p.is_configured and p not in chain:
@@ -113,19 +117,29 @@ class MarketService:
         if cached:
             return cached
 
+        demo_results = await self.demo.search_stocks(q)
+
         for provider in self._get_provider_chain():
+            if provider == self.demo:
+                continue
             try:
                 results = await provider.search_stocks(q)
                 if results:
-                    self.cache.set(cache_key, results, ttl=600)
-                    return results
+                    merged: list[StockSearchResult] = list(demo_results)
+                    seen = {r.symbol.upper().replace(".BSE", "").replace(".NSE", "") for r in demo_results}
+                    for r in results:
+                        clean = r.symbol.upper().replace(".BSE", "").replace(".NSE", "")
+                        if clean not in seen:
+                            seen.add(clean)
+                            merged.append(r)
+                    self.cache.set(cache_key, merged, ttl=600)
+                    return merged
             except Exception as e:
                 logger.warning("Provider %s failed search_stocks for '%s': %s", provider.name, q, e)
 
         # Fallback to demo search
-        results = await self.demo.search_stocks(q)
-        self.cache.set(cache_key, results, ttl=600)
-        return results
+        self.cache.set(cache_key, demo_results, ttl=600)
+        return demo_results
 
     async def get_stock_quote(self, symbol: str) -> StockQuoteResponse:
         """Fetch stock quote with caching and failover."""
@@ -161,6 +175,9 @@ class MarketService:
         for provider in self._get_provider_chain():
             try:
                 hist = await provider.get_stock_history(sym, timeframe=tf)
+                if not hist or not hist.series or len(hist.series) == 0:
+                    logger.warning("Provider %s returned 0 candle series for %s. Cascading...", provider.name, sym)
+                    continue
                 self.cache.set(cache_key, hist, ttl=900)  # History cached for 15 mins
                 return hist
             except Exception as e:

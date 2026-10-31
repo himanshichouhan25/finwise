@@ -93,8 +93,11 @@ class GroqLLMClient:
             )
 
         models_to_try = [self.primary_model]
-        if self.fallback_model and self.fallback_model != self.primary_model:
+        if self.fallback_model and self.fallback_model not in models_to_try:
             models_to_try.append(self.fallback_model)
+        for cand in ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b"]:
+            if cand not in models_to_try:
+                models_to_try.append(cand)
 
         last_error: Exception | None = None
 

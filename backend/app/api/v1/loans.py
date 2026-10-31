@@ -107,3 +107,4 @@ def remove_loan(
 ) -> None:
     """Delete a loan and its associated repayments."""
     delete_loan(db=db, user_id=user_id, loan_id=loan_id)
+

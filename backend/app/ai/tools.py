@@ -235,24 +235,28 @@ def execute_tool(
         elif name == "project_sip":
             monthly_inv = Decimal(str(arguments.get("monthly_investment", 0)))
             annual_ret = Decimal(str(arguments.get("annual_return_pct", 12.0)))
-            tenure = int(arguments.get("tenure_years", 10))
-            step_up = Decimal(str(arguments.get("step_up_pct", 0)))
-            inflation = Decimal(str(arguments.get("inflation_rate_pct", 6.0)))
+            raw_tenure = arguments.get("duration_years", arguments.get("tenure_years", 10))
+            try:
+                tenure = int(raw_tenure)
+            except (ValueError, TypeError):
+                tenure = 10
+            step_up = Decimal(str(arguments.get("annual_step_up_pct", arguments.get("step_up_pct", 0))))
+            inflation = Decimal(str(arguments.get("annual_inflation_pct", arguments.get("inflation_rate_pct", 6.0))))
 
             result = calculate_sip(
                 monthly_investment=monthly_inv,
+                duration_years=tenure,
                 annual_return_pct=annual_ret,
-                tenure_years=tenure,
-                step_up_pct=step_up,
-                inflation_rate_pct=inflation,
+                annual_step_up_pct=step_up,
+                annual_inflation_pct=inflation,
             )
             return {
                 "monthly_investment": float(result.monthly_investment),
                 "total_invested": float(result.total_invested),
-                "wealth_gained": float(result.wealth_gained),
-                "expected_maturity_amount": float(result.expected_maturity_amount),
-                "inflation_adjusted_amount": float(result.inflation_adjusted_amount),
-                "tenure_years": result.tenure_years,
+                "wealth_gained": float(result.estimated_gain),
+                "expected_maturity_amount": float(result.estimated_value),
+                "inflation_adjusted_amount": float(result.inflation_adjusted_value),
+                "tenure_years": result.duration_years,
                 "annual_return_pct": float(result.annual_return_pct),
             }
 

@@ -75,3 +75,4 @@ class LoanRepayment(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
     loan: Mapped["Loan"] = relationship("Loan", back_populates="repayments")
+

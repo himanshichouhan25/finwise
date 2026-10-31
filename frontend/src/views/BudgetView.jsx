@@ -63,10 +63,12 @@ export default function BudgetView() {
     e.preventDefault();
     if (!incomeAmount || Number(incomeAmount) <= 0) return;
     try {
+      const todayStr = new Date().toISOString().split('T')[0];
       await addIncomeRecord({
         amount: Number(incomeAmount),
         source: incomeSource,
-        date: new Date().toISOString().split('T')[0],
+        received_on: todayStr,
+        date: todayStr,
       });
       setIncomeAmount('');
       setShowAddIncome(false);
@@ -90,11 +92,13 @@ export default function BudgetView() {
     e.preventDefault();
     if (!expenseAmount || Number(expenseAmount) <= 0) return;
     try {
+      const todayStr = new Date().toISOString().split('T')[0];
       await addExpenseRecord({
         amount: Number(expenseAmount),
         category: expenseCategory,
         description: expenseDescription || expenseCategory,
-        date: new Date().toISOString().split('T')[0],
+        spent_on: todayStr,
+        date: todayStr,
       });
       setExpenseAmount('');
       setExpenseDescription('');

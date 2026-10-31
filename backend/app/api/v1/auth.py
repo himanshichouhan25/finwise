@@ -62,3 +62,4 @@ def get_me(
 def logout() -> dict[str, str]:
     """Client-side token disposal acknowledgement endpoint."""
     return {"status": "success", "message": "Successfully logged out"}
+

@@ -1,18 +1,31 @@
 """Financial simulation request and response schemas."""
 
 from decimal import Decimal
+from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class SipRequest(BaseModel):
     """Parameters for SIP compound growth projection."""
 
     monthly_investment: Decimal = Field(gt=Decimal("0.00"), le=Decimal("10000000.00"))
-    duration_years: int = Field(ge=1, le=50)
+    duration_years: int = Field(default=10, ge=1, le=50)
     annual_return_pct: Decimal = Field(ge=Decimal("0.00"), le=Decimal("50.00"))
     annual_step_up_pct: Decimal = Field(default=Decimal("0.00"), ge=Decimal("0.00"), le=Decimal("50.00"))
     annual_inflation_pct: Decimal = Field(default=Decimal("0.00"), ge=Decimal("0.00"), le=Decimal("30.00"))
+
+    @model_validator(mode="before")
+    @classmethod
+    def resolve_aliases(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            if "duration_years" not in data or data["duration_years"] is None:
+                data["duration_years"] = data.get("tenure_years", 10)
+            if "annual_step_up_pct" not in data or data["annual_step_up_pct"] is None:
+                data["annual_step_up_pct"] = data.get("step_up_pct", Decimal("0.00"))
+            if "annual_inflation_pct" not in data or data["annual_inflation_pct"] is None:
+                data["annual_inflation_pct"] = data.get("inflation_rate_pct", Decimal("0.00"))
+        return data
 
 
 class SipYearPointSchema(BaseModel):
@@ -23,10 +36,13 @@ class SipYearPointSchema(BaseModel):
 
 class SipScenarioSchema(BaseModel):
     label: str
+    scenario_name: str | None = None
     annual_return_pct: Decimal
     total_invested: Decimal
     estimated_value: Decimal
+    maturity_amount: Decimal | None = None
     estimated_gain: Decimal
+    wealth_gained: Decimal | None = None
 
 
 class SipResponse(BaseModel):
@@ -39,8 +55,11 @@ class SipResponse(BaseModel):
     annual_inflation_pct: Decimal
     total_invested: Decimal
     estimated_value: Decimal
+    maturity_amount: Decimal | None = None
     estimated_gain: Decimal
+    wealth_gained: Decimal | None = None
     inflation_adjusted_value: Decimal
+    inflation_adjusted_maturity: Decimal | None = None
     yearly_series: list[SipYearPointSchema]
     scenarios: list[SipScenarioSchema]
     assumptions: list[str]

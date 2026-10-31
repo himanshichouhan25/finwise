@@ -231,9 +231,13 @@ h1, h2, h3, h4, .font-display {
 .main-content {
   margin-left: 260px;
   flex: 1;
-  min-height: 100vh;
+  min-width: 0;
+  max-width: calc(100vw - 260px);
+  height: 100vh;
+  max-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 /* Top bar disclaimer */

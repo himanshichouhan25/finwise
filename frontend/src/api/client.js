@@ -104,11 +104,20 @@ export async function apiFetch(endpoint, options = {}) {
   const data = contentType && contentType.includes("application/json") ? await response.json() : null;
 
   if (!response.ok) {
-    const errorMsg = data?.error?.message || `API request failed with status ${response.status}`;
+    let errorMsg = data?.error?.message;
+    if (!errorMsg && typeof data?.detail === "string") {
+      errorMsg = data.detail;
+    } else if (!errorMsg && Array.isArray(data?.detail)) {
+      errorMsg = data.detail.map(d => d.msg || `${d.loc?.join(".")}: invalid`).join(", ");
+    } else if (!errorMsg && typeof data?.message === "string") {
+      errorMsg = data.message;
+    } else if (!errorMsg) {
+      errorMsg = `API request failed with status ${response.status}`;
+    }
     const err = new Error(errorMsg);
     err.status = response.status;
     err.code = data?.error?.code || "HTTP_ERROR";
-    err.details = data?.error?.details;
+    err.details = data?.error?.details || data?.detail;
     throw err;
   }
 

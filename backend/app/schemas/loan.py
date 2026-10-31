@@ -158,3 +158,4 @@ class LoanPrioritizationResponse(BaseModel):
     snowball_strategy: list[LoanPrioritizationItemSchema]
     avalanche_recommendation: str
     snowball_recommendation: str
+

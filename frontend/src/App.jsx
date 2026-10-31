@@ -81,7 +81,7 @@ export default function App() {
           onGoToLanding={() => setIsLanding(true)}
         />
 
-        <main style={{ flex: 1, overflowY: 'auto' }}>
+        <main style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', paddingBottom: '3rem' }}>
           {currentTab === 'dashboard' && (
             <DashboardView
               onNavigateToCoach={handleNavigateToCoach}

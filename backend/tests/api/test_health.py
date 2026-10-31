@@ -16,7 +16,8 @@ def test_health_check_returns_200(client: TestClient):
 
 def test_health_check_boots_without_groq_key(client: TestClient, monkeypatch):
     """Confirm the app functions without GROQ_API_KEY, gracefully reporting ai_configured=False."""
-    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    monkeypatch.setenv("GROQ_API_KEY", "")
+    monkeypatch.setenv("GROQ_API_KEYS", "")
     from app.core.config import get_settings
 
     get_settings.cache_clear()

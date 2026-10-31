@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   ShieldAlert, 
   AlertTriangle, 
@@ -7,7 +7,9 @@ import {
   Sparkles, 
   History, 
   TrendingUp, 
-  ExternalLink 
+  ExternalLink,
+  ShieldCheck,
+  Zap
 } from 'lucide-react';
 import { analyzeClaim, getClaimHistory } from '../api/client';
 
@@ -17,6 +19,7 @@ export default function ClaimsAuditView() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const resultRef = useRef(null);
 
   const loadHistory = async () => {
     try {
@@ -45,6 +48,9 @@ export default function ClaimsAuditView() {
       setResult(res);
       setClaimText(text);
       loadHistory();
+      setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 120);
     } catch (err) {
       setError(err.message || 'Failed to analyze claim');
     } finally {
@@ -68,13 +74,13 @@ export default function ClaimsAuditView() {
   ];
 
   return (
-    <div style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.75rem', maxWidth: '1200px' }}>
+    <div style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.75rem', maxWidth: '1200px', margin: '0 auto', paddingBottom: '4rem' }}>
       {/* Header Banner */}
-      <div className="glass-panel" style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+      <div className="glass-panel" style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', borderLeft: '4px solid #EF4444' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
             <ShieldAlert size={22} color="#EF4444" />
-            <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#FFFFFF' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF' }}>
               Finfluencer Claim Reality Check & Scam Detector
             </h2>
           </div>
@@ -82,7 +88,10 @@ export default function ClaimsAuditView() {
             Paste any social media post, YouTube video promise, or Telegram stock tip. We extract the parameters, calculate implied CAGR, and expose red flags.
           </p>
         </div>
-        <span className="badge badge-crimson">SEBI Rule Enforcement</span>
+        <span className="badge badge-crimson" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+          <Zap size={13} />
+          <span>SEBI Rule Enforcement</span>
+        </span>
       </div>
 
       {/* Input Form & Sample Chips */}
@@ -93,15 +102,15 @@ export default function ClaimsAuditView() {
         <textarea
           className="fin-input"
           rows={3}
-          placeholder="e.g. 'Make 15% every month with this guaranteed intraday options strategy...'"
+          placeholder="e.g. 'Turn ₹10,000 into 1 Crore in 3 years with this secret crypto & penny stock trick...'"
           value={claimText}
           onChange={(e) => setClaimText(e.target.value)}
-          style={{ resize: 'vertical' }}
+          style={{ resize: 'vertical', width: '100%', fontSize: '0.9rem', lineHeight: '1.5' }}
         />
 
         {/* Quick Sample Buttons */}
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.75rem', color: '#64748B', alignSelf: 'center' }}>Test with demo claims:</span>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          <span style={{ fontSize: '0.75rem', color: '#64748B' }}>Test with demo claims:</span>
           {SAMPLE_CLAIMS.map((sc, idx) => (
             <button
               key={idx}
@@ -119,33 +128,39 @@ export default function ClaimsAuditView() {
             className="btn btn-teal"
             onClick={() => handleAudit()}
             disabled={loading || !claimText.trim()}
+            style={{ padding: '0.6rem 1.4rem', fontSize: '0.9rem', fontWeight: 700 }}
           >
             <Search size={16} />
-            <span>{loading ? 'Auditing Claim...' : 'Audit Claim Reality'}</span>
+            <span>{loading ? 'Auditing Math & Rules...' : 'Audit Claim Reality'}</span>
           </button>
         </div>
       </div>
 
       {error && (
-        <div className="glass-card" style={{ borderColor: 'rgba(239, 68, 68, 0.4)', background: 'rgba(239, 68, 68, 0.05)', color: '#F87171' }}>
+        <div className="glass-card" style={{ borderColor: 'rgba(239, 68, 68, 0.4)', background: 'rgba(239, 68, 68, 0.08)', color: '#F87171', padding: '1rem' }}>
           {error}
         </div>
       )}
 
       {/* Audit Analysis Results Card */}
       {result && (
-        <div className="glass-panel" style={{
-          padding: '1.75rem',
-          border: `1px solid ${result.risk_level === 'extreme' ? 'rgba(239, 68, 68, 0.5)' : result.risk_level === 'high' ? 'rgba(245, 158, 11, 0.5)' : 'rgba(20, 184, 166, 0.4)'}`,
-          background: result.risk_level === 'extreme' ? 'rgba(239, 68, 68, 0.04)' : 'rgba(21, 31, 51, 0.6)',
-        }}>
+        <div
+          ref={resultRef}
+          className="glass-panel"
+          style={{
+            padding: '1.75rem',
+            border: `1px solid ${result.risk_level === 'extreme' ? 'rgba(239, 68, 68, 0.6)' : result.risk_level === 'high' ? 'rgba(245, 158, 11, 0.6)' : 'rgba(20, 184, 166, 0.5)'}`,
+            background: result.risk_level === 'extreme' ? 'linear-gradient(180deg, rgba(239, 68, 68, 0.08) 0%, rgba(14, 21, 36, 0.7) 100%)' : 'rgba(21, 31, 51, 0.65)',
+            borderRadius: '12px',
+          }}
+        >
           {/* Header & Risk Level Badge */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
-            <div>
-              <span style={{ fontSize: '0.75rem', color: '#94A3B8', textTransform: 'uppercase', fontWeight: 600 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '1rem' }}>
+            <div style={{ flex: 1, minWidth: '260px' }}>
+              <span style={{ fontSize: '0.75rem', color: '#94A3B8', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>
                 AUDIT VERDICT
               </span>
-              <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#FFFFFF', marginTop: '0.2rem' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF', marginTop: '0.35rem', lineHeight: '1.4' }}>
                 {result.verdict}
               </h3>
             </div>
@@ -157,7 +172,7 @@ export default function ClaimsAuditView() {
                   ? 'badge-amber'
                   : 'badge-teal'
               }`}
-              style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
+              style={{ fontSize: '0.85rem', padding: '0.45rem 0.9rem', fontWeight: 800, letterSpacing: '0.04em' }}
             >
               {result.risk_level.toUpperCase()} RISK LEVEL
             </span>
@@ -165,23 +180,23 @@ export default function ClaimsAuditView() {
 
           {/* Metric KPI cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-            <div className="glass-card">
+            <div className="glass-card" style={{ padding: '1rem' }}>
               <span style={{ fontSize: '0.75rem', color: '#94A3B8', fontWeight: 600 }}>IMPLIED ANNUAL CAGR</span>
-              <div style={{ fontSize: '1.75rem', fontWeight: 900, color: result.annualized_cagr_pct > 30 ? '#EF4444' : '#2DD4BF', marginTop: '0.25rem' }}>
+              <div style={{ fontSize: '1.85rem', fontWeight: 900, color: result.annualized_cagr_pct > 30 ? '#EF4444' : '#2DD4BF', marginTop: '0.25rem' }}>
                 {result.annualized_cagr_pct}% p.a.
               </div>
               <span style={{ fontSize: '0.7rem', color: '#64748B' }}>Timeframe: {result.timeframe_years} Year(s)</span>
             </div>
 
-            <div className="glass-card">
+            <div className="glass-card" style={{ padding: '1rem' }}>
               <span style={{ fontSize: '0.75rem', color: '#94A3B8', fontWeight: 600 }}>DOUBLING TIME (RULE OF 72)</span>
-              <div style={{ fontSize: '1.75rem', fontWeight: 900, color: '#F59E0B', marginTop: '0.25rem' }}>
-                {result.doubling_time_years ? `${result.doubling_time_years} Years` : 'N/A'}
+              <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#F59E0B', marginTop: '0.25rem' }}>
+                {result.doubling_time_years ? `${result.doubling_time_years} Years` : 'Instant / High Risk'}
               </div>
               <span style={{ fontSize: '0.7rem', color: '#64748B' }}>Time required to 2x money</span>
             </div>
 
-            <div className="glass-card">
+            <div className="glass-card" style={{ padding: '1rem' }}>
               <span style={{ fontSize: '0.75rem', color: '#94A3B8', fontWeight: 600 }}>RETURN GUARANTEE</span>
               <div style={{ fontSize: '1.25rem', fontWeight: 800, color: result.is_guaranteed ? '#EF4444' : '#2DD4BF', marginTop: '0.4rem' }}>
                 {result.is_guaranteed ? '⚠️ Guaranteed (Illegal)' : '✓ Market-Linked'}
@@ -194,7 +209,7 @@ export default function ClaimsAuditView() {
           {result.red_flags && result.red_flags.length > 0 && (
             <div style={{ marginBottom: '1.5rem' }}>
               <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#F87171', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <AlertTriangle size={16} />
+                <AlertTriangle size={17} />
                 <span>Detected Red Flags ({result.red_flags.length})</span>
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -204,7 +219,7 @@ export default function ClaimsAuditView() {
                       <span style={{ fontWeight: 700, color: '#F87171', fontSize: '0.85rem' }}>{rf.title}</span>
                       <span className="badge badge-crimson" style={{ fontSize: '0.65rem' }}>{rf.severity}</span>
                     </div>
-                    <p style={{ fontSize: '0.8rem', color: '#CBD5E1', marginTop: '0.35rem' }}>{rf.description}</p>
+                    <p style={{ fontSize: '0.8rem', color: '#CBD5E1', marginTop: '0.35rem', lineHeight: '1.4' }}>{rf.description}</p>
                   </div>
                 ))}
               </div>
@@ -214,19 +229,20 @@ export default function ClaimsAuditView() {
           {/* Benchmark Multiples Comparison Table */}
           {result.benchmarks && result.benchmarks.length > 0 && (
             <div>
-              <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#F8FAFC', marginBottom: '0.75rem' }}>
-                Benchmark Multiples Comparison
+              <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#F8FAFC', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <TrendingUp size={16} color="#2DD4BF" />
+                <span>Benchmark Multiples Comparison</span>
               </h4>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
                 {result.benchmarks.map((bm, idx) => (
-                  <div key={idx} className="glass-card" style={{ padding: '0.75rem' }}>
+                  <div key={idx} className="glass-card" style={{ padding: '0.85rem' }}>
                     <div style={{ fontSize: '0.75rem', color: '#94A3B8', textTransform: 'capitalize' }}>
                       {bm.benchmark_name.replace('_', ' ')} ({bm.benchmark_cagr_pct}%)
                     </div>
-                    <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#FFFFFF', marginTop: '0.2rem' }}>
+                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#FFFFFF', marginTop: '0.25rem' }}>
                       {bm.multiplier_vs_benchmark}x
                     </div>
-                    <span style={{ fontSize: '0.68rem', color: '#64748B' }}>vs standard asset rate</span>
+                    <span style={{ fontSize: '0.68rem', color: '#64748B' }}>vs real-world standard asset rate</span>
                   </div>
                 ))}
               </div>
@@ -247,8 +263,8 @@ export default function ClaimsAuditView() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             {history.map((h) => (
-              <div key={h.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
-                <div style={{ flex: 1, marginRight: '1rem' }}>
+              <div key={h.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid var(--border-subtle)', flexWrap: 'wrap', gap: '0.5rem' }}>
+                <div style={{ flex: 1, minWidth: '240px' }}>
                   <p style={{ fontSize: '0.85rem', color: '#F8FAFC', fontWeight: 500 }}>"{h.claim_text}"</p>
                   <span style={{ fontSize: '0.7rem', color: '#64748B' }}>{new Date(h.created_at).toLocaleDateString()}</span>
                 </div>

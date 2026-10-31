@@ -336,7 +336,7 @@ export default function ProfileView({ onNavigateToTab }) {
       </div>
 
       {/* ── ROW 1: Personal Info + Financial Journey ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.15fr', gap: '1.25rem', marginBottom: '1.25rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
 
         {/* Personal Information Card */}
         <div style={{ ...card }}>
@@ -425,7 +425,7 @@ export default function ProfileView({ onNavigateToTab }) {
           <SectionHeader icon={BarChart2} label="Financial Journey" color="#F59E0B" />
 
           {/* 4 stat boxes */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '0.75rem', marginBottom: '1.5rem' }}>
             {[
               { icon: Target, color: '#EF4444', bg: 'rgba(239,68,68,0.15)', value: goalsCount || 6, label: 'Goals Set' },
               { icon: BookOpen, color: '#A78BFA', bg: 'rgba(167,139,250,0.15)', value: decisionsLogged || 24, label: 'Decisions Logged' },
@@ -498,7 +498,7 @@ export default function ProfileView({ onNavigateToTab }) {
       </div>
 
       {/* ── ROW 2: Preferences + Notifications + Security ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr 0.95fr', gap: '1.25rem', marginBottom: '1.25rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
 
         {/* Financial Preferences */}
         <div style={{ ...card }}>
@@ -676,7 +676,7 @@ export default function ProfileView({ onNavigateToTab }) {
       </div>
 
       {/* ── ROW 3: Achievements + App Preferences + Support ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr 0.95fr', gap: '1.25rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
 
         {/* Achievements */}
         <div style={{ ...card }}>
@@ -693,7 +693,7 @@ export default function ProfileView({ onNavigateToTab }) {
               </button>
             }
           />
-          <div style={{ display: 'flex', gap: '0.6rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '0.6rem' }}>
             {achievements.map((a) => (
               <AchievementCard key={a.title} {...a} />
             ))}
@@ -813,3 +813,4 @@ export default function ProfileView({ onNavigateToTab }) {
     </div>
   );
 }
+

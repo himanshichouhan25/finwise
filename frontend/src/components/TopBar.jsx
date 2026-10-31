@@ -57,14 +57,16 @@ export default function TopBar({ title, onRefresh, isRefreshing, onOpenAuth, onG
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0.85rem 1.75rem',
+        flexWrap: 'wrap',
+        gap: '0.75rem',
       }}>
         <div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#FFFFFF' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#FFFFFF', margin: 0 }}>
             {title}
           </h2>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
           {/* Active User Pill */}
           <div style={{
             display: 'flex',

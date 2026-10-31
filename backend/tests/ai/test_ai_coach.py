@@ -27,7 +27,7 @@ def test_user(db_session: Session) -> User:
 
 def test_ai_coach_offline_graceful_degradation(client: TestClient, test_user: User):
     """When no Groq API key is configured, chat endpoint returns HTTP 503 AI_UNAVAILABLE."""
-    with patch("app.ai.client.get_llm_client") as mock_get_client:
+    with patch("app.services.coach_service.get_llm_client") as mock_get_client:
         mock_client = GroqLLMClient(keys=[])
         mock_get_client.return_value = mock_client
 

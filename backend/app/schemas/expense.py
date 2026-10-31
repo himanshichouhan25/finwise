@@ -1,10 +1,10 @@
 """Expense records request and response schemas."""
 
-from datetime import date, datetime
+import datetime as dt
 from decimal import Decimal
-from typing import Literal
+from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class ExpenseCreate(BaseModel):
@@ -16,8 +16,16 @@ class ExpenseCreate(BaseModel):
         default=None, description="Optional bucket override; auto-resolved if omitted"
     )
     description: str = Field(default="", max_length=255)
-    spent_on: date = Field(description="Date expense occurred")
+    spent_on: dt.date | None = Field(default=None, description="Date expense occurred")
+    date: dt.date | None = Field(default=None, description="Alias for spent_on")
     is_impulsive: bool = Field(default=False, description="User flag for impulse purchases")
+
+    @model_validator(mode="before")
+    @classmethod
+    def resolve_date_fields(cls, data: Any) -> Any:
+        if isinstance(data, dict) and ("spent_on" not in data or not data["spent_on"]):
+            data["spent_on"] = data.get("date") or dt.date.today()
+        return data
 
 
 class ExpenseUpdate(BaseModel):
@@ -27,7 +35,7 @@ class ExpenseUpdate(BaseModel):
     category: str | None = Field(default=None, min_length=1, max_length=100)
     bucket: Literal["needs", "wants", "savings"] | None = None
     description: str | None = Field(default=None, max_length=255)
-    spent_on: date | None = None
+    spent_on: dt.date | None = None
     is_impulsive: bool | None = None
 
 
@@ -40,8 +48,8 @@ class ExpenseResponse(BaseModel):
     category: str
     bucket: str
     description: str
-    spent_on: date
+    spent_on: dt.date
     is_impulsive: bool
-    created_at: datetime
+    created_at: dt.datetime
 
     model_config = {"from_attributes": True}

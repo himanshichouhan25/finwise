@@ -42,10 +42,13 @@ def run_sip_simulation(payload: SipRequest) -> SipResponse:
     scenarios = [
         SipScenarioSchema(
             label=sc.label,
+            scenario_name=sc.label,
             annual_return_pct=sc.annual_return_pct,
             total_invested=sc.total_invested,
             estimated_value=sc.estimated_value,
+            maturity_amount=sc.estimated_value,
             estimated_gain=sc.estimated_gain,
+            wealth_gained=sc.estimated_gain,
         )
         for sc in res.scenarios
     ]
@@ -58,8 +61,11 @@ def run_sip_simulation(payload: SipRequest) -> SipResponse:
         annual_inflation_pct=res.annual_inflation_pct,
         total_invested=res.total_invested,
         estimated_value=res.estimated_value,
+        maturity_amount=res.estimated_value,
         estimated_gain=res.estimated_gain,
+        wealth_gained=res.estimated_gain,
         inflation_adjusted_value=res.inflation_adjusted_value,
+        inflation_adjusted_maturity=res.inflation_adjusted_value,
         yearly_series=yearly_series,
         scenarios=scenarios,
         assumptions=res.assumptions,

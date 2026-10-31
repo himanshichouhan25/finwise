@@ -136,9 +136,13 @@ class AlphaVantageProvider(BaseMarketProvider):
 
             if "Note" in data:
                 raise RuntimeError(f"Alpha Vantage rate limit reached: {data['Note']}")
+            if "Information" in data:
+                raise RuntimeError(f"Alpha Vantage rate limit reached: {data['Information']}")
+            if "Error Message" in data:
+                raise ValueError(f"Alpha Vantage error for {ticker}: {data['Error Message']}")
 
             q = data.get("Global Quote", {})
-            if not q:
+            if not q or not q.get("05. price"):
                 raise ValueError(f"No quote returned by Alpha Vantage for {ticker}")
 
             price = Decimal(q.get("05. price", "0"))
@@ -180,7 +184,17 @@ class AlphaVantageProvider(BaseMarketProvider):
             resp.raise_for_status()
             data = resp.json()
 
+            if "Note" in data:
+                raise RuntimeError(f"Alpha Vantage rate limit reached: {data['Note']}")
+            if "Information" in data:
+                raise RuntimeError(f"Alpha Vantage API notice: {data['Information']}")
+            if "Error Message" in data:
+                raise ValueError(f"Alpha Vantage error for {ticker}: {data['Error Message']}")
+
             ts = data.get("Time Series (Daily)", {})
+            if not ts:
+                raise ValueError(f"No daily historical time series returned by Alpha Vantage for {ticker}")
+
             series: list[OHLCVPoint] = []
             for date_str, bar in sorted(ts.items()):
                 series.append(
@@ -193,6 +207,9 @@ class AlphaVantageProvider(BaseMarketProvider):
                         volume=int(bar.get("5. volume", "0")),
                     )
                 )
+
+            if not series:
+                raise ValueError(f"No valid series points parsed from Alpha Vantage for {ticker}")
 
             return StockHistoryResponse(
                 symbol=symbol.upper(),
@@ -219,6 +236,8 @@ class AlphaVantageProvider(BaseMarketProvider):
             )
             resp.raise_for_status()
             d = resp.json()
+            if not d or "Note" in d or "Information" in d or "Error Message" in d:
+                raise ValueError(f"No overview data from Alpha Vantage for {ticker}: {d.get('Note') or d.get('Information') or d.get('Error Message') or 'Empty'}")
 
             def _dec(key: str) -> Decimal | None:
                 val = d.get(key)
@@ -228,6 +247,9 @@ class AlphaVantageProvider(BaseMarketProvider):
                     return Decimal(str(val))
                 except Exception:
                     return None
+
+            if _dec("PERatio") is None and _dec("EPS") is None:
+                raise ValueError(f"Incomplete fundamentals returned by Alpha Vantage for {ticker}")
 
             return StockFundamentalsResponse(
                 symbol=symbol.upper(),

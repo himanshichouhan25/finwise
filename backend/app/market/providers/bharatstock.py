@@ -129,8 +129,14 @@ class BharatStockProvider(BaseMarketProvider):
             resp.raise_for_status()
             prices = resp.json()
 
+            if not prices:
+                raise ValueError(f"Empty price data returned by BharatStock for {ticker}")
+
             latest = prices[-1] if isinstance(prices, list) and prices else prices.get("latest", {})
             close_price = Decimal(str(latest.get("close", latest.get("price", 0))))
+            if close_price <= Decimal("0"):
+                raise ValueError(f"Invalid non-positive quote price ({close_price}) returned by BharatStock for {ticker}")
+
             prev_price = Decimal(str(latest.get("prev_close", latest.get("open", close_price))))
             diff = close_price - prev_price
             pct = (diff / prev_price * 100) if prev_price > 0 else Decimal("0.00")
@@ -162,6 +168,9 @@ class BharatStockProvider(BaseMarketProvider):
             candles = resp.json()
             if not isinstance(candles, list):
                 candles = candles.get("prices", [])
+
+            if not candles:
+                raise ValueError(f"Empty candle series returned by BharatStock for {ticker}")
 
             series = [
                 OHLCVPoint(
@@ -198,10 +207,16 @@ class BharatStockProvider(BaseMarketProvider):
             resp.raise_for_status()
             data = resp.json()
             d = data[0] if isinstance(data, list) and data else data
+            if not d:
+                raise ValueError(f"Empty fundamentals returned by BharatStock for {ticker}")
 
             def _dec(key: str) -> Decimal | None:
                 val = d.get(key)
                 return Decimal(str(val)) if val is not None else None
+
+            pe_val = _dec("pe_ratio") or _dec("pe")
+            if pe_val is None:
+                raise ValueError(f"Incomplete ratios (missing PE) from BharatStock for {ticker}")
 
             return StockFundamentalsResponse(
                 symbol=ticker,
