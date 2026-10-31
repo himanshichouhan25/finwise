@@ -136,32 +136,19 @@ Red flags detected: promised "guaranteed" returns, urgency / FOMO language, and 
 
 ## 🏗 System Architecture
 
-```mermaid
-flowchart TB
-    U([User]) --> FE["React + Vite frontend"]
-    FE -->|"HTTP /api/v1"| API["FastAPI backend<br/>request logging, JSON error envelope"]
-    API --> SVC["Services layer"]
-    SVC --> ENG["Pure-Python financial engine<br/>budget, sip, goals, goal_delay,<br/>claim_math, red_flags, health_score"]
-    API --> AI["AI coach<br/>Groq client, guardrails, tools"]
-    AI -->|"tool calls"| ENG
-    AI -->|"LLM API"| GROQ["Groq<br/>llama-3.3-70b-versatile"]
-    SVC --> DB[("SQLite via SQLAlchemy")]
-    API --> MKT["Market data providers<br/>tapetide, bharatstock, alphavantage, demo"]
-```
+<p align="center">
+  <img src="docs/assets/system-architecture.png" alt="System architecture of FinWise AI" width="90%" />
+</p>
+
+<sub>Editable Mermaid source: <code>docs/assets/src/system-architecture.mmd</code></sub>
 
 ## 🧭 User Journey
 
-```mermaid
-flowchart LR
-    A[Sign in or pick demo persona] --> B[Dashboard:<br/>50/30/20 + Health Score]
-    B --> C[Goals:<br/>enter impulse spend]
-    C --> D[Goal-Days Delayed result]
-    D --> E[Finfluencer Audit:<br/>paste a claim]
-    E --> F[CAGR vs benchmarks<br/>+ red flags]
-    F --> G[Decision Journal:<br/>24h / 48h cooling-off]
-    G --> H[Ask AI Coach<br/>in English or Hinglish]
-    H --> I[Answer using real numbers<br/>+ disclaimer]
-```
+<p align="center">
+  <img src="docs/assets/user-journey.png" alt="Application user journey" width="90%" />
+</p>
+
+<sub>Editable Mermaid source: <code>docs/assets/src/user-journey.mmd</code></sub>
 
 ## 🤖 AI Architecture
 
@@ -177,40 +164,21 @@ flowchart LR
 | Languages | English and Hinglish |
 | Offline mode | Without an API key the backend still boots; AI endpoints return `AI_UNAVAILABLE` |
 
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant API as FastAPI coach endpoint
-    participant CTX as Financial snapshot
-    participant LLM as Groq LLM
-    participant ENG as Python engine (tools)
-    U->>API: Question (English / Hinglish)
-    API->>CTX: Build user's authoritative snapshot
-    API->>LLM: System prompt + guardrails + snapshot + question
-    loop tool-calling rounds
-        LLM->>API: Request tool (project_sip / plan_goal / get_budget_summary)
-        API->>ENG: Run deterministic calculation
-        ENG-->>API: Verified numbers
-        API->>LLM: Tool result
-    end
-    LLM-->>API: Explanation using only verified numbers
-    API-->>U: Response + SEBI-style disclaimer
-    Note over API,LLM: 429 rotates the API key. Model failure falls back to llama-3.1-8b-instant. No key returns AI_UNAVAILABLE.
-```
+<p align="center">
+  <img src="docs/assets/ai-chatbot-workflow.png" alt="AI chatbot workflow" width="90%" />
+</p>
+
+<sub>Editable Mermaid source: <code>docs/assets/src/ai-chatbot-workflow.mmd</code></sub>
 
 ## 🧮 Financial Calculation Engine
 
 All numbers come from modules in `backend/app/engine/`: `budget.py`, `sip.py`, `goals.py`, `goal_delay.py`, `claim_math.py`, `red_flags.py`, `health_score.py`.
 
-```mermaid
-flowchart LR
-    R[API request] --> V[Pydantic v2 validation]
-    V --> S[Service layer]
-    S --> E[Pure-Python engine function]
-    E --> O[Typed result]
-    O --> J[JSON response]
-    O -.-> L[LLM: explanation only]
-```
+<p align="center">
+  <img src="docs/assets/calculation-workflow.png" alt="Financial calculation workflow" width="90%" />
+</p>
+
+<sub>Editable Mermaid source: <code>docs/assets/src/calculation-workflow.mmd</code></sub>
 
 <details>
 <summary><b>Reference formulas</b></summary>
@@ -233,31 +201,21 @@ Projections depend entirely on user inputs and constant-return assumptions. They
 
 SQLite through SQLAlchemy 2. Core entities: **Users, Profiles, Incomes, Expenses, Goals, Claims, Chat Sessions, Journal**. Full schemas are in `backend/app/models/`.
 
-```mermaid
-erDiagram
-    USERS ||--o| PROFILES : has
-    USERS ||--o{ INCOMES : records
-    USERS ||--o{ EXPENSES : records
-    USERS ||--o{ GOALS : sets
-    USERS ||--o{ CLAIMS : checks
-    USERS ||--o{ CHAT_SESSIONS : opens
-    USERS ||--o{ JOURNAL : writes
-```
+<p align="center">
+  <img src="docs/assets/er-diagram.png" alt="Database entity relationship diagram" width="90%" />
+</p>
+
+<sub>Editable Mermaid source: <code>docs/assets/src/er-diagram.mmd</code></sub>
 
 ## 🔐 Authentication
 
 FinWise supports user registration and login. For demos, three seeded personas can be selected with the `X-User-Id` header (`1`, `2`, `3`). Authentication endpoints are listed in the Swagger docs at `/docs`.
 
-```mermaid
-sequenceDiagram
-    participant FE as React frontend
-    participant API as FastAPI
-    participant DB as SQLite
-    FE->>API: Request + X-User-Id (demo mode)
-    API->>DB: Load data for that user
-    DB-->>API: Persona data
-    API-->>FE: JSON response
-```
+<p align="center">
+  <img src="docs/assets/auth-flow.png" alt="Authentication flow" width="90%" />
+</p>
+
+<sub>Editable Mermaid source: <code>docs/assets/src/auth-flow.mmd</code></sub>
 
 ## 📈 Market Data Integration
 
@@ -311,6 +269,7 @@ finwise/
 ├── frontend/
 │   └── src/            # Views, components, API client, design tokens
 ├── docs/               # API.md, DECISIONS.md, FINANCE_SPEC.md, DOCUMENTATION_AUDIT.md
+│   └── assets/         # Diagram images (PNG) and Mermaid sources (src/)
 ├── image/
 └── .env.example
 ```
