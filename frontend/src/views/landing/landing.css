@@ -1,0 +1,228 @@
+/* ==========================================================================
+   FinWise AI — Premium Light Theme Landing Page Design System
+   Violet (#6D4AFF) & Teal (#0F9F9A) on Crisp White / Slate (#F8FAFC)
+   ========================================================================== */
+
+:root {
+  --lp-bg-main: #F8FAFC;
+  --lp-bg-white: #FFFFFF;
+  --lp-bg-soft: #F1F5F9;
+  --lp-bg-lavender: #F4F0FF;
+  --lp-bg-lavender-subtle: #FAF7FF;
+  
+  --lp-brand-violet: #6D4AFF;
+  --lp-brand-violet-dark: #5135CC;
+  --lp-brand-violet-light: #8B6EFE;
+  --lp-brand-violet-glow: rgba(109, 74, 255, 0.16);
+
+  --lp-brand-teal: #0F9F9A;
+  --lp-brand-teal-dark: #0D827E;
+  --lp-brand-teal-soft: #DDF8F5;
+  --lp-brand-teal-glow: rgba(15, 159, 154, 0.16);
+
+  --lp-text-primary: #111827;
+  --lp-text-secondary: #475569;
+  --lp-text-muted: #64748B;
+  --lp-text-light: #94A3B8;
+
+  --lp-border-subtle: #E2E8F0;
+  --lp-border-light: #EDF2F7;
+  --lp-border-focus: #CBD5E1;
+
+  --lp-shadow-sm: 0 1px 2px 0 rgba(16, 24, 40, 0.05);
+  --lp-shadow-md: 0 4px 8px -2px rgba(16, 24, 40, 0.06), 0 2px 4px -2px rgba(16, 24, 40, 0.03);
+  --lp-shadow-lg: 0 12px 24px -4px rgba(16, 24, 40, 0.08), 0 4px 8px -2px rgba(16, 24, 40, 0.03);
+  --lp-shadow-xl: 0 24px 48px -8px rgba(16, 24, 40, 0.1), 0 8px 16px -4px rgba(16, 24, 40, 0.04);
+  --lp-shadow-glow: 0 20px 40px rgba(109, 74, 255, 0.12);
+}
+
+.finwise-landing {
+  background-color: var(--lp-bg-main);
+  color: var(--lp-text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.finwise-landing * {
+  box-sizing: border-box;
+}
+
+/* Typography styles */
+.finwise-landing h1,
+.finwise-landing h2,
+.finwise-landing h3,
+.finwise-landing h4 {
+  color: var(--lp-text-primary);
+  letter-spacing: -0.025em;
+  font-weight: 800;
+  line-height: 1.18;
+}
+
+/* Light Theme Container Utility */
+.lp-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Buttons */
+.lp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 0.75rem 1.4rem;
+  border-radius: 12px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  border: 1px solid transparent;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.lp-btn-primary {
+  background: var(--lp-brand-violet);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(109, 74, 255, 0.35);
+}
+
+.lp-btn-primary:hover {
+  background: var(--lp-brand-violet-dark);
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 20px rgba(109, 74, 255, 0.45);
+}
+
+.lp-btn-secondary {
+  background: var(--lp-bg-white);
+  color: var(--lp-text-primary);
+  border-color: var(--lp-border-subtle);
+  box-shadow: var(--lp-shadow-sm);
+}
+
+.lp-btn-secondary:hover {
+  background: var(--lp-bg-soft);
+  border-color: var(--lp-border-focus);
+  transform: translateY(-1.5px);
+  box-shadow: var(--lp-shadow-md);
+}
+
+.lp-btn-teal {
+  background: var(--lp-brand-teal);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(15, 159, 154, 0.3);
+}
+
+.lp-btn-teal:hover {
+  background: var(--lp-brand-teal-dark);
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 20px rgba(15, 159, 154, 0.4);
+}
+
+/* Badges */
+.lp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.lp-badge-violet {
+  background: var(--lp-bg-lavender);
+  color: var(--lp-brand-violet);
+  border: 1px solid rgba(109, 74, 255, 0.2);
+}
+
+.lp-badge-teal {
+  background: var(--lp-brand-teal-soft);
+  color: var(--lp-brand-teal);
+  border: 1px solid rgba(15, 159, 154, 0.2);
+}
+
+/* Glass Card */
+.lp-card {
+  background: var(--lp-bg-white);
+  border: 1px solid var(--lp-border-subtle);
+  border-radius: 20px;
+  box-shadow: var(--lp-shadow-md);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lp-card-hover:hover {
+  transform: translateY(-4px);
+  border-color: rgba(109, 74, 255, 0.25);
+  box-shadow: var(--lp-shadow-xl), var(--lp-shadow-glow);
+}
+
+/* Gradient Text Accent */
+.lp-gradient-text {
+  background: linear-gradient(135deg, var(--lp-brand-violet) 0%, var(--lp-brand-teal) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Subtle background glowing orb */
+.lp-glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.65;
+}
+
+/* Keyframe animations */
+@keyframes lpFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes lpPulseSubtle {
+  0%, 100% {
+    opacity: 0.95;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.02);
+  }
+}
+
+.lp-animate-float {
+  animation: lpFloat 6s ease-in-out infinite;
+}
+
+.lp-animate-float-delayed {
+  animation: lpFloat 7s ease-in-out infinite 2s;
+}
+
+/* Smooth anchor scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .lp-hero-grid {
+    grid-template-columns: 1fr !important;
+    gap: 2.5rem !important;
+  }
+  .lp-hide-mobile {
+    display: none !important;
+  }
+}
