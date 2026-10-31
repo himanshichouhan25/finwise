@@ -22,7 +22,10 @@ class UserRegisterRequest(BaseModel):
         default="student",
         description="Investor persona: 'student', 'first_job', or 'gig_worker'",
     )
-    language_pref: str = Field(default="en", description="Language preference: 'en' or 'hinglish'")
+    language_pref: str = Field(
+        default="en",
+        description="Language preference: 'en' (English), 'hi' (Hindi), or 'hinglish' (Hinglish)",
+    )
 
 
 class UserLoginRequest(BaseModel):

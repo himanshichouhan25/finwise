@@ -1,6 +1,7 @@
 """Authentication service for user registration, login, and JWT token issuance."""
 
 import logging
+from decimal import Decimal
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -46,9 +47,9 @@ def register_user(db: Session, request: UserRegisterRequest) -> AuthResponse:
     # 4. Initialize empty FinancialProfile for clean onboarding
     initial_profile = FinancialProfile(
         user_id=new_user.id,
-        monthly_income=0,
+        monthly_income=Decimal("0.00"),
         income_type="fixed",
-        emergency_fund_saved=0,
+        emergency_fund_saved=Decimal("0.00"),
     )
     db.add(initial_profile)
     db.commit()

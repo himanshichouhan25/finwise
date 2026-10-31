@@ -402,6 +402,7 @@ export default function LandingView({ onAuthSuccess, onExploreDemo }) {
                       style={{ width: '100%', fontSize: '0.82rem' }}
                     >
                       <option value="en">English</option>
+                      <option value="hi">हिंदी (Hindi)</option>
                       <option value="hinglish">Hinglish</option>
                     </select>
                   </div>
@@ -500,3 +501,4 @@ export default function LandingView({ onAuthSuccess, onExploreDemo }) {
     </div>
   );
 }
+

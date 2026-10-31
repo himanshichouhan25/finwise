@@ -32,7 +32,7 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     persona: Mapped[str] = mapped_column(String(50), default="student", nullable=False)  # student | first_job | gig_worker
-    language_pref: Mapped[str] = mapped_column(String(10), default="en", nullable=False)  # en | hinglish
+    language_pref: Mapped[str] = mapped_column(String(10), default="en", nullable=False)  # en | hi | hinglish
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
     # Relationships (Cascade delete from user downward)

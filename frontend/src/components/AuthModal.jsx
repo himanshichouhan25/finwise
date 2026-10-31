@@ -442,6 +442,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
                     style={{ width: '100%', padding: '0.65rem', fontSize: '0.8rem' }}
                   >
                     <option value="en">English</option>
+                    <option value="hi">हिंदी (Hindi)</option>
                     <option value="hinglish">Hinglish</option>
                   </select>
                 </div>
@@ -473,3 +474,4 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
     </div>
   );
 }
+

@@ -116,7 +116,11 @@ def send_coach_message(
     # 4. Ingest authoritative financial snapshot
     snapshot = build_financial_snapshot(db=db, user_id=user_id)
     persona_name = user.name
-    system_prompt = build_system_prompt(snapshot=snapshot, persona_name=persona_name)
+    system_prompt = build_system_prompt(
+        snapshot=snapshot,
+        persona_name=persona_name,
+        language_pref=user.language_pref,
+    )
 
     # 5. Build prompt message structure for LLM
     llm_messages: list[dict[str, Any]] = [

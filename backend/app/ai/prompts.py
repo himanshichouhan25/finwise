@@ -31,9 +31,39 @@ MANDATORY_DISCLAIMER = (
 )
 
 
-def build_system_prompt(snapshot: FinancialSnapshot | None = None, persona_name: str | None = None) -> str:
-    """Build dynamic system prompt injected with the user's live financial snapshot."""
+def build_system_prompt(
+    snapshot: FinancialSnapshot | None = None,
+    persona_name: str | None = None,
+    language_pref: str = "en",
+) -> str:
+    """Build dynamic system prompt injected with the user's live financial snapshot and language directive."""
     context_sections = [SYSTEM_BASE_PROMPT]
+
+    # Explicit language directive
+    lang = (language_pref or "en").lower().strip()
+    if lang in ("hi", "hindi"):
+        context_sections.append(
+            """### CRITICAL LANGUAGE MANDATE — HINDI (हिंदी):
+The user's preferred language is Hindi.
+- You MUST answer completely in Hindi using natural Devanagari script (हिंदी लिपि).
+- Use clear, respectful, and simple language (e.g. "नमस्ते!", "आपका बजट", "बचत", "आपातकालीन कोष", "निवेश").
+- Explain financial concepts warmly without intimidating English financial jargon.
+- Format currency amounts clearly with ₹ (e.g. ₹10,000)."""
+        )
+    elif lang in ("hinglish",):
+        context_sections.append(
+            """### CRITICAL LANGUAGE MANDATE — HINGLISH:
+The user's preferred language is conversational Indian Hinglish.
+- You MUST answer in natural, expressive Hinglish (Hindi written in Roman/English alphabet).
+- For example: "Aapka 50/30/20 budget kaafi balanced hai!", "Pehle 3 se 6 mahine ka emergency fund ready karo", "Fizul kharchi thoda control karke SIP chalu karna best rahega."
+- Keep the tone encouraging, brotherly/mentor-like, and relatable to young college students and early earners."""
+        )
+    else:
+        context_sections.append(
+            """### CRITICAL LANGUAGE MANDATE — ENGLISH:
+The user's preferred language is English.
+- Answer in clear, polite, structured, and professional English suitable for young first-time investors."""
+        )
 
     if snapshot:
         goals_summary = "None configured yet"
