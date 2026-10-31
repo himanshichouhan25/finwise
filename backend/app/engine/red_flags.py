@@ -51,6 +51,13 @@ RED_FLAG_PATTERNS = [
         "extreme",
         r"\b(?:2x\s*in\s*\d+\s*(?:days?|weeks?)|double\s*in\s*\d+\s*(?:days?|weeks?|months?)|crorepati\s*in\s*\d+\s*months?)\b",
     ),
+    (
+        "SIGNUP_FREE_MONEY_SCAM",
+        "Registration Bonus / Task Scam / Phishing Bait",
+        "Promises free unearned money simply for registering, clicking links, or completing easy online tasks ('register and get ₹5,000'). Legitimate institutions never distribute free cash. This is a classic cyber-fraud advance fee bait or OTP-phishing scam.",
+        "extreme",
+        r"\b(?:register\s*(?:and|to)?\s*(?:get|earn|win)|sign\s*up\s*(?:and|to)?\s*(?:get|earn|bonus)|free\s*(?:money|cash|coins?|rupees?|₹)|daily\s*task|like\s*and\s*earn|work\s*from\s*home\s*earn|recharge\s*and\s*earn|bonus\s*on\s*registration)\b",
+    ),
 ]
 
 

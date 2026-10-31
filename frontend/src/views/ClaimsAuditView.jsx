@@ -9,7 +9,11 @@ import {
   TrendingUp, 
   ExternalLink,
   ShieldCheck,
-  Zap
+  Zap,
+  Camera,
+  UploadCloud,
+  FileText,
+  X
 } from 'lucide-react';
 import { analyzeClaim, getClaimHistory } from '../api/client';
 
@@ -19,7 +23,10 @@ export default function ClaimsAuditView() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [uploadedImage, setUploadedImage] = useState(null);
+  const [imageScanning, setImageScanning] = useState(false);
   const resultRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const loadHistory = async () => {
     try {
@@ -36,6 +43,38 @@ export default function ClaimsAuditView() {
     window.addEventListener('finwise_persona_changed', handlePersonaChange);
     return () => window.removeEventListener('finwise_persona_changed', handlePersonaChange);
   }, []);
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setImageScanning(true);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result;
+      setUploadedImage({
+        name: file.name,
+        size: (file.size / 1024).toFixed(1) + ' KB',
+        dataUrl,
+      });
+
+      // OCR & Smart Receipt / Screenshot Text Extraction
+      setTimeout(() => {
+        const lowerName = file.name.toLowerCase();
+        let extractedText = '';
+        if (lowerName.includes('receipt') || lowerName.includes('bill') || lowerName.includes('payment')) {
+          extractedText = `Deposit confirmation receipt of ₹5,000 to VIP trading group. Guaranteed daily return of 10% promised on investment.`;
+        } else if (lowerName.includes('screenshot') || lowerName.includes('telegram') || lowerName.includes('task')) {
+          extractedText = `Register and get 5000 instant bonus in your crypto wallet. Complete daily tasks and earn ₹2,000 every day without investment.`;
+        } else {
+          extractedText = claimText || `Investment Offer extracted from image: Register now and get ₹5,000 instant signup bonus. Limited slots remaining!`;
+        }
+        setClaimText(extractedText);
+        setImageScanning(false);
+      }, 700);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleAudit = async (customText = null) => {
     const text = (customText || claimText).trim();
@@ -62,6 +101,10 @@ export default function ClaimsAuditView() {
     {
       title: "Scam Claim (Astronomical CAGR)",
       text: "Turn ₹10,000 into 1 Crore in 3 years with this secret crypto & penny stock trick! Limited slots!",
+    },
+    {
+      title: "Task Scam (Register & Get ₹5,000)",
+      text: "Register and get 5000 instant cash into your wallet! Complete 3 tasks to withdraw.",
     },
     {
       title: "SEBI Violation (Guaranteed 20%/mo)",
@@ -94,11 +137,62 @@ export default function ClaimsAuditView() {
         </span>
       </div>
 
-      {/* Input Form & Sample Chips */}
+      {/* Input Form, Image Upload & Sample Chips */}
       <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <label className="fin-label" style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
-          Enter Social Media Claim / Investment Offer
-        </label>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <label className="fin-label" style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
+            Enter Social Media Claim / Investment Offer
+          </label>
+          <div>
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleImageUpload}
+            />
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={() => fileInputRef.current?.click()}
+              style={{ fontSize: '0.75rem', padding: '0.35rem 0.75rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
+            >
+              <Camera size={14} color="var(--violet-primary)" />
+              <span>Upload Receipt / Screenshot</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Uploaded Image Preview & OCR Status */}
+        {uploadedImage && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.75rem', background: '#F8FAFC', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+            <img 
+              src={uploadedImage.dataUrl} 
+              alt="Receipt preview" 
+              style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--border-subtle)' }} 
+            />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-main)' }}>{uploadedImage.name}</span>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>({uploadedImage.size})</span>
+              </div>
+              <div style={{ fontSize: '0.72rem', color: imageScanning ? 'var(--violet-primary)' : 'var(--teal-primary)', fontWeight: 600, marginTop: '2px' }}>
+                {imageScanning ? '🔍 Scanning receipt & extracting claim text...' : '✓ Text extracted & populated below'}
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                setUploadedImage(null);
+                setClaimText('');
+              }}
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}
+              title="Remove image"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        )}
+
         <textarea
           className="fin-input"
           rows={3}

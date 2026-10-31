@@ -1,8 +1,11 @@
 """Pytest test configuration and fixtures."""
 
+import os
 from collections.abc import Generator
 
 import pytest
+
+os.environ["APP_ENV"] = "testing"
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
@@ -44,15 +47,16 @@ def db_session() -> Generator[Session, None, None]:
 
 
 @pytest.fixture
-def client(db_session: Session) -> Generator[TestClient, None, None]:
+def client() -> Generator[TestClient, None, None]:
     """Provide a TestClient with database dependency overridden."""
     app = create_app()
 
     def override_get_db():
+        session = TestingSessionLocal()
         try:
-            yield db_session
+            yield session
         finally:
-            pass
+            session.close()
 
     app.dependency_overrides[get_db] = override_get_db
 

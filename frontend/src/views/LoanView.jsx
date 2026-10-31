@@ -194,6 +194,19 @@ export default function LoanView() {
   const handleRecordPayment = async (e) => {
     e.preventDefault();
     if (!paymentLoanId) return;
+
+    const currentLoan = loans.find((l) => l.id === paymentLoanId);
+    if (paymentData.payment_type === 'emi' && currentLoan) {
+      const scheduledEmi = Number(currentLoan.emi_amount || currentLoan.monthly_emi || 0);
+      const enteredAmount = Number(paymentData.amount_paid || 0);
+      if (enteredAmount < scheduledEmi) {
+        alert(
+          `Payment amount (₹${enteredAmount.toLocaleString('en-IN')}) is less than the scheduled monthly EMI (₹${scheduledEmi.toLocaleString('en-IN')}).\n\nTo record a regular installment, please pay the full monthly EMI, or switch the payment type to 'Extra Prepayment'.`
+        );
+        return;
+      }
+    }
+
     try {
       await recordLoanRepayment(paymentLoanId, {
         amount_paid: Number(paymentData.amount_paid),
@@ -483,7 +496,7 @@ export default function LoanView() {
                     <button
                       onClick={() => {
                         setPaymentLoanId(loan.id);
-                        setPaymentData((p) => ({ ...p, amount_paid: String(loan.emi_amount) }));
+                        setPaymentData((p) => ({ ...p, amount_paid: String(loan.emi_amount || loan.monthly_emi || '') }));
                         setIsPaymentModalOpen(true);
                       }}
                       className="btn btn-teal"
@@ -1076,9 +1089,16 @@ export default function LoanView() {
               </div>
 
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '0.35rem' }}>
-                  Amount Paid (₹) *
-                </label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                    Amount Paid (₹) *
+                  </label>
+                  {paymentLoanId && (
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                      Scheduled EMI: <strong>₹{Number(loans.find((l) => l.id === paymentLoanId)?.emi_amount || loans.find((l) => l.id === paymentLoanId)?.monthly_emi || 0).toLocaleString('en-IN')}</strong>
+                    </span>
+                  )}
+                </div>
                 <input
                   type="number"
                   required
@@ -1088,6 +1108,11 @@ export default function LoanView() {
                   onChange={(e) => setPaymentData({ ...paymentData, amount_paid: e.target.value })}
                   style={{ width: '100%', fontSize: '0.85rem' }}
                 />
+                {paymentData.payment_type === 'emi' && paymentLoanId && Number(paymentData.amount_paid) < Number(loans.find((l) => l.id === paymentLoanId)?.emi_amount || loans.find((l) => l.id === paymentLoanId)?.monthly_emi || 0) && (
+                  <div style={{ fontSize: '0.72rem', color: '#DC2626', marginTop: '0.25rem', fontWeight: 600 }}>
+                    ⚠️ Amount is less than the scheduled monthly EMI (₹{Number(loans.find((l) => l.id === paymentLoanId)?.emi_amount || loans.find((l) => l.id === paymentLoanId)?.monthly_emi || 0).toLocaleString('en-IN')}). Switch to 'Extra Prepayment' if making a partial payment.
+                  </div>
+                )}
               </div>
 
               <div style={{ marginBottom: '1rem' }}>

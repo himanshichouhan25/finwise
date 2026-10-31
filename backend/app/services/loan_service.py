@@ -264,6 +264,12 @@ def record_repayment(
     if loan.status != "active":
         raise ValidationFailure(message="Cannot record payments on a closed or inactive loan.")
 
+    if payload.payment_type == "emi" and payload.amount_paid < loan.emi_amount:
+        raise ValidationFailure(
+            message=f"Regular EMI payment cannot be less than the scheduled monthly EMI of ₹{loan.emi_amount:,.2f}. "
+                    "For partial or custom payments towards debt reduction, please select 'Extra Prepayment'."
+        )
+
     metrics = _compute_loan_live_metrics(loan)
     schedule = metrics["schedule"]
 

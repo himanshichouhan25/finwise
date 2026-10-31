@@ -287,19 +287,38 @@ export default function MarketView() {
 
     const width = 640;
     const height = 220;
-    const padding = 20;
+    const paddingX = 24;
+    const paddingTop = 20;
+    const paddingBottom = 30;
 
     const coords = rawSeries.map((p, idx) => {
-      const x = padding + (idx / (rawSeries.length - 1)) * (width - 2 * padding);
-      const y = height - padding - ((Number(p.close) - min) / range) * (height - 2 * padding);
+      const x = paddingX + (idx / (rawSeries.length - 1)) * (width - 2 * paddingX);
+      const y = height - paddingBottom - ((Number(p.close) - min) / range) * (height - paddingTop - paddingBottom);
       return { x, y, ...p };
     });
 
     const isPositive = closes[closes.length - 1] >= closes[0];
-    const pathD = coords.reduce((acc, pt, idx) => `${acc} ${idx === 0 ? 'M' : 'L'} ${pt.x} ${pt.y}`, '');
-    const areaD = `${pathD} L ${coords[coords.length - 1].x} ${height - padding} L ${coords[0].x} ${height - padding} Z`;
 
-    return { coords, min, max, isPositive, pathD, areaD, width, height };
+    // Smooth cubic bezier spline
+    let pathD = '';
+    if (coords.length > 0) {
+      pathD = `M ${coords[0].x} ${coords[0].y}`;
+      for (let i = 1; i < coords.length; i++) {
+        const prev = coords[i - 1];
+        const curr = coords[i];
+        const cpx1 = prev.x + (curr.x - prev.x) / 2;
+        const cpy1 = prev.y;
+        const cpx2 = prev.x + (curr.x - prev.x) / 2;
+        const cpy2 = curr.y;
+        pathD += ` C ${cpx1} ${cpy1}, ${cpx2} ${cpy2}, ${curr.x} ${curr.y}`;
+      }
+    }
+
+    const areaD = coords.length > 0 
+      ? `${pathD} L ${coords[coords.length - 1].x} ${height - paddingBottom} L ${coords[0].x} ${height - paddingBottom} Z`
+      : '';
+
+    return { coords, min, max, isPositive, pathD, areaD, width, height, paddingBottom };
   }, [history, quote, timeframe]);
 
   // Derived attribution limitations
@@ -609,13 +628,28 @@ export default function MarketView() {
               </div>
 
               {/* Interactive SVG Stock Chart */}
-              <div style={{ position: 'relative', width: '100%', height: '240px', background: 'rgba(10, 16, 28, 0.5)', borderRadius: '10px', overflow: 'hidden', padding: '0.5rem' }}>
+              <div 
+                style={{ 
+                  position: 'relative', 
+                  width: '100%', 
+                  height: '240px', 
+                  background: '#F8FAFC', 
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '12px', 
+                  overflow: 'hidden', 
+                  padding: '0.75rem',
+                  boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.02)'
+                }}
+              >
                 {historyLoading ? (
-                  <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94A3B8', fontSize: '0.85rem' }}>
+                  <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                     Loading OHLCV historical timeline...
                   </div>
                 ) : chartPoints ? (
-                  <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                  <div 
+                    style={{ position: 'relative', width: '100%', height: '100%' }}
+                    onMouseLeave={() => setHoveredPoint(null)}
+                  >
                     <svg
                       viewBox={`0 0 ${chartPoints.width} ${chartPoints.height}`}
                       style={{ width: '100%', height: '100%', overflow: 'visible' }}
@@ -623,66 +657,127 @@ export default function MarketView() {
                     >
                       <defs>
                         <linearGradient id="stockAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor={chartPoints.isPositive ? '#14B8A6' : '#EF4444'} stopOpacity="0.35" />
-                          <stop offset="100%" stopColor={chartPoints.isPositive ? '#14B8A6' : '#EF4444'} stopOpacity="0.0" />
+                          <stop offset="0%" stopColor={chartPoints.isPositive ? 'var(--teal-primary)' : '#EF4444'} stopOpacity="0.28" />
+                          <stop offset="100%" stopColor={chartPoints.isPositive ? 'var(--teal-primary)' : '#EF4444'} stopOpacity="0.0" />
                         </linearGradient>
                       </defs>
+
+                      {/* Subtle Grid Lines & Y-Axis Reference */}
+                      <line x1="24" y1="20" x2="616" y2="20" stroke="#E2E8F0" strokeDasharray="4 4" strokeWidth="1" />
+                      <line x1="24" y1="105" x2="616" y2="105" stroke="#E2E8F0" strokeDasharray="4 4" strokeWidth="1" />
+                      <line x1="24" y1="190" x2="616" y2="190" stroke="#E2E8F0" strokeDasharray="4 4" strokeWidth="1" />
 
                       {/* Area Fill */}
                       <path d={chartPoints.areaD} fill="url(#stockAreaGrad)" />
 
-                      {/* Line Stroke */}
+                      {/* Smooth Line Stroke */}
                       <path
                         d={chartPoints.pathD}
                         fill="none"
-                        stroke={chartPoints.isPositive ? '#2DD4BF' : '#F87171'}
-                        strokeWidth="2.5"
+                        stroke={chartPoints.isPositive ? 'var(--teal-primary)' : '#EF4444'}
+                        strokeWidth="2.75"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
 
-                      {/* Hover / Interactive Points */}
-                      {chartPoints.coords.map((pt, i) => (
-                        <circle
-                          key={i}
-                          cx={pt.x}
-                          cy={pt.y}
-                          r={hoveredPoint?.timestamp === pt.timestamp ? 5 : 3}
-                          fill={chartPoints.isPositive ? '#2DD4BF' : '#F87171'}
-                          stroke="#080C14"
-                          strokeWidth="2"
-                          style={{ cursor: 'pointer', transition: 'all 0.15s ease' }}
-                          onMouseEnter={() => setHoveredPoint(pt)}
-                          onMouseLeave={() => setHoveredPoint(null)}
-                        />
-                      ))}
+                      {/* Active Cursor Tracking Line & Dot on Hover */}
+                      {hoveredPoint && (
+                        <>
+                          <line
+                            x1={hoveredPoint.x}
+                            y1="20"
+                            x2={hoveredPoint.x}
+                            y2="190"
+                            stroke="var(--violet-primary)"
+                            strokeWidth="1.5"
+                            strokeDasharray="3 3"
+                            opacity="0.8"
+                          />
+                          <circle
+                            cx={hoveredPoint.x}
+                            cy={hoveredPoint.y}
+                            r={6}
+                            fill={chartPoints.isPositive ? 'var(--teal-primary)' : '#EF4444'}
+                            stroke="#FFFFFF"
+                            strokeWidth="2.5"
+                            style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.25))' }}
+                          />
+                        </>
+                      )}
+
+                      {/* Transparent Hover Hit Areas (Columns) */}
+                      {chartPoints.coords.map((pt, i) => {
+                        const colWidth = (640 - 48) / (chartPoints.coords.length || 1);
+                        return (
+                          <rect
+                            key={i}
+                            x={pt.x - colWidth / 2}
+                            y="0"
+                            width={colWidth}
+                            height="220"
+                            fill="transparent"
+                            style={{ cursor: 'crosshair' }}
+                            onMouseEnter={() => setHoveredPoint(pt)}
+                          />
+                        );
+                      })}
                     </svg>
 
-                    {/* Hover Tooltip Box */}
+                    {/* Y-Axis Price Tags */}
+                    <div style={{ position: 'absolute', right: '8px', top: '4px', fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                      ₹{chartPoints.max.toLocaleString('en-IN', { maximumFractionDigits: 1 })}
+                    </div>
+                    <div style={{ position: 'absolute', right: '8px', top: '88px', fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                      ₹{((chartPoints.max + chartPoints.min) / 2).toLocaleString('en-IN', { maximumFractionDigits: 1 })}
+                    </div>
+                    <div style={{ position: 'absolute', right: '8px', bottom: '26px', fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                      ₹{chartPoints.min.toLocaleString('en-IN', { maximumFractionDigits: 1 })}
+                    </div>
+
+                    {/* Date labels at bottom */}
+                    <div style={{ position: 'absolute', left: '24px', bottom: '4px', fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                      {chartPoints.coords[0]?.timestamp}
+                    </div>
+                    <div style={{ position: 'absolute', right: '24px', bottom: '4px', fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                      {chartPoints.coords[chartPoints.coords.length - 1]?.timestamp}
+                    </div>
+
+                    {/* Modern Light Fintech Hover Tooltip */}
                     {hoveredPoint && (
                       <div
                         style={{
                           position: 'absolute',
-                          top: '10px',
-                          left: '10px',
-                          background: '#0E1524',
-                          border: '1px solid var(--border-highlight)',
+                          top: '12px',
+                          left: `${Math.min(480, Math.max(16, (hoveredPoint.x / 640) * 100))}%`,
+                          transform: 'translateX(-50%)',
+                          background: '#FFFFFF',
+                          border: '1px solid var(--border-subtle)',
                           borderRadius: '8px',
-                          padding: '0.4rem 0.65rem',
+                          padding: '0.5rem 0.85rem',
                           fontSize: '0.75rem',
-                          color: '#FFFFFF',
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                          color: 'var(--text-main)',
+                          boxShadow: 'var(--shadow-md)',
                           pointerEvents: 'none',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '2px',
+                          zIndex: 10,
                         }}
                       >
-                        <div><strong>Date:</strong> {hoveredPoint.timestamp}</div>
-                        <div><strong>Close:</strong> ₹{Number(hoveredPoint.close).toLocaleString('en-IN')}</div>
-                        <div><strong>Volume:</strong> {Number(hoveredPoint.volume).toLocaleString('en-IN')}</div>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                          {hoveredPoint.timestamp}
+                        </div>
+                        <div style={{ fontSize: '0.92rem', fontWeight: 800, color: chartPoints.isPositive ? 'var(--teal-primary)' : '#DC2626' }}>
+                          ₹{Number(hoveredPoint.close).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                        </div>
+                        <div style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>
+                          Vol: {Number(hoveredPoint.volume).toLocaleString('en-IN')}
+                        </div>
                       </div>
                     )}
                   </div>
                 ) : (
-                  <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B', fontSize: '0.85rem' }}>
+                  <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                     Historical price series currently unavailable for this symbol.
                   </div>
                 )}

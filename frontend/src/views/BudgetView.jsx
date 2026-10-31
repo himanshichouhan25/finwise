@@ -7,7 +7,9 @@ import {
   PieChart, 
   Wallet, 
   ShoppingBag, 
-  Lightbulb 
+  Lightbulb,
+  PiggyBank,
+  TrendingUp
 } from 'lucide-react';
 import { 
   getBudgetSummary, 
@@ -26,6 +28,7 @@ export default function BudgetView() {
   const [loading, setLoading] = useState(true);
   const [showAddIncome, setShowAddIncome] = useState(false);
   const [showAddExpense, setShowAddExpense] = useState(false);
+  const [showAddSavings, setShowAddSavings] = useState(false);
 
   // Form states
   const [incomeAmount, setIncomeAmount] = useState('');
@@ -33,6 +36,9 @@ export default function BudgetView() {
   const [expenseAmount, setExpenseAmount] = useState('');
   const [expenseCategory, setExpenseCategory] = useState('Groceries');
   const [expenseDescription, setExpenseDescription] = useState('');
+  const [savingsAmount, setSavingsAmount] = useState('');
+  const [savingsCategory, setSavingsCategory] = useState('Mutual Fund SIP');
+  const [savingsDescription, setSavingsDescription] = useState('');
 
   const loadData = async () => {
     try {
@@ -75,6 +81,28 @@ export default function BudgetView() {
       loadData();
     } catch (err) {
       alert(err.message || 'Failed to add income');
+    }
+  };
+
+  const handleAddSavings = async (e) => {
+    e.preventDefault();
+    if (!savingsAmount || Number(savingsAmount) <= 0) return;
+    try {
+      const todayStr = new Date().toISOString().split('T')[0];
+      await addExpenseRecord({
+        amount: Number(savingsAmount),
+        category: savingsCategory,
+        bucket: 'savings',
+        description: savingsDescription || `${savingsCategory} Deposit`,
+        spent_on: todayStr,
+        date: todayStr,
+      });
+      setSavingsAmount('');
+      setSavingsDescription('');
+      setShowAddSavings(false);
+      loadData();
+    } catch (err) {
+      alert(err.message || 'Failed to record savings');
     }
   };
 
@@ -171,8 +199,17 @@ export default function BudgetView() {
             <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--teal-primary)', marginTop: '0.5rem', letterSpacing: '-0.02em' }}>
               ₹{Number(summary.savings.actual_amount).toLocaleString('en-IN')}
             </div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '0.35rem' }}>
-              Net Savings Remaining: ₹{Number(summary.net_savings).toLocaleString('en-IN')}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.35rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                Net Remaining: ₹{Number(summary.net_savings).toLocaleString('en-IN')}
+              </span>
+              <button 
+                className="btn btn-teal" 
+                onClick={() => setShowAddSavings(true)} 
+                style={{ fontSize: '0.72rem', padding: '0.25rem 0.65rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+              >
+                <Plus size={12} /> Log Savings
+              </button>
             </div>
           </div>
         </div>
@@ -195,9 +232,9 @@ export default function BudgetView() {
         </div>
       )}
 
-      {/* Income & Expense Data Management Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '1.5rem' }}>
-        {/* Income Card */}
+      {/* Income, Expenses & 20% Savings Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
+        {/* 1. Income Card */}
         <div className="glass-panel" style={{ padding: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.15rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -262,12 +299,12 @@ export default function BudgetView() {
           )}
         </div>
 
-        {/* Expense Card */}
+        {/* 2. Needs & Wants Expense Card */}
         <div className="glass-panel" style={{ padding: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.15rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <ShoppingBag size={18} color="var(--violet-primary)" />
-              <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Expenses & Auto-Bucketing</h3>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Needs & Wants</h3>
             </div>
             <button className="btn btn-violet" onClick={() => setShowAddExpense(true)} style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem' }}>
               <Plus size={14} />
@@ -289,18 +326,16 @@ export default function BudgetView() {
                 />
               </div>
               <div>
-                <label className="fin-label">Category (Auto-classified to 50/30/20)</label>
+                <label className="fin-label">Category</label>
                 <select className="fin-select" value={expenseCategory} onChange={(e) => setExpenseCategory(e.target.value)}>
-                  <option value="Groceries">Groceries (Needs)</option>
-                  <option value="Rent">Rent & Housing (Needs)</option>
-                  <option value="Utilities">Utilities & Electricity (Needs)</option>
-                  <option value="Transport">Public Transport / Fuel (Needs)</option>
-                  <option value="Dining Out">Dining Out & Swiggy (Wants)</option>
-                  <option value="Shopping">Shopping & Fashion (Wants)</option>
-                  <option value="Entertainment">Netflix & Movies (Wants)</option>
-                  <option value="SIP">Mutual Fund SIP (Savings)</option>
-                  <option value="Emergency Fund">Emergency Fund Deposit (Savings)</option>
-                  <option value="Other">Other Miscellaneous</option>
+                  <option value="Groceries">Groceries (Needs 50%)</option>
+                  <option value="Rent">Rent & Housing (Needs 50%)</option>
+                  <option value="Utilities">Utilities & Bills (Needs 50%)</option>
+                  <option value="Transport">Public Transport / Fuel (Needs 50%)</option>
+                  <option value="Dining Out">Dining Out & Swiggy (Wants 30%)</option>
+                  <option value="Shopping">Shopping & Fashion (Wants 30%)</option>
+                  <option value="Entertainment">Netflix & Movies (Wants 30%)</option>
+                  <option value="Other">Other Discretionary</option>
                 </select>
               </div>
               <div>
@@ -320,11 +355,11 @@ export default function BudgetView() {
             </form>
           )}
 
-          {expenses.length === 0 ? (
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No expenses recorded.</p>
+          {expenses.filter((e) => e.bucket !== 'savings').length === 0 ? (
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No living expenses recorded.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '350px', overflowY: 'auto' }}>
-              {expenses.map((exp) => (
+              {expenses.filter((e) => e.bucket !== 'savings').map((exp) => (
                 <div key={exp.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0.95rem', background: '#F8FAFC', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -338,6 +373,97 @@ export default function BudgetView() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
                     <span style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: '0.95rem' }}>₹{Number(exp.amount).toLocaleString('en-IN')}</span>
                     <button onClick={() => handleDeleteExpense(exp.id)} style={{ background: 'none', border: 'none', color: '#DC2626', cursor: 'pointer', padding: '4px' }} title="Delete expense">
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* 3. Dedicated 20% Savings & Investment Card */}
+        <div className="glass-panel" style={{ padding: '1.5rem', borderTop: '3px solid var(--teal-primary)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.15rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <TrendingUp size={18} color="var(--teal-primary)" />
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>20% Savings & SIP</h3>
+            </div>
+            <button className="btn btn-teal" onClick={() => setShowAddSavings(true)} style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem' }}>
+              <Plus size={14} />
+              <span>Log Savings</span>
+            </button>
+          </div>
+
+          {showAddSavings && (
+            <form onSubmit={handleAddSavings} style={{ background: 'var(--bg-surface-subtle)', padding: '1.15rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+              <div>
+                <label className="fin-label">Savings / Investment Amount (₹)</label>
+                <input
+                  type="number"
+                  className="fin-input"
+                  placeholder="e.g. 5000"
+                  value={savingsAmount}
+                  onChange={(e) => setSavingsAmount(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label className="fin-label">Savings Vehicle</label>
+                <select className="fin-select" value={savingsCategory} onChange={(e) => setSavingsCategory(e.target.value)}>
+                  <option value="Mutual Fund SIP">Mutual Fund SIP (Index/Flexi)</option>
+                  <option value="Emergency Fund">Emergency Fund Reserve</option>
+                  <option value="Fixed Deposit">Bank Fixed Deposit (FD)</option>
+                  <option value="PPF / NPS">Government PPF / NPS</option>
+                  <option value="Gold Savings">Sovereign Gold / Digital Gold</option>
+                  <option value="Stocks Portfolio">Direct Equity Investment</option>
+                </select>
+              </div>
+              <div>
+                <label className="fin-label">Notes (Optional)</label>
+                <input
+                  type="text"
+                  className="fin-input"
+                  placeholder="e.g. Monthly Nifty 50 SIP auto-debit"
+                  value={savingsDescription}
+                  onChange={(e) => setSavingsDescription(e.target.value)}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '0.25rem' }}>
+                <button type="button" className="btn btn-outline" onClick={() => setShowAddSavings(false)} style={{ fontSize: '0.78rem' }}>Cancel</button>
+                <button type="submit" className="btn btn-teal" style={{ fontSize: '0.78rem' }}>Save Allocation</button>
+              </div>
+            </form>
+          )}
+
+          {expenses.filter((e) => e.bucket === 'savings').length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '1.5rem 1rem', background: '#F8FAFC', borderRadius: 'var(--radius-sm)' }}>
+              <PiggyBank size={24} color="var(--teal-primary)" style={{ margin: '0 auto 0.4rem' }} />
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>No 20% savings transactions logged yet.</p>
+              <button 
+                className="btn btn-teal" 
+                onClick={() => setShowAddSavings(true)} 
+                style={{ fontSize: '0.75rem', padding: '0.35rem 0.75rem', marginTop: '0.75rem' }}
+              >
+                + Log First SIP / Savings
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '350px', overflowY: 'auto' }}>
+              {expenses.filter((e) => e.bucket === 'savings').map((sav) => (
+                <div key={sav.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0.95rem', background: '#F0FDF4', borderRadius: 'var(--radius-sm)', border: '1px solid #BBF7D0' }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '0.9rem' }}>{sav.description || sav.category}</span>
+                      <span className="badge badge-teal" style={{ fontSize: '0.65rem' }}>
+                        Savings 20%
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.74rem', color: '#166534' }}>{sav.category} • {sav.date}</div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                    <span style={{ fontWeight: 800, color: 'var(--teal-primary)', fontSize: '0.95rem' }}>₹{Number(sav.amount).toLocaleString('en-IN')}</span>
+                    <button onClick={() => handleDeleteExpense(sav.id)} style={{ background: 'none', border: 'none', color: '#DC2626', cursor: 'pointer', padding: '4px' }} title="Delete savings record">
                       <Trash2 size={15} />
                     </button>
                   </div>

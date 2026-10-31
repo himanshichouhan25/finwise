@@ -5,6 +5,7 @@ from datetime import date
 from decimal import Decimal
 from typing import Any
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.engine.goal_delay import calculate_goal_days_delayed
@@ -93,18 +94,23 @@ FINANCIAL_TOOLS = [
         "function": {
             "name": "plan_goal",
             "description": (
-                "Calculate the exact required monthly savings needed to achieve a target goal amount by a target date."
+                "Calculate required monthly savings, projected savings timeline, or reality-check feasibility to reach a financial goal "
+                "(e.g. car, vacation, emergency fund, house). Can automatically look up user's saved goals if name/hint is provided."
             ),
             "parameters": {
                 "type": "object",
                 "properties": {
+                    "goal_name": {
+                        "type": "string",
+                        "description": "Name or keyword of the user's goal (e.g. 'thar', 'car', 'emergency')",
+                    },
                     "target_amount": {
                         "type": "number",
-                        "description": "Target financial goal amount in INR (e.g. 200000 for emergency fund)",
+                        "description": "Target financial goal amount in INR (e.g. 1700000)",
                     },
                     "target_date": {
                         "type": "string",
-                        "description": "Target deadline date in YYYY-MM-DD format (e.g. 2026-12-31)",
+                        "description": "Target deadline date in YYYY-MM-DD format (e.g. 2028-01-01)",
                     },
                     "current_savings": {
                         "type": "number",
@@ -115,7 +121,7 @@ FINANCIAL_TOOLS = [
                         "description": "Expected annual rate of return (default 0 for short-term goals < 3 years)",
                     },
                 },
-                "required": ["target_amount", "target_date"],
+                "required": [],
             },
         },
     },
@@ -261,25 +267,71 @@ def execute_tool(
             }
 
         elif name == "plan_goal":
-            target_amount = Decimal(str(arguments.get("target_amount", 0)))
-            target_date_str = str(arguments.get("target_date", ""))
-            target_date_obj = date.fromisoformat(target_date_str)
-            current_savings = Decimal(str(arguments.get("current_savings", 0)))
+            goal_name_hint = str(arguments.get("goal_name", "")).strip().lower()
+            raw_target_amount = arguments.get("target_amount")
+            raw_target_date = str(arguments.get("target_date", "")).strip()
+
+            from app.models.goal import Goal
+            found_goal = None
+            if db and user_id:
+                user_goals = db.scalars(select(Goal).where(Goal.user_id == user_id)).all()
+                if goal_name_hint:
+                    found_goal = next((g for g in user_goals if goal_name_hint in g.name.lower()), None)
+                if not found_goal and (not raw_target_amount or not raw_target_date):
+                    found_goal = user_goals[0] if user_goals else None
+
+            if found_goal:
+                target_amount = found_goal.target_amount
+                target_date_str = found_goal.target_date.isoformat() if found_goal.target_date else "2028-01-01"
+                current_savings = found_goal.current_saved
+                goal_title = found_goal.name
+                planned_monthly = float(found_goal.planned_monthly_contribution or 0)
+            else:
+                goal_title = goal_name_hint or "Target Goal"
+                target_amount = Decimal(str(raw_target_amount or 100000))
+                target_date_str = raw_target_date or "2028-01-01"
+                current_savings = Decimal(str(arguments.get("current_savings", 0)))
+                planned_monthly = float(arguments.get("planned_monthly_contribution", 0))
+
+            try:
+                target_date_obj = date.fromisoformat(target_date_str)
+            except Exception:
+                target_date_obj = date(2028, 1, 1)
+
+            today = date.today()
+            months_to_deadline = max(1, (target_date_obj.year - today.year) * 12 + (target_date_obj.month - today.month))
+            is_expired = target_date_obj <= today
+
             expected_ret = Decimal(str(arguments.get("expected_return_pct", 0)))
 
             plan = calculate_required_monthly_savings(
                 target_amount=target_amount,
-                target_date=target_date_obj,
-                current_savings=current_savings,
-                expected_annual_return_pct=expected_ret,
+                current_saved=current_savings,
+                months_to_deadline=months_to_deadline,
+                annual_return_pct=expected_ret,
             )
+            req_monthly = float(plan.required_monthly_savings)
+            projected = float(current_savings) + (planned_monthly * months_to_deadline)
+            is_unfeasible = planned_monthly < req_monthly * 0.75 if req_monthly > 0 else False
+
             return {
+                "goal_name": goal_title,
                 "target_amount": float(plan.target_amount),
+                "current_saved": float(current_savings),
                 "remaining_amount": float(plan.remaining_amount),
-                "months_remaining": plan.months_remaining,
-                "required_monthly_savings": float(plan.required_monthly_savings),
+                "months_remaining": months_to_deadline,
+                "planned_monthly": planned_monthly,
+                "required_monthly_savings": req_monthly,
+                "projected_saved_by_deadline": projected,
+                "feasibility_assessment": "Severe Shortfall Alert" if is_unfeasible else "On Track",
+                "reality_check_advice": (
+                    f"Aap abhi ₹{planned_monthly:,.0f}/month save kar rahe ho, jisse {target_date_str} tak sirf ₹{projected:,.0f} hi judenge (shortfall of ₹{float(plan.remaining_amount) - (planned_monthly * months_to_deadline):,.0f}). "
+                    f"Is goal ko time par achieve karne ke liye aapko ₹{req_monthly:,.0f}/month save karna padega (until unless koi sudden huge fund ya windfall na aaye)."
+                    if is_unfeasible else
+                    f"Aapka goal planned monthly savings se achievable hai."
+                ),
                 "is_achieved": plan.is_achieved,
-                "is_expired": plan.is_expired,
+                "is_expired": is_expired,
             }
 
         elif name == "goal_days_delayed":

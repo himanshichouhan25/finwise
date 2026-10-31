@@ -338,14 +338,32 @@ export default function DashboardView({ onNavigateToCoach, onNavigateToTab }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               {active_goals.slice(0, 3).map((g) => {
                 const progressPct = g.target_amount > 0 ? (Number(g.current_saved) / Number(g.target_amount)) * 100 : 0;
+                const rem = Math.max(0, Number(g.target_amount) - Number(g.current_saved));
+                let isUnfeasible = false;
+                let reqMonthly = 0;
+                if (g.target_date) {
+                  const diffDays = Math.ceil((new Date(g.target_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                  const mo = Math.max(1, Math.round(diffDays / 30.4375));
+                  reqMonthly = Math.ceil(rem / mo);
+                  const planMo = Number(g.planned_monthly_contribution || 0);
+                  if (planMo > 0 && planMo < reqMonthly * 0.75 && rem > 0) {
+                    isUnfeasible = true;
+                  }
+                }
+
                 return (
-                  <div key={g.id} className="glass-card" style={{ background: '#FAFBFD', padding: '1rem' }}>
+                  <div key={g.id} className="glass-card" style={{ background: '#FAFBFD', padding: '1rem', border: isUnfeasible ? '1px solid #FCD34D' : '1px solid var(--border-subtle)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <Target size={16} color="var(--teal-primary)" />
                         <span style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '0.88rem' }}>{g.name}</span>
                       </div>
-                      <span className="badge badge-teal" style={{ fontSize: '0.7rem' }}>{progressPct.toFixed(0)}%</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        {isUnfeasible && (
+                          <span className="badge badge-amber" style={{ fontSize: '0.62rem' }}>Pace Shortfall</span>
+                        )}
+                        <span className="badge badge-teal" style={{ fontSize: '0.7rem' }}>{progressPct.toFixed(0)}%</span>
+                      </div>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.65rem', fontSize: '0.8rem' }}>
                       <span style={{ color: 'var(--text-secondary)' }}>Saved: ₹{Number(g.current_saved).toLocaleString('en-IN')}</span>
@@ -354,6 +372,11 @@ export default function DashboardView({ onNavigateToCoach, onNavigateToTab }) {
                     <div style={{ background: '#E2E8F0', height: '6px', borderRadius: '3px', marginTop: '0.45rem', overflow: 'hidden' }}>
                       <div style={{ background: 'var(--teal-primary)', height: '100%', width: `${Math.min(100, progressPct)}%` }} />
                     </div>
+                    {isUnfeasible && (
+                      <div style={{ marginTop: '0.5rem', fontSize: '0.72rem', color: '#B45309', background: '#FFFBEB', padding: '0.35rem 0.55rem', borderRadius: '4px' }}>
+                        ⚠️ Saving ₹{Number(g.planned_monthly_contribution).toLocaleString('en-IN')}/mo is too slow. Need <strong>₹{reqMonthly.toLocaleString('en-IN')}/mo</strong> to hit deadline.
+                      </div>
+                    )}
                   </div>
                 );
               })}

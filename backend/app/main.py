@@ -43,7 +43,9 @@ from app.db.session import engine
 async def lifespan(app: FastAPI):
     """Application lifespan context for startup and shutdown routines."""
     # Bootstrap database tables
-    Base.metadata.create_all(bind=engine)
+    settings = get_settings()
+    if settings.APP_ENV != "testing":
+        Base.metadata.create_all(bind=engine)
     yield
 
 

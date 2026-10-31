@@ -98,12 +98,19 @@ def analyze_claim(
         is_guaranteed=extracted.is_guaranteed,
     )
 
+    final_risk_level = math_result.risk_level
+    final_verdict = math_result.verdict
+    if any(rf.severity == "extreme" for rf in red_flags):
+        final_risk_level = "extreme"
+        if math_result.risk_level != "extreme":
+            final_verdict = f"SCAM & REGULATORY VIOLATION ALERT: {red_flags[0].title}. {red_flags[0].description}"
+
     # 4. Generate structured explanation
     explanation = _build_educational_explanation(
         claim_text=claim_text,
         annualized_cagr=math_result.annualized_cagr_pct,
-        risk_level=math_result.risk_level,
-        verdict=math_result.verdict,
+        risk_level=final_risk_level,
+        verdict=final_verdict,
         doubling_time=math_result.doubling_time_years,
         red_flags_count=len(red_flags),
     )
@@ -146,7 +153,7 @@ def analyze_claim(
         claim_text=claim_text,
         extracted_json=json.dumps(extracted_dict),
         computed_json=json.dumps(computed_dict),
-        risk_level=math_result.risk_level,
+        risk_level=final_risk_level,
         explanation=explanation,
     )
     db.add(claim_record)
@@ -175,8 +182,8 @@ def analyze_claim(
     return ClaimAnalyzeResponse(
         id=claim_record.id,
         claim_text=claim_record.claim_text,
-        risk_level=math_result.risk_level,
-        verdict=math_result.verdict,
+        risk_level=final_risk_level,
+        verdict=final_verdict,
         annualized_cagr_pct=math_result.annualized_cagr_pct,
         claimed_return_pct=math_result.claimed_return_pct,
         timeframe_years=math_result.timeframe_years,

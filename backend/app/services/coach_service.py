@@ -51,7 +51,52 @@ def _generate_deterministic_fallback_reply(
     recorded_tools: list[dict[str, Any]] = []
     msg_lower = user_message.lower()
 
-    # 1. Check for spend / impulse / purchase amount
+    # 1. Check for Goal inquiries (e.g. "car", "thar", "goal", "target", "milestone")
+    if any(w in msg_lower for w in ["goal", "target", "milestone", "car", "thar", "gadi", "bike", "save"]):
+        tool_res = execute_tool(
+            name="plan_goal",
+            arguments={"goal_name": "thar" if "thar" in msg_lower else ("car" if "car" in msg_lower else "")},
+            user_id=user_id,
+            db=db,
+        )
+        recorded_tools.append({
+            "name": "plan_goal",
+            "arguments": {"goal_name": tool_res.get("goal_name", "Goal")},
+            "result": tool_res,
+        })
+        g_name = tool_res.get("goal_name", "Aapka Goal")
+        target_amt = tool_res.get("target_amount", 0)
+        saved_amt = tool_res.get("current_saved", 0)
+        rem_amt = tool_res.get("remaining_amount", 0)
+        mo_rem = tool_res.get("months_remaining", 1)
+        plan_mo = tool_res.get("planned_monthly", 0)
+        req_mo = tool_res.get("required_monthly_savings", 0)
+        proj = tool_res.get("projected_saved_by_deadline", 0)
+
+        if plan_mo > 0 and plan_mo < req_mo * 0.75:
+            reply = (
+                f"Hello {persona_name}! Maine aapka goal **'{g_name}'** inspect kiya:\n\n"
+                f"• Target Amount: **₹{target_amt:,.0f}**\n"
+                f"• Already Saved: ₹{saved_amt:,.0f} (Remaining: ₹{rem_amt:,.0f})\n"
+                f"• Timeframe: **{mo_rem} months remaining**\n"
+                f"• Current Planned Savings: ₹{plan_mo:,.0f}/month\n\n"
+                f"⚠️ **Feasibility Alert (Pace Shortfall):**\n"
+                f"Agar aap ₹{plan_mo:,.0f}/month hi save karte rahe, toh deadline tak sirf **₹{proj:,.0f}** hi judenge (shortfall of ₹{rem_amt - (plan_mo * mo_rem):,.0f})! Is pace par ₹{rem_amt:,.0f} save karne mein lagbhag **{(rem_amt / (plan_mo * 12)):.1f} saal** lag jayenge.\n\n"
+                f"💡 **FinWise Recommendation:**\n"
+                f"1. Is goal ko time par achieve karne ke liye aapko har mahine kam se kam **₹{req_mo:,.0f}/month** save karna padega (until unless koi sudden huge fund ya lump-sum windfall na aaye).\n"
+                f"2. Agar ₹{req_mo:,.0f}/mo possible nahi hai, toh apni deadline ko extend karein ya 50/30/20 budget ke 'Wants' category se savings reallocation karein."
+            )
+        else:
+            reply = (
+                f"Hello {persona_name}! Aapke goal **'{g_name}'** ka status:\n\n"
+                f"• Target: ₹{target_amt:,.0f} | Saved: ₹{saved_amt:,.0f}\n"
+                f"• Remaining: ₹{rem_amt:,.0f} in {mo_rem} months\n"
+                f"• Required Monthly Savings: **₹{req_mo:,.0f}/month**\n\n"
+                f"Aapka current savings plan is goal ke sath aligned hai. Discipline ke sath har mahine save karte rahein!"
+            )
+        return reply, recorded_tools
+
+    # 2. Check for spend / impulse / purchase amount
     amount: Decimal | None = None
     k_match = re.search(r"(\d+(?:\.\d+)?)\s*k\b", msg_lower)
     if k_match:
@@ -65,7 +110,38 @@ def _generate_deterministic_fallback_reply(
                 if parsed_val >= Decimal("100"):
                     amount = parsed_val
 
-    # If asking about purchase or spend
+    # 1. If asking about goals (car, thar, goal, target, milestone, etc.)
+    if any(w in msg_lower for w in ["goal", "car", "thar", "target", "milestone", "save", "bachat"]):
+        hint = "thar" if "thar" in msg_lower else ("car" if "car" in msg_lower else "")
+        tool_res = execute_tool(
+            name="plan_goal",
+            arguments={"goal_name": hint},
+            user_id=user_id,
+            db=db,
+        )
+        recorded_tools.append({
+            "name": "plan_goal",
+            "arguments": {"goal_name": hint},
+            "result": tool_res,
+        })
+        advice = tool_res.get("reality_check_advice", "")
+        target = tool_res.get("target_amount", 0)
+        saved = tool_res.get("current_saved", 0)
+        rem = tool_res.get("remaining_amount", 0)
+        g_name = tool_res.get("goal_name", "Goal")
+        months = tool_res.get("months_remaining", 0)
+
+        reply = (
+            f"Hello {persona_name}! Aapke **'{g_name}'** goal ka reality-check analysis:\n\n"
+            f"• **Target Goal:** ₹{target:,.0f}\n"
+            f"• **Current Saved:** ₹{saved:,.0f} (Remaining: ₹{rem:,.0f})\n"
+            f"• **Time Remaining:** {months} months\n\n"
+            f"⚠️ **Feasibility Alert:**\n{advice}\n\n"
+            f"💡 **Recommendation:** Agar aap ₹500/month se aage nahi badha sakte, toh aapko timeline ko extend karna padega, ya phir koi windfall / bonus saving isme inject karni hogi."
+        )
+        return reply, recorded_tools
+
+    # 2. If asking about purchase or spend
     if amount and any(w in msg_lower for w in ["buy", "purchase", "spend", "cost", "afford", "can i", "delay"]):
         tool_res = execute_tool(
             name="goal_days_delayed",

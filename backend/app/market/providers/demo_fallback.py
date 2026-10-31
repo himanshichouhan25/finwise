@@ -305,7 +305,8 @@ class DemoFallbackProvider(BaseMarketProvider):
         )
 
     async def get_stock_history(self, symbol: str, timeframe: str = "1M") -> StockHistoryResponse:
-        """Generate realistic 30-day historical OHLCV series for charting."""
+        """Generate realistic historical OHLCV series for charting."""
+        import math
         sym = symbol.upper().replace(".NS", "").replace(".BO", "")
         d = self._STOCKS.get(sym, {"name": sym, "price": Decimal("1000.00")})
 
@@ -313,17 +314,21 @@ class DemoFallbackProvider(BaseMarketProvider):
         days = 30 if timeframe == "1M" else (90 if timeframe == "6M" else 180)
         today = datetime.now(UTC)
 
-        # Build consistent non-random trajectory
+        # Build consistent, continuous, realistic market price trajectory
         series: list[OHLCVPoint] = []
         for i in range(days, 0, -1):
             dt = today - timedelta(days=i)
-            # Gentle deterministic sinusoid curve
-            factor = 1.0 - 0.05 * (i / days) + 0.02 * ((i % 7) - 3) / 10.0
+            # Smooth continuous multi-frequency wave with realistic financial drift
+            t = (days - i) / float(days)
+            drift = 0.04 * t  # gentle +4% trend over period
+            wave1 = 0.025 * math.sin(t * math.pi * 3.5)
+            wave2 = 0.012 * math.cos(t * math.pi * 7.2)
+            factor = 0.96 + drift + wave1 + wave2
             day_close = base_price * factor
-            day_open = day_close * 0.995
-            day_high = max(day_open, day_close) * 1.01
-            day_low = min(day_open, day_close) * 0.99
-            vol = 1500000 + (i * 25000)
+            day_open = day_close * (1.0 - 0.003 * math.sin(i * 1.5))
+            day_high = max(day_open, day_close) * 1.008
+            day_low = min(day_open, day_close) * 0.992
+            vol = int(1800000 + 450000 * math.sin(i * 0.8))
 
             series.append(
                 OHLCVPoint(

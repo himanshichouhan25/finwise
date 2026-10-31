@@ -119,6 +119,48 @@ export default function DecisionJournalView() {
         </button>
       </div>
 
+      {/* Behavioral Finance: How It Works Guide Strip */}
+      <div className="glass-card" style={{ background: '#FFFFFF', border: '1px solid #E0E7FF', padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--violet-primary)', fontWeight: 800, fontSize: '0.9rem' }}>
+          <Sparkles size={17} />
+          <span>How the 24h/48h Cooling-Off System Protects Your Wealth</span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginTop: '0.25rem' }}>
+          <div style={{ padding: '0.75rem', background: '#F8FAFC', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+            <div style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--text-main)', marginBottom: '0.2rem' }}>
+              1. Pause the Impulse
+            </div>
+            <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.45 }}>
+              Jab bhi shopping ya online sale mein mehnge item par mann aye, checkout karne ke bajaye prospective purchase log karein.
+            </p>
+          </div>
+          <div style={{ padding: '0.75rem', background: '#F8FAFC', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+            <div style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--text-main)', marginBottom: '0.2rem' }}>
+              2. Opportunity Cost & Delay
+            </div>
+            <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.45 }}>
+              FinWise engine calculate karta hai ki ye kharcha aapke priority goals ko kitne din delay karega aur SIP mein kitna ban sakta tha.
+            </p>
+          </div>
+          <div style={{ padding: '0.75rem', background: '#F8FAFC', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+            <div style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--text-main)', marginBottom: '0.2rem' }}>
+              3. 24h Brain Cooling Window
+            </div>
+            <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.45 }}>
+              Neuroscience shows that emotional impulse peaks in 24 hours. Once the timer ends, you make a calm, rational decision.
+            </p>
+          </div>
+          <div style={{ padding: '0.75rem', background: '#F8FAFC', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+            <div style={{ fontWeight: 700, fontSize: '0.82rem', color: '#166534', marginBottom: '0.2rem' }}>
+              4. Abandon = Pure Savings!
+            </div>
+            <p style={{ margin: 0, fontSize: '0.75rem', color: '#14532D', lineHeight: 1.45 }}>
+              78% of impulse decisions get abandoned! When you click 'Abandon', the money is added to your <strong>Total Money Saved</strong>.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Summary KPI Strip */}
       {summary && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>

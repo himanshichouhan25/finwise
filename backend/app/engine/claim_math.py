@@ -123,8 +123,21 @@ def evaluate_claim_math(
     if annualized_cagr > Decimal("0.00"):
         doubling_time = (Decimal("72.0") / annualized_cagr).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
 
+    # Special case: Free money / reward claim with zero or unspecified initial capital
+    is_free_money_claim = (
+        (initial_amount is None or initial_amount == Decimal("0.00"))
+        and (claimed_amount is not None and claimed_amount > Decimal("0.00"))
+    )
+
     # Risk evaluation
-    if annualized_cagr <= Decimal("8.0"):
+    if is_free_money_claim:
+        risk_level = "extreme"
+        verdict = (
+            f"SCAM / PHISHING BAIT ALERT: Promising free money (₹{claimed_amount:,.0f}) with zero initial capital. "
+            "Legitimate financial entities never distribute unearned cash on registration. "
+            "High probability of an advance-fee scam, task scam, or credential phishing bait."
+        )
+    elif annualized_cagr <= Decimal("8.0"):
         risk_level = "low"
         verdict = "Realistic and aligns with fixed income, FD, or debt mutual fund returns."
     elif annualized_cagr <= Decimal("15.0"):

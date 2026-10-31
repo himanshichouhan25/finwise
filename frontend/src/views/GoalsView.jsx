@@ -194,8 +194,32 @@ export default function GoalsView() {
               const progressPct = g.target_amount > 0 ? (Number(g.current_saved) / Number(g.target_amount)) * 100 : 0;
               const remaining = Math.max(0, Number(g.target_amount) - Number(g.current_saved));
 
+              let monthsRemaining = 0;
+              let requiredMonthly = 0;
+              let isUnfeasible = false;
+              let projectedSaved = 0;
+              let yearsNeededAtCurrentRate = 'N/A';
+
+              if (g.target_date) {
+                const targetTime = new Date(g.target_date).getTime();
+                const nowTime = new Date().getTime();
+                const diffDays = Math.ceil((targetTime - nowTime) / (1000 * 60 * 60 * 24));
+                monthsRemaining = Math.max(1, Math.round(diffDays / 30.4375));
+                requiredMonthly = Math.ceil(remaining / monthsRemaining);
+                const plannedMonthly = Number(g.planned_monthly_contribution || 0);
+                projectedSaved = Number(g.current_saved) + (plannedMonthly * monthsRemaining);
+
+                if (plannedMonthly > 0) {
+                  yearsNeededAtCurrentRate = (remaining / (plannedMonthly * 12)).toFixed(1);
+                }
+
+                if (plannedMonthly < requiredMonthly * 0.75 && remaining > 0) {
+                  isUnfeasible = true;
+                }
+              }
+
               return (
-                <div key={g.id} className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div key={g.id} className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', border: isUnfeasible ? '1px solid #FCD34D' : '1px solid var(--border-subtle)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       <Target size={18} color="var(--teal-primary)" />
@@ -229,6 +253,25 @@ export default function GoalsView() {
                     <Calendar size={13} />
                     <span>Target Deadline: {g.target_date || 'Ongoing Milestone'}</span>
                   </div>
+
+                  {/* Feasibility Alert / Reality Check Warning */}
+                  {isUnfeasible && (
+                    <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', padding: '0.85rem', borderRadius: 'var(--radius-sm)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#B45309', fontWeight: 700, fontSize: '0.78rem' }}>
+                          <AlertTriangle size={14} />
+                          <span>Reality Check: High Pace Shortfall</span>
+                        </div>
+                        <span className="badge badge-amber" style={{ fontSize: '0.62rem' }}>Pace Alert</span>
+                      </div>
+                      <p style={{ margin: 0, fontSize: '0.75rem', color: '#92400E', lineHeight: 1.45 }}>
+                        At <strong>₹{Number(g.planned_monthly_contribution).toLocaleString('en-IN')}/mo</strong>, you will only accumulate <strong>₹{projectedSaved.toLocaleString('en-IN')}</strong> by {g.target_date} ({monthsRemaining} months away).
+                      </p>
+                      <div style={{ marginTop: '0.5rem', paddingTop: '0.4rem', borderTop: '1px solid rgba(217, 119, 6, 0.2)', fontSize: '0.74rem', color: '#78350F', lineHeight: 1.4 }}>
+                        💡 <strong>Required Monthly Savings:</strong> Save <strong>₹{requiredMonthly.toLocaleString('en-IN')}/mo</strong> to reach this goal on time, or it will take <strong>{yearsNeededAtCurrentRate} years</strong> at your current pace without a lump-sum windfall.
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -316,6 +359,36 @@ export default function GoalsView() {
                   />
                 </div>
               </div>
+
+              {/* Live Feasibility Preview */}
+              {targetAmount && targetDate && (
+                (() => {
+                  const rem = Math.max(0, Number(targetAmount) - (Number(currentSaved) || 0));
+                  const diffDays = Math.ceil((new Date(targetDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                  const mo = Math.max(1, Math.round(diffDays / 30.4375));
+                  const reqMo = Math.ceil(rem / mo);
+                  const planMo = Number(monthlyContribution) || 0;
+                  const isShort = planMo > 0 && planMo < reqMo * 0.75;
+                  
+                  return (
+                    <div style={{ padding: '0.85rem', borderRadius: 'var(--radius-sm)', background: isShort ? '#FFFBEB' : '#F0FDF4', border: `1px solid ${isShort ? '#FCD34D' : '#BBF7D0'}`, fontSize: '0.78rem' }}>
+                      <div style={{ fontWeight: 700, color: isShort ? '#B45309' : '#166534', marginBottom: '0.2rem' }}>
+                        {isShort ? '⚠️ Feasibility Reality Check' : '✓ Goal Feasibility Plan'}
+                      </div>
+                      <div style={{ color: isShort ? '#92400E' : '#14532D', lineHeight: 1.4 }}>
+                        Timeframe: <strong>{mo} months</strong> | Remaining to save: <strong>₹{rem.toLocaleString('en-IN')}</strong>.
+                        <br />
+                        Required monthly savings to hit deadline: <strong>₹{reqMo.toLocaleString('en-IN')}/mo</strong>.
+                        {isShort && (
+                          <div style={{ marginTop: '0.35rem', fontWeight: 600 }}>
+                            Saving ₹{planMo.toLocaleString('en-IN')}/mo will only yield ₹{((Number(currentSaved) || 0) + planMo * mo).toLocaleString('en-IN')}. Consider saving ₹{reqMo.toLocaleString('en-IN')}/mo or extending your deadline!
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()
+              )}
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
                 <button type="button" className="btn btn-outline" onClick={() => setShowCreateModal(false)}>Cancel</button>
