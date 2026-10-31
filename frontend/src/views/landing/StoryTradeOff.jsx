@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Clock, ArrowRight, CheckCircle2 } from 'lucide-react';
+import SectionArtifacts from './SectionArtifacts';
 
 export default function StoryTradeOff({ onOpenAuth }) {
   // Interactive Simulation State
@@ -9,16 +10,24 @@ export default function StoryTradeOff({ onOpenAuth }) {
   const daysDelayed = Math.round(purchaseAmount / dailySavingsRate);
 
   return (
-    <section style={{ padding: '7rem 0', background: 'var(--cs-bg-white)', position: 'relative' }}>
-      <div className="cs-container">
+    <section 
+      style={{ 
+        padding: '7rem 0', 
+        background: 'linear-gradient(180deg, #F8FAFC 0%, #FFFBEB 35%, #FEF3C7 70%, #F8FAFC 100%)', 
+        position: 'relative', 
+        overflow: 'hidden' 
+      }}
+    >
+      <SectionArtifacts variant="tradeoff" glowPosition="both" />
+      <div className="cs-container" style={{ position: 'relative', zIndex: 1 }}>
         {/* Header */}
         <div style={{ maxWidth: '820px', margin: '0 auto', textAlign: 'center', marginBottom: '4.5rem' }}>
-          <div className="cs-eyebrow cs-eyebrow-light">
+          <div className="cs-eyebrow cs-eyebrow-light" style={{ background: '#FEF3C7', color: '#B45309', borderColor: '#FDE68A' }}>
             <Clock size={14} /> Signature Behavioral FinTech
           </div>
           <h2 className="cs-headline-editorial" style={{ marginBottom: '1.25rem' }}>
             Every decision has a trade-off. <br />
-            <span style={{ color: 'var(--cs-violet)' }}>See it before you make it.</span>
+            <span style={{ color: '#D97706' }}>See it before you make it.</span>
           </h2>
           <p style={{ fontSize: '1.15rem', color: 'var(--cs-text-secondary)', lineHeight: 1.6 }}>
             FinWise AI calculates your ground-truth daily savings capacity. When you contemplate an impulse purchase,
@@ -33,15 +42,16 @@ export default function StoryTradeOff({ onOpenAuth }) {
             maxWidth: '920px',
             margin: '0 auto',
             padding: '3rem',
-            background: 'linear-gradient(135deg, #FAF7FF 0%, #FFFFFF 60%, #F1F5F9 100%)',
-            border: '1.5px solid rgba(109, 74, 255, 0.25)',
+            background: 'linear-gradient(135deg, #FFFFFF 0%, #FFFDF7 60%, #FEF3C7 100%)',
+            border: '1.5px solid rgba(245, 158, 11, 0.3)',
+            boxShadow: '0 25px 50px -10px rgba(245, 158, 11, 0.15), 0 4px 16px rgba(0, 0, 0, 0.04)',
           }}
         >
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '3rem', alignItems: 'center' }}>
             
             {/* Left: Interactive Controls */}
             <div>
-              <div style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--cs-violet)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.5rem' }}>
+              <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#D97706', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.5rem' }}>
                 Interactive Trade-off Simulator
               </div>
               <h3 style={{ fontSize: '1.6rem', fontWeight: 850, color: 'var(--cs-text-primary)', marginBottom: '1.5rem' }}>
@@ -65,7 +75,7 @@ export default function StoryTradeOff({ onOpenAuth }) {
                   step="1000"
                   value={purchaseAmount}
                   onChange={(e) => setPurchaseAmount(Number(e.target.value))}
-                  style={{ width: '100%', accentColor: 'var(--cs-violet)', cursor: 'pointer' }}
+                  style={{ width: '100%', accentColor: '#D97706', cursor: 'pointer' }}
                 />
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--cs-text-muted)', marginTop: '0.35rem' }}>
                   <span>₹2,000 (Dinner/Shoes)</span>
@@ -78,13 +88,13 @@ export default function StoryTradeOff({ onOpenAuth }) {
               <div style={{ background: '#FFFFFF', borderRadius: '14px', padding: '1rem', border: '1px solid var(--cs-border-light)', marginBottom: '1.5rem' }}>
                 <div style={{ fontSize: '0.75rem', color: 'var(--cs-text-muted)' }}>Target Savings Goal</div>
                 <div style={{ fontSize: '1rem', fontWeight: 750, color: 'var(--cs-text-primary)' }}>Emergency Runway • Target ₹80,000</div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--cs-teal)', fontWeight: 650, marginTop: '2px' }}>
+                <div style={{ fontSize: '0.78rem', color: '#D97706', fontWeight: 650, marginTop: '2px' }}>
                   Current Pace: ₹25,000 / month (₹833 / day)
                 </div>
               </div>
 
               <div style={{ fontSize: '0.78rem', color: 'var(--cs-text-muted)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <CheckCircle2 size={15} color="var(--cs-violet)" />
+                <CheckCircle2 size={15} color="#D97706" />
                 <span>Calculated via FinWise Goal Delay Engine</span>
               </div>
             </div>
@@ -96,7 +106,7 @@ export default function StoryTradeOff({ onOpenAuth }) {
                 borderRadius: '20px',
                 padding: '2.5rem 2rem',
                 border: '2px solid rgba(239, 68, 68, 0.25)',
-                boxShadow: '0 20px 40px -10px rgba(239, 68, 68, 0.1)',
+                boxShadow: '0 20px 40px -10px rgba(239, 68, 68, 0.12)',
                 textAlign: 'center',
               }}
             >
@@ -121,7 +131,7 @@ export default function StoryTradeOff({ onOpenAuth }) {
                 type="button"
                 onClick={() => onOpenAuth?.('register')}
                 className="cs-btn cs-btn-primary"
-                style={{ width: '100%', padding: '0.8rem', fontSize: '0.92rem' }}
+                style={{ width: '100%', padding: '0.8rem', fontSize: '0.92rem', background: '#D97706' }}
               >
                 Put on 24h Cooling-Off Timer <ArrowRight size={16} />
               </button>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Sparkles, Activity, ShieldCheck, HeartPulse, Check, ArrowRight } from 'lucide-react';
+import SectionArtifacts from './SectionArtifacts';
 
 export default function StoryClarity({ onOpenAuth }) {
   const pillars = [
@@ -10,8 +11,16 @@ export default function StoryClarity({ onOpenAuth }) {
   ];
 
   return (
-    <section style={{ padding: '7rem 0', background: 'var(--cs-bg-white)', position: 'relative' }}>
-      <div className="cs-container">
+    <section 
+      style={{ 
+        padding: '7rem 0', 
+        background: 'linear-gradient(180deg, #F8FAFC 0%, #EEF2FF 35%, #F0FDFA 75%, #F8FAFC 100%)', 
+        position: 'relative', 
+        overflow: 'hidden' 
+      }}
+    >
+      <SectionArtifacts variant="clarity" glowPosition="both" />
+      <div className="cs-container" style={{ position: 'relative', zIndex: 1 }}>
         {/* Header */}
         <div style={{ maxWidth: '820px', margin: '0 auto', textAlign: 'center', marginBottom: '4.5rem' }}>
           <div className="cs-eyebrow cs-eyebrow-teal">
@@ -36,6 +45,7 @@ export default function StoryClarity({ onOpenAuth }) {
             padding: '3rem',
             borderRadius: '28px',
             background: 'linear-gradient(135deg, #FFFFFF 0%, #FAF7FF 50%, #F1F5F9 100%)',
+            boxShadow: '0 25px 50px -10px rgba(109, 74, 255, 0.12), 0 4px 16px rgba(0, 0, 0, 0.04)',
           }}
         >
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '3.5rem', alignItems: 'center' }}>
@@ -69,31 +79,29 @@ export default function StoryClarity({ onOpenAuth }) {
               </p>
             </div>
 
-            {/* Right: 4 Health Diagnostic Pillars */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {pillars.map((pil) => (
+            {/* Right: The 4 Core Diagnostic Pillars */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              {pillars.map((p) => (
                 <div
-                  key={pil.name}
+                  key={p.name}
                   style={{
                     background: '#FFFFFF',
                     borderRadius: '16px',
-                    padding: '1.1rem 1.35rem',
+                    padding: '1.25rem 1.5rem',
                     border: '1px solid var(--cs-border-light)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    boxShadow: '0 2px 8px rgba(16, 24, 40, 0.03)',
+                    boxShadow: '0 4px 12px rgba(16, 24, 40, 0.03)',
                   }}
                 >
-                  <div>
-                    <div style={{ fontSize: '0.92rem', fontWeight: 750, color: 'var(--cs-text-primary)' }}>{pil.name}</div>
-                    <div style={{ fontSize: '0.78rem', color: 'var(--cs-text-muted)' }}>{pil.desc}</div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '1.05rem', fontWeight: 850, color: 'var(--cs-violet)' }}>{pil.score}</div>
-                    <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--cs-teal)', background: 'var(--cs-teal-soft)', padding: '0.15rem 0.5rem', borderRadius: '4px' }}>
-                      {pil.status}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                    <span style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--cs-text-primary)' }}>
+                      {p.name}
                     </span>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 850, color: 'var(--cs-teal)' }}>
+                      {p.score}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '0.82rem', color: 'var(--cs-text-secondary)' }}>
+                    {p.desc}
                   </div>
                 </div>
               ))}
@@ -101,17 +109,14 @@ export default function StoryClarity({ onOpenAuth }) {
 
           </div>
 
-          <div style={{ marginTop: '2.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--cs-border-light)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-            <span style={{ fontSize: '0.82rem', color: 'var(--cs-text-muted)' }}>
-              ✦ Educational diagnostic tool based on peer-reviewed personal finance benchmarks.
-            </span>
+          {/* Action Callout */}
+          <div style={{ textAlign: 'center', marginTop: '3rem', paddingTop: '1.75rem', borderTop: '1px solid var(--cs-border-light)' }}>
             <button
               type="button"
               onClick={() => onOpenAuth?.('register')}
               className="cs-btn cs-btn-primary"
-              style={{ fontSize: '0.9rem', padding: '0.7rem 1.4rem' }}
             >
-              Get Your Score Free <ArrowRight size={16} />
+              Analyze Your Financial Baseline <ArrowRight size={17} />
             </button>
           </div>
         </div>
@@ -119,4 +124,3 @@ export default function StoryClarity({ onOpenAuth }) {
     </section>
   );
 }
-

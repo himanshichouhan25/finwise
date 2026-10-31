@@ -1,10 +1,20 @@
 import React from 'react';
 import { ArrowDownRight, ArrowUpRight, Clock, HelpCircle, Compass } from 'lucide-react';
+import SectionArtifacts from './SectionArtifacts';
 
 export default function StoryProblem() {
   return (
-    <section id="problem" style={{ padding: '7rem 0', background: 'var(--cs-bg-light)', position: 'relative' }}>
-      <div className="cs-container">
+    <section 
+      id="problem" 
+      style={{ 
+        padding: '7rem 0', 
+        background: 'linear-gradient(180deg, #F8FAFC 0%, #EEF2FF 40%, #F5F3FF 75%, #F8FAFC 100%)', 
+        position: 'relative', 
+        overflow: 'hidden' 
+      }}
+    >
+      <SectionArtifacts variant="problem" />
+      <div className="cs-container" style={{ position: 'relative', zIndex: 1 }}>
         {/* Section Header */}
         <div style={{ maxWidth: '820px', marginBottom: '4rem' }}>
           <div className="cs-eyebrow cs-eyebrow-light">
@@ -38,6 +48,8 @@ export default function StoryProblem() {
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
+              background: '#FFFFFF',
+              boxShadow: '0 20px 45px -10px rgba(109, 74, 255, 0.1), 0 4px 16px rgba(0, 0, 0, 0.04)',
             }}
           >
             <div>
@@ -85,6 +97,7 @@ export default function StoryProblem() {
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
+              boxShadow: '0 20px 45px -10px rgba(109, 74, 255, 0.12), 0 4px 16px rgba(0, 0, 0, 0.04)',
             }}
           >
             <div>
@@ -131,4 +144,3 @@ export default function StoryProblem() {
     </section>
   );
 }
-

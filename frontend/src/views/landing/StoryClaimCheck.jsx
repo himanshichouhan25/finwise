@@ -1,10 +1,20 @@
 import React from 'react';
 import { ShieldAlert, ArrowRight } from 'lucide-react';
+import SectionArtifacts from './SectionArtifacts';
 
 export default function StoryClaimCheck({ onOpenAuth }) {
   return (
-    <section id="claims" style={{ padding: '7rem 0', background: 'var(--cs-bg-soft)', position: 'relative' }}>
-      <div className="cs-container">
+    <section 
+      id="claims" 
+      style={{ 
+        padding: '7rem 0', 
+        background: 'linear-gradient(180deg, #F8FAFC 0%, #FEF2F2 35%, #FEE2E2 70%, #F8FAFC 100%)', 
+        position: 'relative', 
+        overflow: 'hidden' 
+      }}
+    >
+      <SectionArtifacts variant="claim" glowPosition="both" />
+      <div className="cs-container" style={{ position: 'relative', zIndex: 1 }}>
         {/* Section Header */}
         <div style={{ maxWidth: '820px', margin: '0 auto', textAlign: 'center', marginBottom: '4.5rem' }}>
           <div className="cs-eyebrow cs-eyebrow-dark" style={{ background: 'rgba(220, 38, 38, 0.1)', color: '#DC2626', borderColor: 'rgba(220, 38, 38, 0.25)' }}>
@@ -28,6 +38,8 @@ export default function StoryClaimCheck({ onOpenAuth }) {
             margin: '0 auto',
             padding: '2.5rem',
             borderRadius: '28px',
+            background: '#FFFFFF',
+            boxShadow: '0 25px 50px -10px rgba(239, 68, 68, 0.15), 0 4px 16px rgba(0, 0, 0, 0.04)',
           }}
         >
           {/* Step Sequence Header */}
@@ -61,75 +73,31 @@ export default function StoryClaimCheck({ onOpenAuth }) {
             </div>
 
             {/* Step 3: Verdict */}
-            <div style={{ background: 'rgba(254, 242, 242, 0.7)', borderRadius: '16px', padding: '1.25rem', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+            <div style={{ background: 'rgba(239, 68, 68, 0.08)', borderRadius: '16px', padding: '1.25rem', border: '1.5px solid rgba(239, 68, 68, 0.3)' }}>
               <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#DC2626', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
-                Stage 3 • Scam Exposure
+                Stage 3 • SEBI Verdict & Flags
               </div>
-              <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#DC2626', marginBottom: '0.5rem' }}>
-                High Risk Scam Flagged
+              <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--cs-text-primary)', marginBottom: '0.5rem' }}>
+                High Scam Probability
               </div>
-              <div style={{ fontSize: '0.78rem', color: '#991B1B', lineHeight: 1.45 }}>
-                Exceeds Warren Buffett's 50-year record by 45x. Characteristic of pump-and-dump fraud.
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.78rem', color: '#991B1B' }}>
+                <div>🚩 Exceeds Warren Buffett / Nifty 50 CAGR by 40x</div>
+                <div>🚩 Unregulated advice without SEBI registration</div>
               </div>
             </div>
 
           </div>
 
-          {/* Historical Benchmark Comparison */}
-          <div style={{ background: 'var(--cs-bg-soft)', borderRadius: '18px', padding: '1.75rem', marginBottom: '1.75rem' }}>
-            <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--cs-text-primary)', marginBottom: '1rem' }}>
-              Historical Benchmark Comparison (Annualized Returns)
-            </div>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.3rem' }}>
-                  <span style={{ color: '#DC2626' }}>Social Media Influencer Promise (900.0%)</span>
-                  <span style={{ color: '#DC2626' }}>Mathematically Impossible</span>
-                </div>
-                <div style={{ height: '10px', borderRadius: '999px', background: '#E2E8F0', overflow: 'hidden' }}>
-                  <div style={{ width: '100%', height: '100%', background: '#DC2626' }} />
-                </div>
-              </div>
-
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.3rem' }}>
-                  <span style={{ color: 'var(--cs-violet)' }}>Warren Buffett Berkshire Track Record (20.0%)</span>
-                  <span style={{ color: 'var(--cs-text-muted)' }}>Top Hedge Fund History</span>
-                </div>
-                <div style={{ height: '8px', borderRadius: '999px', background: '#E2E8F0', overflow: 'hidden' }}>
-                  <div style={{ width: '22%', height: '100%', background: 'var(--cs-violet)' }} />
-                </div>
-              </div>
-
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.3rem' }}>
-                  <span style={{ color: 'var(--cs-teal)' }}>NIFTY 50 Index 20-Year Average (12.5%)</span>
-                  <span style={{ color: 'var(--cs-text-muted)' }}>Indian Market Benchmark</span>
-                </div>
-                <div style={{ height: '8px', borderRadius: '999px', background: '#E2E8F0', overflow: 'hidden' }}>
-                  <div style={{ width: '14%', height: '100%', background: 'var(--cs-teal)' }} />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Educational Disclaimer Banner */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--cs-border-light)' }}>
-            <div style={{ fontSize: '0.78rem', color: 'var(--cs-text-muted)', maxWidth: '680px' }}>
-              <strong>Educational Disclaimer:</strong> FinWise provides mathematical compound return verification based on the parameters entered.
-              It is an educational decision-support tool and does not constitute official SEBI certification or regulatory enforcement.
-            </div>
+          {/* Action CTA */}
+          <div style={{ textAlign: 'center', paddingTop: '1.5rem', borderTop: '1px solid var(--cs-border-light)' }}>
             <button
               type="button"
               onClick={() => onOpenAuth?.('register')}
               className="cs-btn cs-btn-secondary"
-              style={{ fontSize: '0.88rem', padding: '0.6rem 1.25rem' }}
             >
-              Audit a Claim Free <ArrowRight size={15} />
+              Verify Any Questionable Financial Tip <ArrowRight size={16} />
             </button>
           </div>
-
         </div>
       </div>
     </section>

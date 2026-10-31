@@ -1,10 +1,20 @@
 import React from 'react';
 import { BotMessageSquare, Sparkles, CheckCircle2, ShieldAlert, Languages, ArrowRight } from 'lucide-react';
+import SectionArtifacts from './SectionArtifacts';
 
 export default function StoryCoach({ onOpenAuth }) {
   return (
-    <section id="coach" style={{ padding: '7rem 0', background: 'var(--cs-bg-white)', position: 'relative' }}>
-      <div className="cs-container">
+    <section 
+      id="coach" 
+      style={{ 
+        padding: '7rem 0', 
+        background: 'linear-gradient(180deg, #F8FAFC 0%, #FAF5FF 40%, #F5F3FF 70%, #F8FAFC 100%)', 
+        position: 'relative', 
+        overflow: 'hidden' 
+      }}
+    >
+      <SectionArtifacts variant="coach" glowPosition="both" />
+      <div className="cs-container" style={{ position: 'relative', zIndex: 1 }}>
         <div
           className="cs-editorial-split"
           style={{
@@ -67,7 +77,7 @@ export default function StoryCoach({ onOpenAuth }) {
                 borderRadius: '24px',
                 border: '1px solid var(--cs-border-light)',
                 background: '#FFFFFF',
-                boxShadow: 'var(--cs-shadow-card)',
+                boxShadow: '0 25px 50px -12px rgba(109, 74, 255, 0.15), 0 4px 16px rgba(0, 0, 0, 0.04)',
               }}
             >
               {/* Chat Session Top Bar */}
@@ -127,4 +137,3 @@ export default function StoryCoach({ onOpenAuth }) {
     </section>
   );
 }
-
