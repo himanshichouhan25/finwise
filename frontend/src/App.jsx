@@ -36,6 +36,7 @@ export default function App() {
   const [coachPrompt, setCoachPrompt] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleNavigateToCoach = (prompt = '') => {
     setCoachPrompt(prompt);
@@ -68,8 +69,28 @@ export default function App() {
 
   return (
     <div className="app-container">
+      {/* Mobile Backdrop */}
+      {mobileMenuOpen && (
+        <div
+          onClick={() => setMobileMenuOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.4)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 35,
+          }}
+        />
+      )}
+
       {/* Sidebar Navigation */}
-      <Sidebar currentTab={currentTab} setTab={setCurrentTab} onGoToLanding={() => setIsLanding(true)} />
+      <Sidebar
+        currentTab={currentTab}
+        setTab={setCurrentTab}
+        onGoToLanding={() => setIsLanding(true)}
+        mobileOpen={mobileMenuOpen}
+        onCloseMobile={() => setMobileMenuOpen(false)}
+      />
 
       {/* Main Content Area */}
       <div className="main-content">
@@ -79,6 +100,7 @@ export default function App() {
           isRefreshing={isRefreshing}
           onOpenAuth={() => setIsAuthModalOpen(true)}
           onGoToLanding={() => setIsLanding(true)}
+          onToggleMobile={() => setMobileMenuOpen((prev) => !prev)}
         />
 
         <main style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', paddingBottom: '3rem' }}>

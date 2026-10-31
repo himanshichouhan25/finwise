@@ -360,15 +360,15 @@ export default function MarketView() {
       {/* SECTION A: Market Overview Indices */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <span>Indian Market Indices</span>
-            <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#94A3B8' }}>
-              (Status: <strong style={{ color: (overview?.status?.is_open ?? overview?.market_status === 'OPEN') ? '#34D399' : '#FBBF24' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--text-secondary)' }}>
+              (Status: <strong style={{ color: (overview?.status?.is_open ?? overview?.market_status === 'OPEN') ? 'var(--teal-primary)' : '#D97706' }}>
                 {overview?.status?.trading_session || overview?.market_status || 'Regular Trading'}
               </strong>)
             </span>
           </h2>
-          <span style={{ fontSize: '0.75rem', color: '#64748B' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
             Updated: {overview?.attribution?.timestamp ? new Date(overview.attribution.timestamp).toLocaleTimeString('en-IN') : 'Live'}
           </span>
         </div>
@@ -377,7 +377,7 @@ export default function MarketView() {
           {overviewLoading && !overview ? (
             [1, 2, 3].map((n) => (
               <div key={n} className="glass-card" style={{ height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ color: '#64748B', fontSize: '0.85rem' }}>Loading index metrics...</span>
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Loading index metrics...</span>
               </div>
             ))
           ) : (
@@ -392,8 +392,8 @@ export default function MarketView() {
                 <div key={idx.name} className="glass-card glass-card-hover" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div>
-                      <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#FFFFFF' }}>{idx.name}</h3>
-                      <span style={{ fontSize: '0.7rem', color: '#64748B', textTransform: 'uppercase' }}>
+                      <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-main)' }}>{idx.name}</h3>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
                         {idx.symbol || 'NSE'}
                       </span>
                     </div>
@@ -404,15 +404,15 @@ export default function MarketView() {
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', marginTop: '0.25rem' }}>
-                    <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#F8FAFC' }}>
+                    <span style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-main)' }}>
                       ₹{currentVal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                     </span>
-                    <span style={{ fontSize: '0.8rem', fontWeight: 600, color: isUp ? '#34D399' : '#F87171' }}>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 600, color: isUp ? 'var(--teal-primary)' : '#DC2626' }}>
                       {isUp ? '+' : ''}{changeVal.toFixed(2)}
                     </span>
                   </div>
 
-                  <div style={{ fontSize: '0.7rem', color: '#64748B', display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '0.4rem', marginTop: '0.25rem' }}>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--border-subtle)', paddingTop: '0.4rem', marginTop: '0.25rem' }}>
                     <span>Day High: ₹{highVal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
                     <span>Day Low: ₹{lowVal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
                   </div>
@@ -538,13 +538,13 @@ export default function MarketView() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                    <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#FFFFFF' }}>
+                    <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-main)' }}>
                       {quote?.company_name || selectedSymbol}
                     </h2>
                     <span className="badge badge-teal">{quote?.exchange || 'NSE'}</span>
                     <span className="badge badge-slate">{quote?.symbol || selectedSymbol}</span>
                   </div>
-                  <p style={{ fontSize: '0.8rem', color: '#94A3B8' }}>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                     {fundamentals?.sector ? `${fundamentals.sector} • ${fundamentals.industry || ''}` : 'Indian Equity Market'}
                   </p>
                 </div>
@@ -561,7 +561,7 @@ export default function MarketView() {
                   </button>
 
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#F8FAFC' }}>
+                    <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-main)' }}>
                       ₹{quote?.current_price ? Number(quote.current_price).toLocaleString('en-IN', { maximumFractionDigits: 2 }) : '—'}
                     </div>
                     {quote?.change_pct !== undefined && (
@@ -689,26 +689,26 @@ export default function MarketView() {
               </div>
 
               {/* Day OHLCV Summary Strip */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.5rem', background: 'rgba(255,255,255,0.02)', padding: '0.65rem', borderRadius: '8px', textAlign: 'center' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.5rem', background: '#F8FAFC', border: '1px solid var(--border-subtle)', padding: '0.65rem', borderRadius: '8px', textAlign: 'center' }}>
                 <div>
-                  <div style={{ fontSize: '0.65rem', color: '#64748B' }}>OPEN</div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#E2E8F0' }}>{formatVal(quote?.open_price ?? quote?.open, '₹')}</div>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>OPEN</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)' }}>{formatVal(quote?.open_price ?? quote?.open, '₹')}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.65rem', color: '#64748B' }}>HIGH</div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#34D399' }}>{formatVal(quote?.high_price ?? quote?.high, '₹')}</div>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>HIGH</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--teal-primary)' }}>{formatVal(quote?.high_price ?? quote?.high, '₹')}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.65rem', color: '#64748B' }}>LOW</div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#F87171' }}>{formatVal(quote?.low_price ?? quote?.low, '₹')}</div>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>LOW</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#DC2626' }}>{formatVal(quote?.low_price ?? quote?.low, '₹')}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.65rem', color: '#64748B' }}>PREV CLOSE</div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#E2E8F0' }}>{formatVal(quote?.previous_close, '₹')}</div>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>PREV CLOSE</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)' }}>{formatVal(quote?.previous_close, '₹')}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.65rem', color: '#64748B' }}>VOLUME</div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#E2E8F0' }}>{formatVal(quote?.volume, '', '', 0)}</div>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>VOLUME</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)' }}>{formatVal(quote?.volume, '', '', 0)}</div>
                 </div>
               </div>
             </div>
@@ -716,17 +716,17 @@ export default function MarketView() {
             {/* SECTION C: Verified Fundamentals Grid */}
             <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <Building2 size={18} color="#F59E0B" />
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Building2 size={18} color="var(--violet-primary)" />
                   <span>Company Fundamentals & Ratios</span>
                 </h3>
-                <span style={{ fontSize: '0.7rem', color: '#64748B' }}>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
                   Verified Public Metrics • Zero Fabrications
                 </span>
               </div>
 
               {fundamentalsLoading ? (
-                <div style={{ padding: '2rem', textAlign: 'center', color: '#94A3B8', fontSize: '0.85rem' }}>
+                <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                   Loading balance sheet & financial ratios...
                 </div>
               ) : (
@@ -734,16 +734,16 @@ export default function MarketView() {
                   
                   {/* Market Cap */}
                   <div className="glass-card">
-                    <div style={{ fontSize: '0.7rem', color: '#94A3B8', marginBottom: '0.2rem' }}>Market Capitalization</div>
-                    <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#F8FAFC' }}>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Market Capitalization</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-main)' }}>
                       {formatVal(fundamentals?.market_cap_cr, '₹', ' Cr', 0)}
                     </div>
                   </div>
 
                   {/* P/E Ratio */}
                   <div className="glass-card">
-                    <div style={{ fontSize: '0.7rem', color: '#94A3B8', marginBottom: '0.2rem' }}>P/E Ratio (Price to Earnings)</div>
-                    <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#F8FAFC' }}>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>P/E Ratio (Price to Earnings)</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-main)' }}>
                       {formatVal(fundamentals?.pe_ratio, '', 'x', 1)}
                     </div>
                   </div>
@@ -810,16 +810,16 @@ export default function MarketView() {
 
           {/* Right Column: SECTION D: AI Stock Analyst (Groq) */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div className="glass-panel" style={{ padding: '1.5rem', border: '1px solid rgba(20, 184, 166, 0.3)', background: 'linear-gradient(180deg, rgba(20, 184, 166, 0.05) 0%, rgba(14, 21, 36, 0.9) 100%)' }}>
+            <div className="glass-panel" style={{ padding: '1.5rem', border: '1px solid rgba(19, 168, 158, 0.3)', background: 'linear-gradient(180deg, #F0FDF4 0%, #FFFFFF 100%)' }}>
               
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(20, 184, 166, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Sparkles size={18} color="#2DD4BF" />
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(19, 168, 158, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Sparkles size={18} color="var(--teal-primary)" />
                   </div>
                   <div>
-                    <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#FFFFFF' }}>AI Stock Analyst</h3>
-                    <p style={{ fontSize: '0.7rem', color: '#94A3B8' }}>Powered by Groq & Deterministic Financial Math</p>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>AI Stock Analyst</h3>
+                    <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', margin: 0 }}>Powered by Groq & Deterministic Financial Math</p>
                   </div>
                 </div>
 
@@ -835,7 +835,7 @@ export default function MarketView() {
               </div>
 
               {aiError && (
-                <div style={{ padding: '0.75rem', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#F87171', fontSize: '0.8rem', marginBottom: '1rem' }}>
+                <div style={{ padding: '0.75rem', borderRadius: '8px', background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#DC2626', fontSize: '0.8rem', marginBottom: '1rem' }}>
                   {aiError}
                 </div>
               )}
@@ -844,11 +844,11 @@ export default function MarketView() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   
                   {/* Plain English Summary */}
-                  <div style={{ padding: '0.85rem', borderRadius: '10px', background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#2DD4BF', textTransform: 'uppercase', marginBottom: '0.4rem', letterSpacing: '0.04em' }}>
+                  <div style={{ padding: '0.9rem', borderRadius: '10px', background: '#F8FAFC', border: '1px solid var(--border-subtle)' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--teal-primary)', textTransform: 'uppercase', marginBottom: '0.4rem', letterSpacing: '0.04em' }}>
                       Executive Takeaway ({aiAnalysis.model_used || 'Groq'})
                     </div>
-                    <p style={{ fontSize: '0.85rem', color: '#F1F5F9', lineHeight: 1.55 }}>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-main)', lineHeight: 1.55, margin: 0 }}>
                       {aiAnalysis.summary_explanation || aiAnalysis.summary}
                     </p>
                   </div>
@@ -856,17 +856,17 @@ export default function MarketView() {
                   {/* Ratio Explanations */}
                   {aiAnalysis.ratios_explained?.length > 0 && (
                     <div>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
                         Metric Interpretations
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                         {aiAnalysis.ratios_explained.map((r, i) => (
-                          <div key={i} style={{ padding: '0.5rem 0.75rem', borderRadius: '6px', background: 'rgba(255,255,255,0.02)', fontSize: '0.78rem' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, color: '#FFFFFF', marginBottom: '0.15rem' }}>
+                          <div key={i} style={{ padding: '0.55rem 0.75rem', borderRadius: '6px', background: '#FFFFFF', border: '1px solid var(--border-subtle)', fontSize: '0.78rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, color: 'var(--text-main)', marginBottom: '0.15rem' }}>
                               <span>{r.metric}</span>
-                              <span style={{ color: '#F59E0B' }}>{r.value}</span>
+                              <span style={{ color: '#D97706', fontWeight: 700 }}>{r.value}</span>
                             </div>
-                            <div style={{ color: '#94A3B8' }}>{r.interpretation}</div>
+                            <div style={{ color: 'var(--text-secondary)' }}>{r.interpretation}</div>
                           </div>
                         ))}
                       </div>
@@ -877,33 +877,33 @@ export default function MarketView() {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
                     
                     {/* Strengths / Pros */}
-                    <div style={{ padding: '0.75rem', borderRadius: '8px', background: 'rgba(20, 184, 166, 0.06)', border: '1px solid rgba(20, 184, 166, 0.2)' }}>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#2DD4BF', marginBottom: '0.4rem' }}>Key Strengths</div>
-                      <ul style={{ paddingLeft: '1rem', margin: 0, fontSize: '0.75rem', color: '#CBD5E1', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                    <div style={{ padding: '0.85rem', borderRadius: '8px', background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#166534', marginBottom: '0.4rem' }}>Key Strengths</div>
+                      <ul style={{ paddingLeft: '1rem', margin: 0, fontSize: '0.75rem', color: '#14532D', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                         {(aiAnalysis.pros || aiAnalysis.strengths)?.length > 0 ? (
                           (aiAnalysis.pros || aiAnalysis.strengths).map((s, i) => <li key={i}>{s}</li>)
                         ) : (
-                          <li style={{ color: '#64748B' }}>Neutral financial metrics.</li>
+                          <li style={{ color: 'var(--text-muted)' }}>Neutral financial metrics.</li>
                         )}
                       </ul>
                     </div>
 
                     {/* Considerations / Risks */}
-                    <div style={{ padding: '0.75rem', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.06)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#F87171', marginBottom: '0.4rem' }}>Risks & Watchouts</div>
-                      <ul style={{ paddingLeft: '1rem', margin: 0, fontSize: '0.75rem', color: '#CBD5E1', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                    <div style={{ padding: '0.85rem', borderRadius: '8px', background: '#FEF2F2', border: '1px solid #FECACA' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#991B1B', marginBottom: '0.4rem' }}>Risks & Watchouts</div>
+                      <ul style={{ paddingLeft: '1rem', margin: 0, fontSize: '0.75rem', color: '#7F1D1D', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                         {(aiAnalysis.cons || aiAnalysis.risks)?.length > 0 ? (
                           (aiAnalysis.cons || aiAnalysis.risks).map((r, i) => <li key={i}>{r}</li>)
                         ) : (
-                          <li style={{ color: '#64748B' }}>Standard market fluctuations.</li>
+                          <li style={{ color: 'var(--text-muted)' }}>Standard market fluctuations.</li>
                         )}
                       </ul>
                     </div>
                   </div>
 
                   {/* SEBI Compliance & Educational Disclaimer */}
-                  <div style={{ padding: '0.65rem 0.85rem', borderRadius: '8px', background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.25)', fontSize: '0.7rem', color: '#FDE68A', display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
-                    <ShieldCheck size={16} color="#F59E0B" style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <div style={{ padding: '0.65rem 0.85rem', borderRadius: '8px', background: '#FFFBEB', border: '1px solid #FDE68A', fontSize: '0.7rem', color: '#92400E', display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
+                    <ShieldCheck size={16} color="#D97706" style={{ flexShrink: 0, marginTop: '2px' }} />
                     <div>
                       <strong>SEBI Educational Guardrail: </strong>
                       {aiAnalysis.sebi_disclaimer || aiAnalysis.disclaimer}
@@ -912,12 +912,12 @@ export default function MarketView() {
 
                 </div>
               ) : (
-                <div style={{ padding: '2rem 1rem', textAlign: 'center', color: '#64748B', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                  <HelpCircle size={32} color="#334155" />
+                <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                  <HelpCircle size={32} color="var(--violet-primary)" />
                   <p style={{ fontSize: '0.85rem' }}>
                     Click <strong>Analyze Stock</strong> to synthesize verified financial fundamentals into plain-English takeaways for first-time investors.
                   </p>
-                  <p style={{ fontSize: '0.7rem', color: '#475569' }}>
+                  <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
                     Strict guardrails: Zero hallucinated figures • Educational only • No buy/sell tips.
                   </p>
                 </div>
@@ -935,8 +935,8 @@ export default function MarketView() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF' }}>Latest Financial Market News</h3>
-              <p style={{ fontSize: '0.8rem', color: '#94A3B8' }}>Verified business headlines paired with AI 1-line takeaways.</p>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Latest Financial Market News</h3>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '0.2rem 0 0 0' }}>Verified business headlines paired with AI 1-line takeaways.</p>
             </div>
             {newsAttribution && (
               <span className="badge badge-slate" style={{ fontSize: '0.7rem' }}>
@@ -946,14 +946,14 @@ export default function MarketView() {
           </div>
 
           {newsLoading ? (
-            <div style={{ padding: '3rem', textAlign: 'center', color: '#94A3B8' }}>
+            <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
               Loading financial news feed...
             </div>
           ) : news.length === 0 ? (
-            <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center', color: '#94A3B8' }}>
-              <AlertCircle size={32} color="#64748B" style={{ margin: '0 auto 0.75rem auto' }} />
-              <p>News provider currently unavailable or free tier limit reached.</p>
-              <p style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '0.25rem' }}>
+            <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+              <AlertCircle size={32} color="var(--text-muted)" style={{ margin: '0 auto 0.75rem auto' }} />
+              <p style={{ fontWeight: 600 }}>News provider currently unavailable or free tier limit reached.</p>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
                 FinWise AI transparently reports provider status instead of fabricating fake headlines.
               </p>
             </div>
@@ -964,27 +964,27 @@ export default function MarketView() {
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                       <span className="badge badge-teal" style={{ fontSize: '0.65rem' }}>{item.source}</span>
-                      <span style={{ fontSize: '0.7rem', color: '#64748B' }}>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
                         {item.published_at ? new Date(item.published_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recent'}
                       </span>
                     </div>
-                    <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#FFFFFF', lineHeight: 1.4, marginBottom: '0.5rem' }}>
+                    <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-main)', lineHeight: 1.4, marginBottom: '0.5rem' }}>
                       {item.title || item.headline}
                     </h4>
                     {(item.ai_takeaway || item.ai_summary) && (
-                      <div style={{ padding: '0.5rem 0.75rem', borderRadius: '6px', background: 'rgba(20, 184, 166, 0.08)', border: '1px solid rgba(20, 184, 166, 0.2)', fontSize: '0.75rem', color: '#2DD4BF', lineHeight: 1.4 }}>
+                      <div style={{ padding: '0.5rem 0.75rem', borderRadius: '6px', background: '#F0FDFA', border: '1px solid #99F6E4', fontSize: '0.75rem', color: '#0F766E', lineHeight: 1.4 }}>
                         <strong>AI Takeaway: </strong>{item.ai_takeaway || item.ai_summary}
                       </div>
                     )}
                   </div>
 
                   {item.url && (
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '0.5rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid var(--border-subtle)', paddingTop: '0.5rem' }}>
                       <a
                         href={item.url}
                         target="_blank"
                         rel="noreferrer"
-                        style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: '#38BDF8', textDecoration: 'none' }}
+                        style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: 'var(--violet-primary)', textDecoration: 'none', fontWeight: 600 }}
                       >
                         Read Full Story
                         <ArrowUpRight size={13} />
@@ -1005,8 +1005,8 @@ export default function MarketView() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF' }}>Personal Stock Watchlist</h3>
-              <p style={{ fontSize: '0.8rem', color: '#94A3B8' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Personal Stock Watchlist</h3>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '0.2rem 0 0 0' }}>
                 Securely isolated per user persona with real-time tracking.
               </p>
             </div>
@@ -1021,14 +1021,14 @@ export default function MarketView() {
           </div>
 
           {watchlistLoading && watchlist.length === 0 ? (
-            <div style={{ padding: '3rem', textAlign: 'center', color: '#94A3B8' }}>
+            <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
               Loading saved watchlist items...
             </div>
           ) : watchlist.length === 0 ? (
-            <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center', color: '#94A3B8' }}>
-              <Bookmark size={36} color="#64748B" style={{ margin: '0 auto 0.75rem auto' }} />
-              <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#F8FAFC', marginBottom: '0.25rem' }}>Your Watchlist is Empty</h4>
-              <p style={{ fontSize: '0.85rem', color: '#64748B', maxWidth: '400px', margin: '0 auto 1rem auto' }}>
+            <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+              <Bookmark size={36} color="var(--text-muted)" style={{ margin: '0 auto 0.75rem auto' }} />
+              <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.25rem' }}>Your Watchlist is Empty</h4>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', maxWidth: '400px', margin: '0 auto 1rem auto' }}>
                 Search for companies in the <strong>Stock Explorer</strong> tab and click <strong>Add to Watchlist</strong> to track prices here.
               </p>
               <button className="btn btn-teal" onClick={() => setActiveTab('explorer')}>
@@ -1044,10 +1044,10 @@ export default function MarketView() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                          <span style={{ fontWeight: 800, color: '#2DD4BF', fontSize: '1.05rem' }}>{item.symbol}</span>
+                          <span style={{ fontWeight: 800, color: 'var(--teal-primary)', fontSize: '1.05rem' }}>{item.symbol}</span>
                           <span className="badge badge-slate" style={{ fontSize: '0.65rem' }}>{item.exchange}</span>
                         </div>
-                        <div style={{ fontSize: '0.8rem', color: '#E2E8F0', marginTop: '0.15rem' }}>{item.company_name}</div>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-main)', marginTop: '0.15rem' }}>{item.company_name}</div>
                       </div>
 
                       <button
@@ -1055,17 +1055,17 @@ export default function MarketView() {
                           await removeFromWatchlist(item.symbol);
                           loadWatchlist();
                         }}
-                        style={{ background: 'transparent', border: 'none', color: '#64748B', cursor: 'pointer', padding: '0.25rem' }}
+                        style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '0.25rem' }}
                         title="Remove from Watchlist"
-                        onMouseEnter={(e) => (e.currentTarget.style.color = '#F87171')}
-                        onMouseLeave={(e) => (e.currentTarget.style.color = '#64748B')}
+                        onMouseEnter={(e) => (e.currentTarget.style.color = '#EF4444')}
+                        onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
                       >
                         <Trash2 size={16} />
                       </button>
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: '1.3rem', fontWeight: 800, color: '#FFFFFF' }}>
+                      <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-main)' }}>
                         {item.current_price || item.latest_price ? `₹${Number(item.current_price || item.latest_price).toLocaleString('en-IN')}` : '—'}
                       </span>
                       {item.change_pct !== null && item.change_pct !== undefined && (
@@ -1075,8 +1075,8 @@ export default function MarketView() {
                       )}
                     </div>
 
-                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.7rem', color: '#64748B' }}>
+                    <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
                         Saved: {item.added_at ? new Date(item.added_at).toLocaleDateString('en-IN') : 'Recently'}
                       </span>
                       <button

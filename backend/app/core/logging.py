@@ -19,6 +19,17 @@ logger = logging.getLogger("finwise")
 
 def setup_logging(log_level: str = "INFO") -> None:
     """Configure structured logging for the application."""
+    if hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+    if hasattr(sys.stderr, "reconfigure"):
+        try:
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
     numeric_level = getattr(logging, log_level.upper(), logging.INFO)
 
     # Format: [timestamp] [level] [name]: message

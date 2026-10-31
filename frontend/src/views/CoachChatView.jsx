@@ -40,13 +40,12 @@ export default function CoachChatView({ initialPrompt = '' }) {
 
   useEffect(() => {
     loadSessions();
-    // Default greeting if new session
     if (messages.length === 0) {
       setMessages([
         {
           id: 'welcome',
           role: 'assistant',
-          content: 'Namaste! I am your FinWise AI Coach. I can help you budget your money with the 50/30/20 rule, calculate SIP wealth compounding, check if you can afford impulse purchases, and build a solid financial foundation. How can I guide you today?\n\n*Disclaimer: I am an AI financial coach, not a SEBI-registered investment advisor. All calculations are for educational purposes.*',
+          content: 'Namaste! I am your FinWise AI Coach. I analyze your real-time financial snapshot to help you balance your 50/30/20 budget, project compound SIP wealth, and evaluate whether you can afford discretionary purchases.\n\nHow can I help optimize your money decisions today?',
           tools_used: null,
           created_at: new Date().toISOString(),
         },
@@ -74,7 +73,7 @@ export default function CoachChatView({ initialPrompt = '' }) {
       {
         id: 'welcome-new',
         role: 'assistant',
-        content: 'Started a fresh conversation! Ask me anything about your budget, savings goals, or SIP investments.',
+        content: 'Started a fresh consultation! Ask me anything about your cash flow, budget limits, emergency runway, or SIP compounding goals.',
         tools_used: null,
         created_at: new Date().toISOString(),
       },
@@ -128,31 +127,32 @@ export default function CoachChatView({ initialPrompt = '' }) {
 
   return (
     <div style={{ display: 'flex', height: 'calc(100vh - 85px)', overflow: 'hidden' }}>
-      {/* Session History Drawer */}
+      {/* Session History Sidebar Drawer */}
       <div style={{
-        width: '240px',
-        background: 'rgba(11, 17, 29, 0.85)',
+        width: '260px',
+        background: '#FFFFFF',
         borderRight: '1px solid var(--border-subtle)',
         display: 'flex',
         flexDirection: 'column',
-        padding: '1rem',
+        padding: '1.25rem 1rem',
+        flexShrink: 0,
       }}>
         <button
-          className="btn btn-teal"
+          className="btn btn-violet"
           onClick={handleNewChat}
-          style={{ width: '100%', marginBottom: '1rem', fontSize: '0.8rem' }}
+          style={{ width: '100%', marginBottom: '1.25rem', fontSize: '0.84rem', padding: '0.65rem' }}
         >
           <Plus size={16} />
           <span>New Consultation</span>
         </button>
 
-        <span style={{ fontSize: '0.7rem', fontWeight: 600, color: '#64748B', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
-          Past Conversations
+        <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.65rem', paddingLeft: '0.35rem' }}>
+          Past Sessions
         </span>
 
-        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
           {sessions.length === 0 ? (
-            <span style={{ fontSize: '0.75rem', color: '#64748B' }}>No saved sessions</span>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', paddingLeft: '0.35rem' }}>No saved sessions</span>
           ) : (
             sessions.map((s) => (
               <button
@@ -161,21 +161,23 @@ export default function CoachChatView({ initialPrompt = '' }) {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.5rem 0.65rem',
-                  borderRadius: '8px',
+                  gap: '0.65rem',
+                  padding: '0.6rem 0.75rem',
+                  borderRadius: 'var(--radius-sm)',
                   border: 'none',
-                  background: sessionId === s.id ? 'rgba(20, 184, 166, 0.15)' : 'transparent',
-                  color: sessionId === s.id ? '#2DD4BF' : '#94A3B8',
-                  fontSize: '0.75rem',
+                  background: sessionId === s.id ? 'var(--violet-soft)' : 'transparent',
+                  color: sessionId === s.id ? 'var(--violet-primary)' : 'var(--text-secondary)',
+                  fontSize: '0.8rem',
+                  fontWeight: sessionId === s.id ? 700 : 500,
                   textAlign: 'left',
                   cursor: 'pointer',
+                  transition: 'all 0.15s ease',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                 }}
               >
-                <MessageSquare size={14} />
+                <MessageSquare size={14} color={sessionId === s.id ? 'var(--violet-primary)' : 'var(--text-muted)'} />
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.title}</span>
               </button>
             ))
@@ -184,9 +186,9 @@ export default function CoachChatView({ initialPrompt = '' }) {
       </div>
 
       {/* Main Chat Flow */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'rgba(8, 12, 20, 0.5)' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--bg-app)' }}>
         {/* Messages Stream */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           {messages.map((m) => {
             const isUser = m.role === 'user';
             return (
@@ -194,20 +196,21 @@ export default function CoachChatView({ initialPrompt = '' }) {
                 key={m.id}
                 style={{
                   display: 'flex',
-                  gap: '0.75rem',
+                  gap: '0.85rem',
                   maxWidth: '850px',
                   alignSelf: isUser ? 'flex-end' : 'flex-start',
                 }}
               >
                 {!isUser && (
                   <div style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '8px',
-                    background: 'linear-gradient(135deg, #14B8A6 0%, #0D9488 100%)',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '10px',
+                    background: 'linear-gradient(135deg, #7047FF 0%, #5135CC 100%)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    boxShadow: '0 3px 10px rgba(112, 71, 255, 0.25)',
                     flexShrink: 0,
                   }}>
                     <Bot size={18} color="#FFFFFF" />
@@ -215,24 +218,24 @@ export default function CoachChatView({ initialPrompt = '' }) {
                 )}
 
                 <div style={{
-                  background: isUser ? 'rgba(20, 184, 166, 0.15)' : 'rgba(21, 31, 51, 0.75)',
-                  border: `1px solid ${isUser ? 'rgba(20, 184, 166, 0.3)' : 'var(--border-subtle)'}`,
-                  borderRadius: '12px',
-                  padding: '1rem',
-                  color: '#F8FAFC',
-                  fontSize: '0.9rem',
-                  lineHeight: '1.5',
-                  backdropFilter: 'blur(10px)',
+                  background: isUser ? 'var(--violet-primary)' : '#FFFFFF',
+                  border: `1px solid ${isUser ? 'transparent' : 'var(--border-subtle)'}`,
+                  borderRadius: isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                  padding: '1.15rem 1.25rem',
+                  color: isUser ? '#FFFFFF' : 'var(--text-main)',
+                  fontSize: '0.92rem',
+                  lineHeight: '1.55',
+                  boxShadow: isUser ? 'var(--shadow-violet)' : 'var(--shadow-sm)',
                   whiteSpace: 'pre-wrap',
                 }}>
                   {m.content}
 
-                  {/* Tool Calls Badge */}
+                  {/* Tool Execution Pill */}
                   {m.tools_used && m.tools_used.length > 0 && (
-                    <div style={{ marginTop: '0.75rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', color: '#2DD4BF' }}>
-                        <Wrench size={13} />
-                        <span>Executed Deterministic Tool: <strong>{m.tools_used[0].name}</strong></span>
+                    <div style={{ marginTop: '0.85rem', paddingTop: '0.65rem', borderTop: '1px solid var(--border-light)' }}>
+                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.74rem', color: 'var(--teal-primary)', background: 'var(--teal-soft)', padding: '0.2rem 0.55rem', borderRadius: 'var(--radius-full)', fontWeight: 600 }}>
+                        <Wrench size={12} />
+                        <span>Ran deterministic calculation: <strong>{m.tools_used[0].name}</strong></span>
                       </div>
                     </div>
                   )}
@@ -240,16 +243,16 @@ export default function CoachChatView({ initialPrompt = '' }) {
 
                 {isUser && (
                   <div style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '8px',
-                    background: 'rgba(245, 158, 11, 0.2)',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '10px',
+                    background: '#EDE9FE',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexShrink: 0,
                   }}>
-                    <User size={18} color="#F59E0B" />
+                    <User size={18} color="var(--violet-primary)" />
                   </div>
                 )}
               </div>
@@ -257,20 +260,32 @@ export default function CoachChatView({ initialPrompt = '' }) {
           })}
 
           {loading && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', gap: '0.85rem', alignSelf: 'flex-start' }}>
               <div style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '8px',
-                background: 'linear-gradient(135deg, #14B8A6 0%, #0D9488 100%)',
+                width: '36px',
+                height: '36px',
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, #7047FF 0%, #5135CC 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
                 <Bot size={18} color="#FFFFFF" />
               </div>
-              <div className="glass-card" style={{ padding: '0.65rem 1rem', color: '#2DD4BF', fontSize: '0.85rem' }}>
-                FinWise AI Coach is evaluating financial snapshot and calculating...
+              <div style={{
+                background: '#FFFFFF',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: '16px 16px 16px 4px',
+                padding: '0.9rem 1.25rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                color: 'var(--text-secondary)',
+                fontSize: '0.85rem',
+                boxShadow: 'var(--shadow-xs)',
+              }}>
+                <Sparkles size={16} color="var(--violet-primary)" style={{ animation: 'spin 2s linear infinite' }} />
+                <span>Analyzing your financial data & running calculations...</span>
               </div>
             </div>
           )}
@@ -278,46 +293,68 @@ export default function CoachChatView({ initialPrompt = '' }) {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Quick Suggestion Pills */}
-        <div style={{ padding: '0.5rem 1.5rem', display: 'flex', gap: '0.5rem', overflowX: 'auto', borderTop: '1px solid var(--border-subtle)' }}>
-          {QUICK_PROMPTS.map((p, idx) => (
+        {/* Suggested Quick Question Chips */}
+        <div style={{ padding: '0.5rem 1.75rem', display: 'flex', gap: '0.5rem', overflowX: 'auto', flexWrap: 'wrap' }}>
+          {QUICK_PROMPTS.map((prompt, idx) => (
             <button
               key={idx}
               className="btn btn-outline"
-              onClick={() => handleSend(p)}
-              disabled={loading}
-              style={{ fontSize: '0.75rem', padding: '0.35rem 0.65rem' }}
+              onClick={() => handleSend(prompt)}
+              style={{
+                fontSize: '0.78rem',
+                padding: '0.4rem 0.8rem',
+                borderRadius: 'var(--radius-full)',
+                background: '#FFFFFF',
+                color: 'var(--text-secondary)',
+              }}
             >
-              {p}
+              {prompt}
             </button>
           ))}
         </div>
 
-        {/* Input Bar */}
-        <div style={{ padding: '1rem 1.5rem', background: 'rgba(11, 17, 29, 0.95)', borderTop: '1px solid var(--border-subtle)' }}>
+        {/* Chat Input Bar */}
+        <div style={{ padding: '1rem 1.75rem', background: '#FFFFFF', borderTop: '1px solid var(--border-subtle)', boxShadow: '0 -2px 10px rgba(16, 24, 40, 0.03)' }}>
           <form
             onSubmit={(e) => {
               e.preventDefault();
               handleSend();
             }}
-            style={{ display: 'flex', gap: '0.75rem' }}
+            style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}
           >
             <input
               type="text"
               className="fin-input"
-              placeholder="Ask your coach in English or Hinglish (e.g. 'Can I afford an iPhone?', 'SIP kaise shuru karein?')..."
+              placeholder="Ask anything (e.g. 'Can I afford a ₹15,000 watch?', 'How much to invest in SIP?')..."
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               disabled={loading}
+              style={{
+                flex: 1,
+                fontSize: '0.92rem',
+                padding: '0.75rem 1.15rem',
+                borderRadius: 'var(--radius-full)',
+              }}
             />
-            <button type="submit" className="btn btn-teal" disabled={loading || !inputText.trim()}>
-              <Send size={16} />
-              <span>Send</span>
+            <button
+              type="submit"
+              className="btn btn-violet"
+              disabled={loading || !inputText.trim()}
+              style={{
+                width: '46px',
+                height: '46px',
+                borderRadius: '50%',
+                padding: 0,
+                flexShrink: 0,
+              }}
+            >
+              <Send size={18} />
             </button>
           </form>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.4rem', fontSize: '0.68rem', color: '#64748B' }}>
-            <ShieldCheck size={12} color="#14B8A6" />
-            <span>Zero-hallucination math: all numbers are computed strictly via pure Python engine.</span>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '0.5rem' }}>
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+              *FinWise AI Coach enforces deterministic calculations with SEBI educational guardrails.*
+            </span>
           </div>
         </div>
       </div>

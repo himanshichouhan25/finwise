@@ -118,3 +118,4 @@ export default function HowItWorks({ onOpenAuth }) {
     </section>
   );
 }
+

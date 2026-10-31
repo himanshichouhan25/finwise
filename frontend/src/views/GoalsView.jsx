@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Target, Plus, Calendar, Clock, AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
+import { Target, Plus, Calendar, Clock, AlertCircle, ArrowRight, Sparkles, X } from 'lucide-react';
 import { getGoals, createGoal, runGoalDelaySimulation } from '../api/client';
 
 export default function GoalsView() {
@@ -89,22 +89,23 @@ export default function GoalsView() {
   }, [spendAmount, selectedGoalId, goals]);
 
   if (loading) {
-    return <div style={{ padding: '3rem', textAlign: 'center', color: '#94A3B8' }}>Loading financial goals...</div>;
+    return <div style={{ padding: '3.5rem', textAlign: 'center', color: 'var(--text-muted)' }}>Loading financial goals...</div>;
   }
 
   return (
-    <div style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.75rem', maxWidth: '1200px' }}>
+    <div style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '1240px', margin: '0 auto' }}>
       {/* Top Banner & Action */}
-      <div className="glass-panel" style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+      <div className="glass-panel" style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', borderLeft: '4px solid var(--violet-primary)' }}>
         <div>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#FFFFFF' }}>
-            Goal Setting & Delayed Gratification Engine
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Target size={20} color="var(--violet-primary)" />
+            <span>Goal Planning & Delayed Gratification Engine</span>
           </h2>
-          <p style={{ fontSize: '0.85rem', color: '#94A3B8' }}>
-            Map target milestones, track real completion progress, and see the exact days delayed by impulsive purchases.
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
+            Map target milestones, track real completion progress, and calculate the exact timeline delays caused by impulsive purchases.
           </p>
         </div>
-        <button className="btn btn-teal" onClick={() => setShowCreateModal(true)}>
+        <button className="btn btn-violet" onClick={() => setShowCreateModal(true)}>
           <Plus size={16} />
           <span>New Financial Goal</span>
         </button>
@@ -113,22 +114,22 @@ export default function GoalsView() {
       {/* Goal-Days Delayed Signature Feature Card */}
       <div className="glass-panel" style={{
         padding: '1.5rem',
-        background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(20, 184, 166, 0.08) 100%)',
+        background: 'linear-gradient(135deg, var(--bg-surface-amber) 0%, #FFFFFF 100%)',
         border: '1px solid rgba(245, 158, 11, 0.3)',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
-          <Clock size={20} color="#F59E0B" />
-          <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#FBBF24' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.35rem' }}>
+          <Clock size={20} color="var(--gold-primary)" />
+          <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#B45309', margin: 0 }}>
             Goal-Days Delayed Calculator (Impulse Spend Reality Check)
           </h3>
         </div>
-        <p style={{ fontSize: '0.85rem', color: '#94A3B8', marginBottom: '1.25rem' }}>
-          Before buying sneakers, dining at a fancy café, or shopping online, see how many days of your hard-earned progress this purchase delays.
+        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.25rem' }}>
+          Before buying sneakers, ordering food, or checking out online, calculate exactly how many days of your planned savings this purchase sets you back.
         </p>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', alignItems: 'flex-end' }}>
           <div>
-            <label className="fin-label">Impulsive Spend Amount (₹)</label>
+            <label className="fin-label">Contemplated Spend Amount (₹)</label>
             <input
               type="number"
               className="fin-input"
@@ -139,7 +140,7 @@ export default function GoalsView() {
           </div>
 
           <div>
-            <label className="fin-label">Compare Against Goal</label>
+            <label className="fin-label">Target Milestone to Compare</label>
             <select
               className="fin-select"
               value={selectedGoalId}
@@ -156,19 +157,19 @@ export default function GoalsView() {
 
         {/* Delay Calculation Output Banner */}
         {delayResult && (
-          <div className="glass-card" style={{ marginTop: '1.25rem', background: 'rgba(15, 23, 42, 0.7)', border: '1px solid rgba(245, 158, 11, 0.4)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-              <div style={{ textAlign: 'center', padding: '0.5rem 1rem', background: 'rgba(239, 68, 68, 0.15)', borderRadius: '10px', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
-                <span style={{ fontSize: '0.7rem', color: '#F87171', fontWeight: 600, display: 'block' }}>DELAY PENALTY</span>
-                <span style={{ fontSize: '1.75rem', fontWeight: 900, color: '#F87171' }}>
+          <div className="glass-card" style={{ marginTop: '1.25rem', background: '#FFFFFF', border: '1px solid #FCD34D', boxShadow: 'var(--shadow-sm)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.15rem', flexWrap: 'wrap' }}>
+              <div style={{ textAlign: 'center', padding: '0.65rem 1.15rem', background: '#FEF2F2', borderRadius: 'var(--radius-sm)', border: '1px solid #FEE2E2' }}>
+                <span style={{ fontSize: '0.72rem', color: '#DC2626', fontWeight: 700, display: 'block' }}>DELAY PENALTY</span>
+                <span style={{ fontSize: '1.85rem', fontWeight: 900, color: '#DC2626' }}>
                   +{delayResult.days_delayed} Days
                 </span>
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 700, color: '#F8FAFC', fontSize: '0.95rem' }}>
+                <div style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: '0.96rem' }}>
                   {delayResult.message}
                 </div>
-                <div style={{ fontSize: '0.8rem', color: '#94A3B8', marginTop: '0.25rem' }}>
+                <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '0.3rem' }}>
                   Based on daily savings rate of ₹{Number(delayResult.daily_goal_rate).toFixed(2)}/day toward your {delayResult.goal_name || 'goal'}.
                 </div>
               </div>
@@ -179,13 +180,13 @@ export default function GoalsView() {
 
       {/* Active Goals Grid */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#FFFFFF' }}>
-          Current Active Milestones ({goals.length})
+        <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+          Active Milestones ({goals.length})
         </h3>
 
         {goals.length === 0 ? (
-          <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center', color: '#64748B' }}>
-            <p>No goals defined yet. Click "New Financial Goal" above to create one.</p>
+          <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+            <p style={{ margin: 0 }}>No goals defined yet. Click "New Financial Goal" above to create one.</p>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
@@ -197,36 +198,36 @@ export default function GoalsView() {
                 <div key={g.id} className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <Target size={18} color="#14B8A6" />
-                      <h4 style={{ fontWeight: 700, color: '#FFFFFF', fontSize: '1rem' }}>{g.name}</h4>
+                      <Target size={18} color="var(--teal-primary)" />
+                      <h4 style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: '1.02rem', margin: 0 }}>{g.name}</h4>
                     </div>
                     <span className="badge badge-teal">{progressPct.toFixed(1)}%</span>
                   </div>
 
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
-                      <span style={{ color: '#94A3B8' }}>Saved: ₹{Number(g.current_saved).toLocaleString('en-IN')}</span>
-                      <span style={{ fontWeight: 700, color: '#FFFFFF' }}>Target: ₹{Number(g.target_amount).toLocaleString('en-IN')}</span>
+                      <span style={{ color: 'var(--text-secondary)' }}>Saved: ₹{Number(g.current_saved).toLocaleString('en-IN')}</span>
+                      <span style={{ fontWeight: 700, color: 'var(--text-main)' }}>Target: ₹{Number(g.target_amount).toLocaleString('en-IN')}</span>
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.1)', height: '8px', borderRadius: '4px', marginTop: '0.5rem', overflow: 'hidden' }}>
-                      <div style={{ background: '#14B8A6', height: '100%', width: `${Math.min(100, progressPct)}%` }} />
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', background: 'rgba(255,255,255,0.02)', padding: '0.75rem', borderRadius: '8px' }}>
-                    <div>
-                      <span style={{ fontSize: '0.7rem', color: '#64748B', display: 'block' }}>REMAINING</span>
-                      <span style={{ fontWeight: 600, color: '#F8FAFC', fontSize: '0.85rem' }}>₹{remaining.toLocaleString('en-IN')}</span>
-                    </div>
-                    <div>
-                      <span style={{ fontSize: '0.7rem', color: '#64748B', display: 'block' }}>TARGET DATE</span>
-                      <span style={{ fontWeight: 600, color: '#F8FAFC', fontSize: '0.85rem' }}>{g.target_date || 'Ongoing'}</span>
+                    <div style={{ background: '#E2E8F0', height: '8px', borderRadius: '4px', marginTop: '0.5rem', overflow: 'hidden' }}>
+                      <div style={{ background: 'var(--teal-primary)', height: '100%', width: `${Math.min(100, progressPct)}%` }} />
                     </div>
                   </div>
 
-                  <div style={{ fontSize: '0.75rem', color: '#94A3B8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>Plan: ₹{Number(g.planned_monthly_contribution || 0).toLocaleString('en-IN')}/mo</span>
-                    <span className="badge badge-slate">{g.status}</span>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', background: '#F8FAFC', padding: '0.85rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
+                    <div>
+                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600, display: 'block' }}>REMAINING</span>
+                      <span style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: '0.9rem' }}>₹{remaining.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600, display: 'block' }}>MONTHLY PLAN</span>
+                      <span style={{ fontWeight: 800, color: 'var(--teal-primary)', fontSize: '0.9rem' }}>₹{Number(g.planned_monthly_contribution || 0).toLocaleString('en-IN')}/mo</span>
+                    </div>
+                  </div>
+
+                  <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <Calendar size={13} />
+                    <span>Target Deadline: {g.target_date || 'Ongoing Milestone'}</span>
                   </div>
                 </div>
               );
@@ -235,82 +236,90 @@ export default function GoalsView() {
         )}
       </div>
 
-      {/* Create Goal Modal */}
+      {/* Modal for creating goal */}
       {showCreateModal && (
         <div style={{
           position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.7)',
-          backdropFilter: 'blur(8px)',
+          inset: 0,
+          background: 'rgba(15, 23, 42, 0.4)',
+          backdropFilter: 'blur(4px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 50,
           padding: '1rem',
         }}>
-          <div className="glass-panel" style={{ width: '100%', maxWidth: '480px', padding: '1.75rem' }}>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#FFFFFF', marginBottom: '1rem' }}>
-              Create Financial Goal
-            </h3>
+          <div className="glass-panel" style={{ width: '100%', maxWidth: '480px', padding: '1.75rem', background: '#FFFFFF', boxShadow: 'var(--shadow-lg)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Create New Financial Goal</h3>
+              <button onClick={() => setShowCreateModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
+                <X size={20} />
+              </button>
+            </div>
+
             <form onSubmit={handleCreateGoal} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
                 <label className="fin-label">Goal Name</label>
                 <input
                   type="text"
                   className="fin-input"
-                  placeholder="e.g. 3-Month Emergency Fund, Laptop"
+                  placeholder="e.g. 3-Month Emergency Fund, Laptop Upgrade"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
                 />
               </div>
-              <div>
-                <label className="fin-label">Target Amount (₹)</label>
-                <input
-                  type="number"
-                  className="fin-input"
-                  placeholder="e.g. 50000"
-                  value={targetAmount}
-                  onChange={(e) => setTargetAmount(e.target.value)}
-                  required
-                />
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <label className="fin-label">Target Amount (₹)</label>
+                  <input
+                    type="number"
+                    className="fin-input"
+                    placeholder="e.g. 50000"
+                    value={targetAmount}
+                    onChange={(e) => setTargetAmount(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="fin-label">Already Saved (₹)</label>
+                  <input
+                    type="number"
+                    className="fin-input"
+                    placeholder="e.g. 10000"
+                    value={currentSaved}
+                    onChange={(e) => setCurrentSaved(e.target.value)}
+                  />
+                </div>
               </div>
-              <div>
-                <label className="fin-label">Already Saved (₹, optional)</label>
-                <input
-                  type="number"
-                  className="fin-input"
-                  placeholder="e.g. 10000"
-                  value={currentSaved}
-                  onChange={(e) => setCurrentSaved(e.target.value)}
-                />
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <label className="fin-label">Target Date</label>
+                  <input
+                    type="date"
+                    className="fin-input"
+                    value={targetDate}
+                    onChange={(e) => setTargetDate(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="fin-label">Planned Monthly (₹)</label>
+                  <input
+                    type="number"
+                    className="fin-input"
+                    placeholder="e.g. 5000"
+                    value={monthlyContribution}
+                    onChange={(e) => setMonthlyContribution(e.target.value)}
+                  />
+                </div>
               </div>
-              <div>
-                <label className="fin-label">Target Completion Date</label>
-                <input
-                  type="date"
-                  className="fin-input"
-                  value={targetDate}
-                  onChange={(e) => setTargetDate(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <label className="fin-label">Planned Monthly Savings (₹, optional)</label>
-                <input
-                  type="number"
-                  className="fin-input"
-                  placeholder="e.g. 5000"
-                  value={monthlyContribution}
-                  onChange={(e) => setMonthlyContribution(e.target.value)}
-                />
-              </div>
-              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
                 <button type="button" className="btn btn-outline" onClick={() => setShowCreateModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-teal">Save Goal</button>
+                <button type="submit" className="btn btn-violet">Save Goal</button>
               </div>
             </form>
           </div>

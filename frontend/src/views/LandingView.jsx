@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import './landing/landing.css';
+import './landing/cinematic-story.css';
+
 import LandingNavbar from './landing/LandingNavbar';
-import LandingHero from './landing/LandingHero';
-import TrustStrip from './landing/TrustStrip';
-import ProblemSection from './landing/ProblemSection';
-import SolutionGrid from './landing/SolutionGrid';
-import FeatureShowcase from './landing/FeatureShowcase';
-import HowItWorks from './landing/HowItWorks';
-import ImpactSection from './landing/ImpactSection';
-import FinalCta from './landing/FinalCta';
+import CinematicHero from './landing/CinematicHero';
+import StoryProblem from './landing/StoryProblem';
+import StoryCoach from './landing/StoryCoach';
+import StoryConnected from './landing/StoryConnected';
+import StoryTradeOff from './landing/StoryTradeOff';
+import StoryClaimCheck from './landing/StoryClaimCheck';
+import StoryClarity from './landing/StoryClarity';
+import CinematicFinalCta from './landing/CinematicFinalCta';
 import LandingFooter from './landing/LandingFooter';
 import LandingAuthModal from './landing/LandingAuthModal';
 import { demoLogin } from '../api/client';
@@ -30,60 +32,61 @@ export default function LandingView({ onAuthSuccess, onExploreDemo }) {
       }
     } catch (err) {
       console.error('Demo login error:', err);
-      // Fallback to opening auth modal if session token creation fails
       handleOpenAuth('login');
     }
   };
 
   return (
-    <div className="finwise-landing">
-      {/* 1. Sticky Navigation */}
+    <div className="cinematic-landing">
+      {/* Floating Minimal Glass Navigation */}
       <LandingNavbar
         onOpenAuth={handleOpenAuth}
         onExploreDemo={onExploreDemo}
       />
 
-      {/* 2. Striking Light Hero */}
-      <LandingHero
+      {/* Hero: "Your money has a future." with 3D Luminous Financial Artifact */}
+      <CinematicHero
         onOpenAuth={handleOpenAuth}
         onExploreDemo={onExploreDemo}
       />
 
-      {/* 3. Trust & Core Value Strip */}
-      <TrustStrip />
+      {/* Section 1 — The Problem: "Your money is moving. Is it moving you forward?" */}
+      <StoryProblem />
 
-      {/* 4. Editorial Problem Section */}
-      <ProblemSection />
-
-      {/* 5. 9-Module Connected Solution Grid */}
-      <SolutionGrid
-        onSelectFeature={(_featureId) => handleOpenAuth('register')}
-      />
-
-      {/* 6. Feature Deep Dive Showcase */}
-      <FeatureShowcase
+      {/* Section 2 — Meet Your Financial Coach: "Meet the coach that helps you think before you spend." */}
+      <StoryCoach
         onOpenAuth={handleOpenAuth}
       />
 
-      {/* 7. How It Works: 3-Step Journey */}
-      <HowItWorks
+      {/* Section 3 — Your Financial Life, Connected: Asymmetrical Implemented Feature Showcase */}
+      <StoryConnected />
+
+      {/* Section 4 — Understand the Trade-Off: Interactive Goal-Days Delayed What-If Visualizer */}
+      <StoryTradeOff
         onOpenAuth={handleOpenAuth}
       />
 
-      {/* 8. Impact & Differentiation Matrix */}
-      <ImpactSection />
+      {/* Section 5 — Question the Claim: "Not every financial claim deserves your trust." */}
+      <StoryClaimCheck
+        onOpenAuth={handleOpenAuth}
+      />
 
-      {/* 9. Final CTA with 1-Click Persona Demos */}
-      <FinalCta
+      {/* Section 6 — From Confusion to Clarity: "Less financial noise. More intentional decisions." */}
+      <StoryClarity
+        onOpenAuth={handleOpenAuth}
+      />
+
+      {/* Final Call to Action: "Your next financial decision can be smarter." */}
+      <CinematicFinalCta
         onOpenAuth={handleOpenAuth}
         onExploreDemo={onExploreDemo}
         on1ClickDemo={handle1ClickDemo}
       />
 
-      {/* 10. Educational Disclaimer & Footer */}
+      {/* Minimal Footer with Educational Disclaimer & SEBI Notices */}
       <LandingFooter />
 
-      {/* 11. Light-Theme Auth Modal */}
+      {/* Light-Theme Authentication Dialog */}
       <LandingAuthModal
         isOpen={authModalOpen}
         initialMode={authMode}

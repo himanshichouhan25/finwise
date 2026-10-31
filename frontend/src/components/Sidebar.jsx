@@ -12,11 +12,12 @@ import {
   Sparkles,
   BarChart3,
   CreditCard,
-  LogOut
+  LogOut,
+  X
 } from 'lucide-react';
 import { PERSONAS, getActiveUserId, setActiveUserId, getAuthUser, getAuthToken, logoutUser } from '../api/client';
 
-export default function Sidebar({ currentTab, setTab, onGoToLanding }) {
+export default function Sidebar({ currentTab, setTab, onGoToLanding, mobileOpen, onCloseMobile }) {
   const [activeId, setActiveId] = useState(getActiveUserId());
   const [authUser, setAuthUser] = useState(getAuthUser());
   const [token, setToken] = useState(getAuthToken());
@@ -38,84 +39,140 @@ export default function Sidebar({ currentTab, setTab, onGoToLanding }) {
   const isRealUser = Boolean(authUser?.email && token);
 
   const NAV_ITEMS = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'market', label: 'Market Intel', icon: BarChart3, badge: 'NSE/BSE' },
+    { id: 'dashboard', label: 'Executive Dashboard', icon: LayoutDashboard },
+    { id: 'market', label: 'Market Intelligence', icon: BarChart3, badge: 'NSE/BSE' },
     { id: 'budget', label: '50/30/20 Budget', icon: PieChart },
     { id: 'sip', label: 'SIP Simulator', icon: TrendingUp },
-    { id: 'loans', label: 'Loans & EMIs', icon: CreditCard, badge: 'New' },
+    { id: 'loans', label: 'Loans & Repayment', icon: CreditCard },
     { id: 'goals', label: 'Goals & Timeline', icon: Target },
-    { id: 'coach', label: 'AI Coach Chat', icon: BotMessageSquare, badge: 'Live AI' },
-    { id: 'claims', label: 'Finfluencer Audit', icon: ShieldAlert, badge: 'SEBI' },
+    { id: 'coach', label: 'AI Financial Coach', icon: BotMessageSquare, badge: 'Live AI' },
+    { id: 'claims', label: 'Claim Reality Check', icon: ShieldAlert, badge: 'SEBI' },
     { id: 'journal', label: 'Decision Journal', icon: Hourglass, badge: '24h Timer' },
-    { id: 'health', label: 'Health Score', icon: Activity },
-    { id: 'profile', label: 'My Profile', icon: UserCircle2 },
+    { id: 'health', label: 'Health Diagnostic', icon: Activity },
+    { id: 'profile', label: 'Financial Profile', icon: UserCircle2 },
   ];
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
       {/* Brand Header */}
-      <div style={{ padding: '1.25rem', borderBottom: '1px solid var(--border-subtle)', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+      <div style={{
+        padding: '1.25rem 1.4rem',
+        borderBottom: '1px solid var(--border-subtle)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexShrink: 0,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div style={{
-            width: '34px',
-            height: '34px',
+            width: '36px',
+            height: '36px',
             borderRadius: '10px',
-            background: 'linear-gradient(135deg, #14B8A6 0%, #0D9488 100%)',
+            background: 'linear-gradient(135deg, #7047FF 0%, #5135CC 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 0 15px rgba(20, 184, 166, 0.4)'
+            boxShadow: '0 4px 14px rgba(112, 71, 255, 0.3)',
           }}>
             <Sparkles size={18} color="#FFFFFF" />
           </div>
           <div>
-            <h1 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#FFFFFF', lineHeight: 1.1 }}>
-              FinWise <span style={{ color: '#2DD4BF' }}>AI</span>
+            <h1 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1.1, margin: 0 }}>
+              FinWise <span style={{ color: 'var(--violet-primary)' }}>AI</span>
             </h1>
-            <p style={{ fontSize: '0.68rem', color: '#94A3B8', marginTop: '1px' }}>
-              Financial Intelligence
+            <p style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '2px', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+              Wealth Intelligence
             </p>
           </div>
         </div>
+
+        {onCloseMobile && (
+          <button
+            onClick={onCloseMobile}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--text-secondary)',
+              padding: '0.25rem',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+            className="md:hidden"
+            aria-label="Close Navigation"
+          >
+            <X size={20} />
+          </button>
+        )}
       </div>
 
       {/* Navigation Links */}
-      <nav style={{ padding: '0.75rem 0.6rem', flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+      <nav style={{
+        padding: '0.85rem 0.75rem',
+        flex: 1,
+        overflowY: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.25rem',
+      }}>
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = currentTab === item.id;
           return (
             <button
               key={item.id}
-              onClick={() => setTab(item.id)}
+              onClick={() => {
+                setTab(item.id);
+                if (onCloseMobile) onCloseMobile();
+              }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '0.55rem 0.75rem',
-                borderRadius: '8px',
+                padding: '0.65rem 0.85rem',
+                borderRadius: 'var(--radius-sm)',
                 border: 'none',
-                background: isActive ? 'rgba(20, 184, 166, 0.15)' : 'transparent',
-                color: isActive ? '#2DD4BF' : '#94A3B8',
+                background: isActive ? 'var(--violet-soft)' : 'transparent',
+                color: isActive ? 'var(--violet-primary)' : 'var(--text-secondary)',
                 cursor: 'pointer',
                 textAlign: 'left',
-                transition: 'all 0.15s ease',
-                fontWeight: isActive ? 600 : 500,
-                fontSize: '0.84rem',
+                transition: 'all 0.18s ease',
+                fontWeight: isActive ? 700 : 500,
+                fontSize: '0.86rem',
+                position: 'relative',
               }}
               onMouseEnter={(e) => {
-                if (!isActive) e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)';
+                if (!isActive) {
+                  e.currentTarget.style.background = '#F8F9FD';
+                  e.currentTarget.style.color = 'var(--text-main)';
+                }
               }}
               onMouseLeave={(e) => {
-                if (!isActive) e.currentTarget.style.background = 'transparent';
+                if (!isActive) {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = 'var(--text-secondary)';
+                }
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                <Icon size={16} color={isActive ? '#2DD4BF' : '#64748B'} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <Icon
+                  size={17}
+                  color={isActive ? '#7047FF' : '#8A94A6'}
+                  strokeWidth={isActive ? 2.3 : 1.8}
+                />
                 <span>{item.label}</span>
               </div>
               {item.badge && (
-                <span className={`badge ${isActive ? 'badge-teal' : 'badge-slate'}`} style={{ fontSize: '0.62rem', padding: '0.15rem 0.4rem' }}>
+                <span
+                  className={`badge ${
+                    item.badge === 'SEBI'
+                      ? 'badge-amber'
+                      : item.badge === 'Live AI'
+                      ? 'badge-violet'
+                      : 'badge-teal'
+                  }`}
+                  style={{ fontSize: '0.62rem', padding: '0.15rem 0.45rem', fontWeight: 700 }}
+                >
                   {item.badge}
                 </span>
               )}
@@ -126,27 +183,35 @@ export default function Sidebar({ currentTab, setTab, onGoToLanding }) {
 
       {/* Persona & Auth Footer */}
       <div style={{
-        padding: '0.85rem 1rem',
+        padding: '1rem',
         borderTop: '1px solid var(--border-subtle)',
-        background: 'rgba(15, 23, 42, 0.5)',
+        background: '#FAFBFD',
         flexShrink: 0,
       }}>
         {isRealUser ? (
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.45rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.65rem' }}>
               <div style={{
-                width: '32px', height: '32px', borderRadius: '50%',
-                background: 'linear-gradient(135deg, #14B8A6, #0D9488)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#fff', fontWeight: 800, fontSize: '0.82rem', flexShrink: 0,
+                width: '34px',
+                height: '34px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #7047FF, #5135CC)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#FFFFFF',
+                fontWeight: 800,
+                fontSize: '0.85rem',
+                flexShrink: 0,
+                boxShadow: '0 2px 8px rgba(112, 71, 255, 0.25)',
               }}>
                 {(authUser.name || 'U')[0].toUpperCase()}
               </div>
               <div style={{ overflow: 'hidden', flex: 1 }}>
-                <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#F8FAFC', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div style={{ fontSize: '0.84rem', fontWeight: 700, color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {authUser.name}
                 </div>
-                <div style={{ fontSize: '0.68rem', color: '#14B8A6', textTransform: 'capitalize' }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--teal-primary)', fontWeight: 600, textTransform: 'capitalize' }}>
                   {authUser.persona || 'Investor'} • JWT Live
                 </div>
               </div>
@@ -157,28 +222,30 @@ export default function Sidebar({ currentTab, setTab, onGoToLanding }) {
                   await logoutUser();
                   onGoToLanding();
                 }}
+                className="btn btn-outline"
                 style={{
-                  width: '100%', padding: '0.35rem 0.5rem',
-                  borderRadius: '6px', border: '1px solid rgba(239, 68, 68, 0.3)',
-                  background: 'rgba(239, 68, 68, 0.08)', color: '#FCA5A5',
-                  fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
+                  width: '100%',
+                  padding: '0.4rem 0.6rem',
+                  fontSize: '0.74rem',
+                  color: '#DC2626',
+                  borderColor: '#FEE2E2',
+                  background: '#FEF2F2',
                 }}
               >
-                <LogOut size={12} /> Exit / Log Out
+                <LogOut size={13} /> Exit / Log Out
               </button>
             )}
           </div>
         ) : (
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.45rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <UserCircle2 size={13} color="#F59E0B" />
-                <span style={{ fontSize: '0.72rem', fontWeight: 600, color: '#F8FAFC' }}>
-                  DEMO PERSONA
+                <UserCircle2 size={14} color="#7047FF" />
+                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-main)', letterSpacing: '0.04em' }}>
+                  TEST PERSONA
                 </span>
               </div>
-              <span style={{ fontSize: '0.65rem', color: '#14B8A6', fontWeight: 600 }}>
+              <span className="badge badge-teal" style={{ fontSize: '0.62rem', padding: '0.12rem 0.4rem' }}>
                 Demo Mode
               </span>
             </div>
@@ -186,10 +253,10 @@ export default function Sidebar({ currentTab, setTab, onGoToLanding }) {
               className="fin-select"
               value={activeId}
               onChange={(e) => setActiveUserId(e.target.value)}
-              style={{ fontSize: '0.75rem', padding: '0.35rem', width: '100%' }}
+              style={{ fontSize: '0.78rem', padding: '0.45rem 0.6rem', width: '100%', marginBottom: '0.45rem' }}
             >
               {PERSONAS.map((p) => (
-                <option key={p.id} value={p.id} style={{ background: '#0F172A', color: '#F8FAFC' }}>
+                <option key={p.id} value={p.id}>
                   {p.name} ({p.role})
                 </option>
               ))}
@@ -197,15 +264,17 @@ export default function Sidebar({ currentTab, setTab, onGoToLanding }) {
             {onGoToLanding && (
               <button
                 onClick={onGoToLanding}
+                className="btn btn-outline"
                 style={{
-                  width: '100%', marginTop: '0.4rem', padding: '0.35rem 0.5rem',
-                  borderRadius: '6px', border: '1px solid rgba(20, 184, 166, 0.3)',
-                  background: 'rgba(20, 184, 166, 0.08)', color: '#2DD4BF',
-                  fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
+                  width: '100%',
+                  padding: '0.4rem 0.6rem',
+                  fontSize: '0.74rem',
+                  color: 'var(--violet-primary)',
+                  borderColor: 'rgba(112, 71, 255, 0.25)',
+                  background: 'var(--violet-soft)',
                 }}
               >
-                ← Exit to Landing Page
+                ← Back to Landing Page
               </button>
             )}
           </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Menu, X, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Sparkles, Menu, X, ArrowRight } from 'lucide-react';
 
 export default function LandingNavbar({ onOpenAuth, onExploreDemo }) {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -15,10 +15,10 @@ export default function LandingNavbar({ onOpenAuth, onExploreDemo }) {
 
   const navLinks = [
     { label: 'Overview', href: '#overview' },
-    { label: 'Problem', href: '#problem' },
+    { label: 'The Problem', href: '#problem' },
+    { label: 'AI Coach', href: '#coach' },
     { label: 'Features', href: '#features' },
-    { label: 'How It Works', href: '#how-it-works' },
-    { label: 'Impact', href: '#impact' },
+    { label: 'Scam Shield', href: '#claims' },
   ];
 
   return (
@@ -208,3 +208,4 @@ export default function LandingNavbar({ onOpenAuth, onExploreDemo }) {
     </header>
   );
 }
+

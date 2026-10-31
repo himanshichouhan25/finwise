@@ -8,7 +8,8 @@ import {
   Sparkles, 
   AlertCircle, 
   HeartHandshake, 
-  Target 
+  Target,
+  X 
 } from 'lucide-react';
 import { 
   getJournalEntries, 
@@ -94,21 +95,21 @@ export default function DecisionJournalView() {
   };
 
   if (loading) {
-    return <div style={{ padding: '3rem', textAlign: 'center', color: '#94A3B8' }}>Loading decision journal...</div>;
+    return <div style={{ padding: '3.5rem', textAlign: 'center', color: 'var(--text-muted)' }}>Loading decision journal...</div>;
   }
 
   return (
-    <div style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.75rem', maxWidth: '1200px' }}>
+    <div style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '1240px', margin: '0 auto' }}>
       {/* Top Banner */}
-      <div className="glass-panel" style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+      <div className="glass-panel" style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', borderLeft: '4px solid var(--gold-primary)' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-            <Hourglass size={22} color="#F59E0B" />
-            <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#FFFFFF' }}>
+            <Hourglass size={22} color="var(--gold-primary)" />
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
               Impulse Decision Journal & 24h/48h Cooling-Off Timers
             </h2>
           </div>
-          <p style={{ fontSize: '0.85rem', color: '#94A3B8' }}>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>
             Delay immediate gratification. Log purchases you feel tempted to make, set a cooling-off timer, and reflect before spending.
           </p>
         </div>
@@ -120,44 +121,48 @@ export default function DecisionJournalView() {
 
       {/* Summary KPI Strip */}
       {summary && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
-          <div className="glass-card">
-            <span style={{ fontSize: '0.75rem', color: '#94A3B8', fontWeight: 600 }}>TOTAL MONEY SAVED</span>
-            <div style={{ fontSize: '1.8rem', fontWeight: 900, color: '#2DD4BF', marginTop: '0.25rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
+          <div className="glass-card" style={{ background: '#FFFFFF' }}>
+            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 700 }}>TOTAL MONEY SAVED</span>
+            <div style={{ fontSize: '1.85rem', fontWeight: 900, color: 'var(--teal-primary)', marginTop: '0.35rem', letterSpacing: '-0.02em' }}>
               ₹{Number(summary.total_saved_amount).toLocaleString('en-IN')}
             </div>
-            <span style={{ fontSize: '0.7rem', color: '#64748B' }}>
-              From {summary.avoided_count} avoided impulse purchases
+            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block' }}>
+              From <strong>{summary.avoided_count}</strong> avoided impulse purchases
             </span>
           </div>
 
-          <div className="glass-card">
-            <span style={{ fontSize: '0.75rem', color: '#94A3B8', fontWeight: 600 }}>ACTIVE COOLING-OFF TIMERS</span>
-            <div style={{ fontSize: '1.8rem', fontWeight: 900, color: '#F59E0B', marginTop: '0.25rem' }}>
+          <div className="glass-card" style={{ background: '#FFFFFF' }}>
+            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 700 }}>ACTIVE COOLING-OFF TIMERS</span>
+            <div style={{ fontSize: '1.85rem', fontWeight: 900, color: 'var(--gold-primary)', marginTop: '0.35rem', letterSpacing: '-0.02em' }}>
               {summary.active_cooling_count}
             </div>
-            <span style={{ fontSize: '0.7rem', color: '#64748B' }}>Currently locked in reflection window</span>
+            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block' }}>
+              Currently locked in reflection window
+            </span>
           </div>
 
-          <div className="glass-card">
-            <span style={{ fontSize: '0.75rem', color: '#94A3B8', fontWeight: 600 }}>READY FOR FINAL REVIEW</span>
-            <div style={{ fontSize: '1.8rem', fontWeight: 900, color: '#FFFFFF', marginTop: '0.25rem' }}>
+          <div className="glass-card" style={{ background: '#FFFFFF' }}>
+            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 700 }}>READY FOR FINAL DECISION</span>
+            <div style={{ fontSize: '1.85rem', fontWeight: 900, color: 'var(--text-main)', marginTop: '0.35rem', letterSpacing: '-0.02em' }}>
               {summary.ready_for_review_count}
             </div>
-            <span style={{ fontSize: '0.7rem', color: '#64748B' }}>Cooling-off expired — ready to decide</span>
+            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block' }}>
+              Cooling-off expired — ready to decide
+            </span>
           </div>
         </div>
       )}
 
       {/* Entries List */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#FFFFFF' }}>
+        <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
           Journal Entries ({entries.length})
         </h3>
 
         {entries.length === 0 ? (
-          <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center', color: '#64748B' }}>
-            <p>No impulse purchases logged yet. When tempted to buy something, log it here first!</p>
+          <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+            <p style={{ margin: 0 }}>No impulse purchases logged yet. When tempted to buy something, log it here first!</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -171,31 +176,31 @@ export default function DecisionJournalView() {
                   className="glass-panel"
                   style={{
                     padding: '1.5rem',
-                    border: entry.is_cooling_active
-                      ? '1px solid rgba(245, 158, 11, 0.4)'
+                    borderLeft: entry.is_cooling_active
+                      ? '4px solid var(--gold-primary)'
                       : entry.status === 'dropped'
-                      ? '1px solid rgba(20, 184, 166, 0.4)'
-                      : '1px solid var(--border-subtle)',
+                      ? '4px solid var(--teal-primary)'
+                      : '4px solid var(--border-subtle)',
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
                     <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                        <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#FFFFFF' }}>{entry.title}</h4>
-                        <span className={`badge ${entry.emotional_state === 'fomo' ? 'badge-amber' : 'badge-slate'}`}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                        <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>{entry.title}</h4>
+                        <span className={`badge ${entry.emotional_state === 'fomo' ? 'badge-amber' : 'badge-slate'}`} style={{ fontSize: '0.7rem' }}>
                           Trigger: {entry.emotional_state}
                         </span>
                         {entry.is_urgent && (
-                          <span className="badge badge-crimson">Urgency Feeling</span>
+                          <span className="badge badge-crimson" style={{ fontSize: '0.7rem' }}>Urgency Feeling</span>
                         )}
                       </div>
-                      <p style={{ fontSize: '0.85rem', color: '#94A3B8', marginTop: '0.35rem' }}>
+                      <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', marginTop: '0.35rem', lineHeight: 1.45 }}>
                         "{entry.rationale}"
                       </p>
                     </div>
 
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: '1.35rem', fontWeight: 900, color: '#FFFFFF' }}>
+                      <div style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
                         {entry.amount ? `₹${Number(entry.amount).toLocaleString('en-IN')}` : 'Non-monetary'}
                       </div>
                       <span className={`badge ${
@@ -223,15 +228,15 @@ export default function DecisionJournalView() {
                     <div style={{
                       marginTop: '1rem',
                       padding: '0.75rem 1rem',
-                      background: 'rgba(239, 68, 68, 0.08)',
-                      border: '1px solid rgba(239, 68, 68, 0.25)',
-                      borderRadius: '8px',
+                      background: '#FEF2F2',
+                      border: '1px solid #FEE2E2',
+                      borderRadius: 'var(--radius-sm)',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.75rem'
+                      gap: '0.75rem',
                     }}>
-                      <Target size={18} color="#EF4444" />
-                      <span style={{ fontSize: '0.85rem', color: '#F87171', fontWeight: 600 }}>
+                      <Target size={18} color="#DC2626" />
+                      <span style={{ fontSize: '0.85rem', color: '#DC2626', fontWeight: 600 }}>
                         {entry.delay_insight_message || `Delays your primary financial goal by ${entry.goal_days_delayed} days!`}
                       </span>
                     </div>
@@ -239,7 +244,7 @@ export default function DecisionJournalView() {
 
                   {/* Outcome Note if resolved */}
                   {entry.outcome_note && (
-                    <div style={{ marginTop: '0.75rem', fontSize: '0.8rem', color: '#CBD5E1', fontStyle: 'italic' }}>
+                    <div style={{ marginTop: '0.75rem', fontSize: '0.82rem', color: 'var(--text-secondary)', fontStyle: 'italic', background: '#F8FAFC', padding: '0.65rem 0.85rem', borderRadius: 'var(--radius-sm)' }}>
                       Reflection: "{entry.outcome_note}"
                     </div>
                   )}
@@ -254,9 +259,9 @@ export default function DecisionJournalView() {
                       justifyContent: 'space-between',
                       alignItems: 'center',
                       flexWrap: 'wrap',
-                      gap: '0.75rem'
+                      gap: '0.75rem',
                     }}>
-                      <div style={{ fontSize: '0.75rem', color: '#64748B' }}>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
                         {entry.is_cooling_active
                           ? `Locked until ${new Date(entry.cooling_off_until).toLocaleString()}. Take time to reflect.`
                           : 'Cooling-off window completed! Make your final rational decision.'}
@@ -267,7 +272,7 @@ export default function DecisionJournalView() {
                           className="btn btn-teal"
                           onClick={() => setDecideEntry(entry)}
                           disabled={entry.is_cooling_active}
-                          style={{ fontSize: '0.8rem' }}
+                          style={{ fontSize: '0.8rem', padding: '0.45rem 0.9rem' }}
                         >
                           <CheckCircle2 size={15} />
                           <span>Finalize Decision</span>
@@ -286,22 +291,25 @@ export default function DecisionJournalView() {
       {showLogModal && (
         <div style={{
           position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.75)',
-          backdropFilter: 'blur(8px)',
+          inset: 0,
+          background: 'rgba(15, 23, 42, 0.4)',
+          backdropFilter: 'blur(4px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 50,
           padding: '1rem',
         }}>
-          <div className="glass-panel" style={{ width: '100%', maxWidth: '480px', padding: '1.75rem' }}>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#FFFFFF', marginBottom: '1rem' }}>
-              Log Prospective Spend & Activate Cooling Off
-            </h3>
+          <div className="glass-panel" style={{ width: '100%', maxWidth: '480px', padding: '1.75rem', background: '#FFFFFF', boxShadow: 'var(--shadow-lg)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+                Log Prospective Spend & Cooling-Off Timer
+              </h3>
+              <button onClick={() => setShowLogModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
+                <X size={20} />
+              </button>
+            </div>
+
             <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               <div>
                 <label className="fin-label">Item / Purchase Title</label>
@@ -350,18 +358,16 @@ export default function DecisionJournalView() {
               </div>
 
               <div>
-                <label className="fin-label">Cooling-Off Period Duration</label>
+                <label className="fin-label">Cooling-Off Window</label>
                 <select className="fin-select" value={coolingHours} onChange={(e) => setCoolingHours(e.target.value)}>
-                  <option value="24">24 Hours (Standard Cooling-Off)</option>
-                  <option value="48">48 Hours (Recommended for Large Purchases)</option>
-                  <option value="72">72 Hours (High Ticket Items)</option>
-                  <option value="0">0 Hours (Immediate Review Demo)</option>
+                  <option value="24">24 Hours (Standard Cooling)</option>
+                  <option value="48">48 Hours (Big Ticket Reflection)</option>
                 </select>
               </div>
 
-              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
                 <button type="button" className="btn btn-outline" onClick={() => setShowLogModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-gold">Lock Cooling Timer</button>
+                <button type="submit" className="btn btn-gold">Lock Cooling-Off Timer</button>
               </div>
             </form>
           </div>
@@ -372,55 +378,56 @@ export default function DecisionJournalView() {
       {decideEntry && (
         <div style={{
           position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.75)',
-          backdropFilter: 'blur(8px)',
+          inset: 0,
+          background: 'rgba(15, 23, 42, 0.4)',
+          backdropFilter: 'blur(4px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 50,
           padding: '1rem',
         }}>
-          <div className="glass-panel" style={{ width: '100%', maxWidth: '480px', padding: '1.75rem' }}>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#FFFFFF', marginBottom: '0.5rem' }}>
+          <div className="glass-panel" style={{ width: '100%', maxWidth: '440px', padding: '1.75rem', background: '#FFFFFF', boxShadow: 'var(--shadow-lg)' }}>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.5rem 0' }}>
               Finalize Decision: {decideEntry.title}
             </h3>
-            <p style={{ fontSize: '0.85rem', color: '#94A3B8', marginBottom: '1rem' }}>
-              Now that your cooling-off window has elapsed, did you decide to purchase or avoid it?
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '1.25rem' }}>
+              Your cooling-off period has expired. Did taking time to reflect help you decide?
             </p>
 
             <div style={{ marginBottom: '1rem' }}>
-              <label className="fin-label">Retrospective Reflection (Optional)</label>
+              <label className="fin-label">Reflection Note</label>
               <textarea
                 className="fin-input"
                 rows={2}
-                placeholder="e.g. Realized I didn't actually need it and put the ₹7,500 into my Emergency Fund!"
+                placeholder="e.g. Realized I didn't actually need it, saved ₹5,000 for my emergency fund!"
                 value={outcomeNote}
                 onChange={(e) => setOutcomeNote(e.target.value)}
               />
             </div>
 
-            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-              <button type="button" className="btn btn-outline" onClick={() => setDecideEntry(null)}>
-                Cancel
-              </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <button
-                type="button"
-                className="btn btn-outline"
-                onClick={() => handleDecide('proceeded')}
-              >
-                Proceeded with Buy
-              </button>
-              <button
-                type="button"
                 className="btn btn-teal"
                 onClick={() => handleDecide('dropped')}
+                style={{ width: '100%' }}
               >
-                <Sparkles size={16} />
-                <span>Avoided (Saved Money)</span>
+                <CheckCircle2 size={16} />
+                <span>Avoided Purchase (Saved Money!)</span>
+              </button>
+              <button
+                className="btn btn-outline"
+                onClick={() => handleDecide('proceeded')}
+                style={{ width: '100%' }}
+              >
+                <span>Proceeded with Purchase</span>
+              </button>
+              <button
+                className="btn btn-outline"
+                onClick={() => setDecideEntry(null)}
+                style={{ width: '100%', marginTop: '0.25rem' }}
+              >
+                Cancel
               </button>
             </div>
           </div>

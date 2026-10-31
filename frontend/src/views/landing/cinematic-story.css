@@ -1,0 +1,359 @@
+/* ==========================================================================
+   FinWise AI — "Your Financial Future, Unfolding"
+   Cinematic Scroll-Story Design System & Keyframe Motion Engine
+   ========================================================================== */
+
+:root {
+  --cs-bg-light: #F8FAFC;
+  --cs-bg-white: #FFFFFF;
+  --cs-bg-soft: #F1F5F9;
+  --cs-bg-lavender: #EEE9FF;
+  --cs-bg-lavender-subtle: #FAF7FF;
+  --cs-bg-dark-hero: #090D16;
+  --cs-bg-dark-surface: #0F172A;
+  --cs-bg-dark-card: rgba(15, 23, 42, 0.75);
+
+  --cs-violet: #6D4AFF;
+  --cs-violet-deep: #4C32C7;
+  --cs-violet-light: #9B82FE;
+  --cs-violet-glow: rgba(109, 74, 255, 0.25);
+
+  --cs-teal: #0F9F9A;
+  --cs-teal-soft: #DDF8F5;
+  --cs-teal-glow: rgba(15, 159, 154, 0.25);
+
+  --cs-text-primary: #111827;
+  --cs-text-secondary: #64748B;
+  --cs-text-muted: #94A3B8;
+  --cs-text-light-hero: #F8FAFC;
+  --cs-text-light-sub: #94A3B8;
+
+  --cs-border-light: #E2E8F0;
+  --cs-border-dark: rgba(255, 255, 255, 0.08);
+
+  --cs-shadow-card: 0 16px 36px -8px rgba(16, 24, 40, 0.08), 0 4px 12px -2px rgba(16, 24, 40, 0.03);
+  --cs-shadow-glow: 0 20px 50px rgba(109, 74, 255, 0.18);
+  --cs-shadow-hero: 0 30px 80px -15px rgba(0, 0, 0, 0.65), 0 0 60px rgba(109, 74, 255, 0.15);
+}
+
+/* Global Container & Typography */
+.cinematic-landing {
+  background-color: var(--cs-bg-light);
+  color: var(--cs-text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+}
+
+.cs-container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Editorial Oversized Headings */
+.cs-headline-editorial {
+  font-size: clamp(2.75rem, 6vw, 4.8rem);
+  font-weight: 850;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  color: var(--cs-text-primary);
+}
+
+.cs-headline-hero {
+  font-size: clamp(3rem, 7.5vw, 5.8rem);
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  color: #FFFFFF;
+}
+
+.cs-section-title {
+  font-size: clamp(2.2rem, 4.2vw, 3.4rem);
+  font-weight: 850;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--cs-text-primary);
+}
+
+/* Editorial Eyebrow Badge */
+.cs-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.95rem;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
+}
+
+.cs-eyebrow-dark {
+  background: rgba(109, 74, 255, 0.16);
+  color: #B4A2FE;
+  border: 1px solid rgba(109, 74, 255, 0.35);
+}
+
+.cs-eyebrow-light {
+  background: var(--cs-bg-lavender);
+  color: var(--cs-violet);
+  border: 1px solid rgba(109, 74, 255, 0.2);
+}
+
+.cs-eyebrow-teal {
+  background: var(--cs-teal-soft);
+  color: var(--cs-teal);
+  border: 1px solid rgba(15, 159, 154, 0.25);
+}
+
+/* Buttons */
+.cs-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 650;
+  font-size: 0.95rem;
+  padding: 0.85rem 1.75rem;
+  border-radius: 14px;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  border: 1px solid transparent;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.cs-btn-primary {
+  background: var(--cs-violet);
+  color: #FFFFFF;
+  box-shadow: 0 8px 24px -4px rgba(109, 74, 255, 0.45);
+}
+
+.cs-btn-primary:hover {
+  background: var(--cs-violet-deep);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px -4px rgba(109, 74, 255, 0.55);
+}
+
+.cs-btn-glass-hero {
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(12px);
+}
+
+.cs-btn-glass-hero:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-2px);
+}
+
+.cs-btn-secondary {
+  background: #FFFFFF;
+  color: var(--cs-text-primary);
+  border-color: var(--cs-border-light);
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.04);
+}
+
+.cs-btn-secondary:hover {
+  background: var(--cs-bg-soft);
+  border-color: #CBD5E1;
+  transform: translateY(-2px);
+  box-shadow: var(--cs-shadow-card);
+}
+
+/* 3D Luminous Sphere & Orbit System */
+.cs-luminous-stage {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  height: 520px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.cs-sphere-core {
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #C4B5FD 0%, #7C3AED 45%, #4C1D95 80%, #1E1B4B 100%);
+  box-shadow: 
+    0 0 70px rgba(139, 92, 246, 0.6),
+    inset -25px -25px 50px rgba(0, 0, 0, 0.7),
+    inset 15px 15px 35px rgba(255, 255, 255, 0.5);
+  position: relative;
+  animation: csSpherePulse 8s ease-in-out infinite;
+}
+
+.cs-orbit-ring-1 {
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(167, 139, 250, 0.35);
+  animation: csRotateCW 28s linear infinite;
+}
+
+.cs-orbit-ring-2 {
+  position: absolute;
+  width: 470px;
+  height: 470px;
+  border-radius: 50%;
+  border: 1px solid rgba(15, 159, 154, 0.28);
+  animation: csRotateCCW 36s linear infinite;
+}
+
+.cs-orbit-glow-disc {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(109, 74, 255, 0.22) 0%, rgba(15, 159, 154, 0.15) 50%, transparent 75%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+/* Floating Orbit Badges */
+.cs-orbit-pill {
+  position: absolute;
+  padding: 0.65rem 1rem;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  z-index: 5;
+  transition: transform 0.3s ease;
+}
+
+.cs-orbit-pill:hover {
+  transform: scale(1.04) translateY(-3px);
+  border-color: rgba(109, 74, 255, 0.4);
+}
+
+/* Keyframe Motions */
+@keyframes csSpherePulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 70px rgba(139, 92, 246, 0.6), inset -25px -25px 50px rgba(0, 0, 0, 0.7);
+  }
+  50% {
+    transform: scale(1.035);
+    box-shadow: 0 0 95px rgba(167, 139, 250, 0.75), inset -20px -20px 45px rgba(0, 0, 0, 0.6);
+  }
+}
+
+@keyframes csRotateCW {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes csRotateCCW {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes csFloatSlow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes csFloatSlowAlt {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+}
+
+.cs-float-1 {
+  animation: csFloatSlow 7s ease-in-out infinite;
+}
+
+.cs-float-2 {
+  animation: csFloatSlowAlt 8.5s ease-in-out infinite 1.5s;
+}
+
+/* Glass Editorial Cards */
+.cs-editorial-card {
+  background: #FFFFFF;
+  border: 1px solid var(--cs-border-light);
+  border-radius: 28px;
+  box-shadow: var(--cs-shadow-card);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cs-editorial-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(109, 74, 255, 0.25);
+  box-shadow: 0 24px 50px -10px rgba(16, 24, 40, 0.12), var(--cs-shadow-glow);
+}
+
+/* Dark Editorial Contrast Section */
+.cs-dark-editorial {
+  background: var(--cs-bg-dark-hero);
+  color: #FFFFFF;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 960px) {
+  .cs-hero-split {
+    grid-template-columns: 1fr !important;
+    text-align: center;
+    gap: 3.5rem !important;
+  }
+  .cs-hero-ctas {
+    justify-content: center !important;
+  }
+  .cs-luminous-stage {
+    width: 320px;
+    height: 320px;
+  }
+  .cs-sphere-core {
+    width: 170px;
+    height: 170px;
+  }
+  .cs-orbit-ring-1 {
+    width: 260px;
+    height: 260px;
+  }
+  .cs-orbit-ring-2 {
+    width: 320px;
+    height: 320px;
+  }
+  .cs-orbit-pill-desktop {
+    display: none !important;
+  }
+  .cs-editorial-split {
+    grid-template-columns: 1fr !important;
+    gap: 2.5rem !important;
+  }
+}
+

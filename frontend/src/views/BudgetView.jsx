@@ -120,58 +120,58 @@ export default function BudgetView() {
   };
 
   if (loading) {
-    return <div style={{ padding: '3rem', textAlign: 'center', color: '#94A3B8' }}>Loading budget data...</div>;
+    return <div style={{ padding: '3.5rem', textAlign: 'center', color: 'var(--text-muted)' }}>Loading budget intelligence...</div>;
   }
 
   return (
-    <div style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.75rem', maxWidth: '1200px' }}>
+    <div style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '1240px', margin: '0 auto' }}>
       {/* 50/30/20 Metric Cards */}
       {summary && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
           {/* Needs */}
-          <div className="glass-panel" style={{ padding: '1.25rem' }}>
+          <div className="glass-panel" style={{ padding: '1.5rem', borderLeft: '4px solid #3B82F6' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.85rem', color: '#94A3B8', fontWeight: 600 }}>50% NEEDS</span>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.04em' }}>50% NEEDS</span>
               <span className={`badge ${summary.needs.status === 'within_budget' ? 'badge-teal' : 'badge-crimson'}`}>
                 {summary.needs.percent_of_income}% of Income
               </span>
             </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#FFFFFF', marginTop: '0.5rem' }}>
+            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-main)', marginTop: '0.5rem', letterSpacing: '-0.02em' }}>
               ₹{Number(summary.needs.actual_amount).toLocaleString('en-IN')}
             </div>
-            <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '0.25rem' }}>
-              Target: ₹{Number(summary.needs.target_amount).toLocaleString('en-IN')} (Rent, Groceries, Bills)
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '0.35rem' }}>
+              Target: ₹{Number(summary.needs.target_amount).toLocaleString('en-IN')} (Housing, Groceries, Bills)
             </div>
           </div>
 
           {/* Wants */}
-          <div className="glass-panel" style={{ padding: '1.25rem' }}>
+          <div className="glass-panel" style={{ padding: '1.5rem', borderLeft: '4px solid #F59E0B' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.85rem', color: '#94A3B8', fontWeight: 600 }}>30% WANTS</span>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.04em' }}>30% WANTS</span>
               <span className={`badge ${summary.wants.status === 'within_budget' ? 'badge-teal' : 'badge-crimson'}`}>
                 {summary.wants.percent_of_income}% of Income
               </span>
             </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#FFFFFF', marginTop: '0.5rem' }}>
+            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-main)', marginTop: '0.5rem', letterSpacing: '-0.02em' }}>
               ₹{Number(summary.wants.actual_amount).toLocaleString('en-IN')}
             </div>
-            <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '0.25rem' }}>
-              Target: ₹{Number(summary.wants.target_amount).toLocaleString('en-IN')} (Dining, Shopping, Movies)
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '0.35rem' }}>
+              Target: ₹{Number(summary.wants.target_amount).toLocaleString('en-IN')} (Dining, Subscriptions, Shopping)
             </div>
           </div>
 
           {/* Savings */}
-          <div className="glass-panel" style={{ padding: '1.25rem' }}>
+          <div className="glass-panel" style={{ padding: '1.5rem', borderLeft: '4px solid var(--teal-primary)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.85rem', color: '#94A3B8', fontWeight: 600 }}>20% SAVINGS / SIP</span>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.04em' }}>20% SAVINGS / SIP</span>
               <span className={`badge ${Number(summary.savings.percent_of_income) >= 20 ? 'badge-teal' : 'badge-amber'}`}>
                 {summary.savings.percent_of_income}% of Income
               </span>
             </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#2DD4BF', marginTop: '0.5rem' }}>
+            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--teal-primary)', marginTop: '0.5rem', letterSpacing: '-0.02em' }}>
               ₹{Number(summary.savings.actual_amount).toLocaleString('en-IN')}
             </div>
-            <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '0.25rem' }}>
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '0.35rem' }}>
               Net Savings Remaining: ₹{Number(summary.net_savings).toLocaleString('en-IN')}
             </div>
           </div>
@@ -180,38 +180,38 @@ export default function BudgetView() {
 
       {/* Deterministic Optimization Suggestions Box */}
       {summary && summary.suggestions && summary.suggestions.length > 0 && (
-        <div className="glass-card" style={{ border: '1px solid rgba(20, 184, 166, 0.3)', background: 'rgba(20, 184, 166, 0.05)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-            <Lightbulb size={18} color="#2DD4BF" />
-            <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#2DD4BF' }}>
+        <div className="glass-card" style={{ border: '1px solid rgba(19, 168, 158, 0.3)', background: 'var(--teal-soft)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.65rem' }}>
+            <Lightbulb size={18} color="var(--teal-primary)" />
+            <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--teal-primary)', margin: 0 }}>
               Deterministic Engine Recommendations
             </h4>
           </div>
-          <ul style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.85rem', color: '#CBD5E1' }}>
+          <ul style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.85rem', color: '#0F766E' }}>
             {summary.suggestions.map((s, idx) => (
-              <li key={idx}>{s}</li>
+              <li key={idx} style={{ lineHeight: 1.45 }}>{s}</li>
             ))}
           </ul>
         </div>
       )}
 
       {/* Income & Expense Data Management Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem' }}>
-        {/* Income Table */}
-        <div className="glass-panel" style={{ padding: '1.25rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '1.5rem' }}>
+        {/* Income Card */}
+        <div className="glass-panel" style={{ padding: '1.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.15rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Wallet size={18} color="#14B8A6" />
-              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#FFFFFF' }}>Income Sources</h3>
+              <Wallet size={18} color="var(--teal-primary)" />
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Income Sources</h3>
             </div>
-            <button className="btn btn-teal" onClick={() => setShowAddIncome(true)} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>
+            <button className="btn btn-teal" onClick={() => setShowAddIncome(true)} style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem' }}>
               <Plus size={14} />
               <span>Add Income</span>
             </button>
           </div>
 
           {showAddIncome && (
-            <form onSubmit={handleAddIncome} style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '1rem', borderRadius: '10px', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <form onSubmit={handleAddIncome} style={{ background: 'var(--bg-surface-subtle)', padding: '1.15rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               <div>
                 <label className="fin-label">Monthly Amount (₹)</label>
                 <input
@@ -233,27 +233,27 @@ export default function BudgetView() {
                   <option value="Other">Other</option>
                 </select>
               </div>
-              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                <button type="button" className="btn btn-outline" onClick={() => setShowAddIncome(false)} style={{ fontSize: '0.75rem' }}>Cancel</button>
-                <button type="submit" className="btn btn-teal" style={{ fontSize: '0.75rem' }}>Save Income</button>
+              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '0.25rem' }}>
+                <button type="button" className="btn btn-outline" onClick={() => setShowAddIncome(false)} style={{ fontSize: '0.78rem' }}>Cancel</button>
+                <button type="submit" className="btn btn-teal" style={{ fontSize: '0.78rem' }}>Save Income</button>
               </div>
             </form>
           )}
 
           {incomes.length === 0 ? (
-            <p style={{ color: '#64748B', fontSize: '0.85rem' }}>No income sources recorded.</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No income sources recorded.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {incomes.map((inc) => (
-                <div key={inc.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+                <div key={inc.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0.95rem', background: '#F8FAFC', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
                   <div>
-                    <div style={{ fontWeight: 600, color: '#F8FAFC', fontSize: '0.9rem' }}>{inc.source}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>{inc.date || inc.month}</div>
+                    <div style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '0.9rem' }}>{inc.source}</div>
+                    <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>{inc.date || inc.month}</div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <span style={{ fontWeight: 700, color: '#2DD4BF' }}>₹{Number(inc.amount).toLocaleString('en-IN')}</span>
-                    <button onClick={() => handleDeleteIncome(inc.id)} style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer', padding: '4px' }}>
-                      <Trash2 size={14} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                    <span style={{ fontWeight: 800, color: 'var(--teal-primary)', fontSize: '0.95rem' }}>₹{Number(inc.amount).toLocaleString('en-IN')}</span>
+                    <button onClick={() => handleDeleteIncome(inc.id)} style={{ background: 'none', border: 'none', color: '#DC2626', cursor: 'pointer', padding: '4px' }} title="Delete income">
+                      <Trash2 size={15} />
                     </button>
                   </div>
                 </div>
@@ -262,21 +262,21 @@ export default function BudgetView() {
           )}
         </div>
 
-        {/* Expense Table */}
-        <div className="glass-panel" style={{ padding: '1.25rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        {/* Expense Card */}
+        <div className="glass-panel" style={{ padding: '1.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.15rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <ShoppingBag size={18} color="#F59E0B" />
-              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#FFFFFF' }}>Expenses & Auto-Bucketing</h3>
+              <ShoppingBag size={18} color="var(--violet-primary)" />
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Expenses & Auto-Bucketing</h3>
             </div>
-            <button className="btn btn-gold" onClick={() => setShowAddExpense(true)} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>
+            <button className="btn btn-violet" onClick={() => setShowAddExpense(true)} style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem' }}>
               <Plus size={14} />
               <span>Add Expense</span>
             </button>
           </div>
 
           {showAddExpense && (
-            <form onSubmit={handleAddExpense} style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '1rem', borderRadius: '10px', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <form onSubmit={handleAddExpense} style={{ background: 'var(--bg-surface-subtle)', padding: '1.15rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               <div>
                 <label className="fin-label">Expense Amount (₹)</label>
                 <input
@@ -313,32 +313,32 @@ export default function BudgetView() {
                   onChange={(e) => setExpenseDescription(e.target.value)}
                 />
               </div>
-              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                <button type="button" className="btn btn-outline" onClick={() => setShowAddExpense(false)} style={{ fontSize: '0.75rem' }}>Cancel</button>
-                <button type="submit" className="btn btn-gold" style={{ fontSize: '0.75rem' }}>Save Expense</button>
+              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '0.25rem' }}>
+                <button type="button" className="btn btn-outline" onClick={() => setShowAddExpense(false)} style={{ fontSize: '0.78rem' }}>Cancel</button>
+                <button type="submit" className="btn btn-violet" style={{ fontSize: '0.78rem' }}>Save Expense</button>
               </div>
             </form>
           )}
 
           {expenses.length === 0 ? (
-            <p style={{ color: '#64748B', fontSize: '0.85rem' }}>No expenses recorded.</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No expenses recorded.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '350px', overflowY: 'auto' }}>
               {expenses.map((exp) => (
-                <div key={exp.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+                <div key={exp.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0.95rem', background: '#F8FAFC', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span style={{ fontWeight: 600, color: '#F8FAFC', fontSize: '0.9rem' }}>{exp.description || exp.category}</span>
+                      <span style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '0.9rem' }}>{exp.description || exp.category}</span>
                       <span className={`badge ${exp.bucket === 'needs' ? 'badge-teal' : exp.bucket === 'wants' ? 'badge-amber' : 'badge-slate'}`} style={{ fontSize: '0.65rem' }}>
                         {exp.bucket}
                       </span>
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>{exp.category} • {exp.date}</div>
+                    <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>{exp.category} • {exp.date}</div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <span style={{ fontWeight: 700, color: '#F8FAFC' }}>₹{Number(exp.amount).toLocaleString('en-IN')}</span>
-                    <button onClick={() => handleDeleteExpense(exp.id)} style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer', padding: '4px' }}>
-                      <Trash2 size={14} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                    <span style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: '0.95rem' }}>₹{Number(exp.amount).toLocaleString('en-IN')}</span>
+                    <button onClick={() => handleDeleteExpense(exp.id)} style={{ background: 'none', border: 'none', color: '#DC2626', cursor: 'pointer', padding: '4px' }} title="Delete expense">
+                      <Trash2 size={15} />
                     </button>
                   </div>
                 </div>
