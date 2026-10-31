@@ -10,7 +10,8 @@ import {
   Activity, 
   UserCircle2, 
   Sparkles,
-  BarChart3
+  BarChart3,
+  CreditCard
 } from 'lucide-react';
 import { PERSONAS, getActiveUserId, setActiveUserId } from '../api/client';
 
@@ -22,6 +23,7 @@ export default function Sidebar({ currentTab, setTab }) {
     { id: 'market', label: 'Market Intel', icon: BarChart3, badge: 'NSE/BSE' },
     { id: 'budget', label: '50/30/20 Budget', icon: PieChart },
     { id: 'sip', label: 'SIP Simulator', icon: TrendingUp },
+    { id: 'loans', label: 'Loans & EMIs', icon: CreditCard, badge: 'New' },
     { id: 'goals', label: 'Goals & Timeline', icon: Target },
     { id: 'coach', label: 'AI Coach Chat', icon: BotMessageSquare, badge: 'Live AI' },
     { id: 'claims', label: 'Finfluencer Audit', icon: ShieldAlert, badge: 'SEBI' },

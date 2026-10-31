@@ -297,3 +297,34 @@ export const removeFromWatchlist = (symbol) =>
   apiFetch(`/api/v1/market/watchlist/${encodeURIComponent(symbol)}`, {
     method: "DELETE",
   });
+
+// ================= Loans & Debt Management =================
+export const getLoans = () => apiFetch("/api/v1/loans");
+
+export const getLoanDetail = (loanId) => apiFetch(`/api/v1/loans/${loanId}`);
+
+export const createLoan = (payload) =>
+  apiFetch("/api/v1/loans", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+export const recordLoanRepayment = (loanId, payload) =>
+  apiFetch(`/api/v1/loans/${loanId}/repayments`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+export const simulateLoanPrepayment = (loanId, extraMonthlyAmount) =>
+  apiFetch(`/api/v1/loans/${loanId}/simulate-extra`, {
+    method: "POST",
+    body: JSON.stringify({ extra_monthly_amount: extraMonthlyAmount }),
+  });
+
+export const getLoanPrioritization = () =>
+  apiFetch("/api/v1/loans/strategy/prioritization");
+
+export const deleteLoan = (loanId) =>
+  apiFetch(`/api/v1/loans/${loanId}`, {
+    method: "DELETE",
+  });

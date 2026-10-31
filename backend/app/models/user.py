@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from app.models.health_score import HealthScoreSnapshot
     from app.models.income import IncomeRecord
     from app.models.journal import JournalEntry
+    from app.models.loan import Loan
     from app.models.profile import FinancialProfile
     from app.models.watchlist import WatchlistItem
 
@@ -78,6 +79,11 @@ class User(Base):
     )
     watchlist_items: Mapped[list["WatchlistItem"]] = relationship(
         "WatchlistItem",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+    loans: Mapped[list["Loan"]] = relationship(
+        "Loan",
         back_populates="user",
         cascade="all, delete-orphan",
     )

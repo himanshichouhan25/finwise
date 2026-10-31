@@ -12,12 +12,14 @@ import DecisionJournalView from './views/DecisionJournalView';
 import HealthScoreView from './views/HealthScoreView';
 import MarketView from './views/MarketView';
 import ProfileView from './views/ProfileView';
+import LoanView from './views/LoanView';
 
 const TAB_TITLES = {
   dashboard: 'Executive Financial Intelligence',
   market: 'Indian Market Intelligence & Stock Analysis',
   budget: '50/30/20 Budget & Expense Tracking',
   sip: 'Systematic Investment Plan (SIP) Simulator',
+  loans: 'Loan Management & Amortization Intelligence',
   goals: 'Financial Goals & Delayed Gratification',
   coach: 'FinWise AI Financial Coach',
   claims: 'Finfluencer Claim Reality Check & SEBI Audit',
@@ -70,6 +72,7 @@ export default function App() {
           {currentTab === 'market' && <MarketView />}
           {currentTab === 'budget' && <BudgetView />}
           {currentTab === 'sip' && <SipSimulatorView />}
+          {currentTab === 'loans' && <LoanView />}
           {currentTab === 'goals' && <GoalsView />}
           {currentTab === 'coach' && <CoachChatView initialPrompt={coachPrompt} />}
           {currentTab === 'claims' && <ClaimsAuditView />}

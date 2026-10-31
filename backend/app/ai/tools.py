@@ -13,6 +13,11 @@ from app.engine.sip import calculate_sip
 from app.schemas.simulation import GoalDelayRequest
 from app.services.budget_service import get_budget_summary
 from app.services.health_score_service import get_and_snapshot_health_score
+from app.services.loan_service import (
+    get_loans,
+    get_prioritization_strategy,
+    simulate_loan_prepayment,
+)
 from app.services.simulation_service import run_goal_delay_simulation
 
 logger = logging.getLogger("finwise.ai.tools")
@@ -157,6 +162,60 @@ FINANCIAL_TOOLS = [
             },
         },
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_user_loans",
+            "description": (
+                "Retrieve user's active loans, total outstanding debt, monthly EMI obligations, "
+                "interest rates, total interest paid so far, and remaining installments."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "simulate_loan_prepayment",
+            "description": (
+                "Simulate the financial impact of paying an extra monthly amount towards a loan. "
+                "Calculates how many months are shaved off the tenure and how much total interest is saved."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "loan_id": {
+                        "type": "integer",
+                        "description": "ID of the loan to prepay",
+                    },
+                    "extra_monthly_amount": {
+                        "type": "number",
+                        "description": "Additional amount paid each month beyond the regular EMI (e.g. 2000)",
+                    },
+                },
+                "required": ["loan_id", "extra_monthly_amount"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "prioritize_loans",
+            "description": (
+                "Compare Debt Avalanche (highest interest rate first) and Debt Snowball (lowest balance first) "
+                "payoff strategies for all user loans, with mathematical and behavioral rationales."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+            },
+        },
+    },
 ]
 
 
@@ -247,6 +306,25 @@ def execute_tool(
         elif name == "get_health_score":
             score_data = get_and_snapshot_health_score(db=db, user_id=user_id)
             return _sanitize_for_json(score_data.model_dump())
+
+        elif name == "get_user_loans":
+            loans_summary = get_loans(db=db, user_id=user_id)
+            return _sanitize_for_json(loans_summary.model_dump())
+
+        elif name == "simulate_loan_prepayment":
+            loan_id = int(arguments.get("loan_id", 0))
+            extra_amount = Decimal(str(arguments.get("extra_monthly_amount", 0)))
+            sim_res = simulate_loan_prepayment(
+                db=db,
+                user_id=user_id,
+                loan_id=loan_id,
+                extra_monthly_amount=extra_amount,
+            )
+            return _sanitize_for_json(sim_res.model_dump())
+
+        elif name == "prioritize_loans":
+            prio_res = get_prioritization_strategy(db=db, user_id=user_id)
+            return _sanitize_for_json(prio_res.model_dump())
 
         else:
             return {"error": f"Tool '{name}' is not supported."}

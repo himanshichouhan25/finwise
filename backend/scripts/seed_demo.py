@@ -21,6 +21,7 @@ from sqlalchemy import select
 from app.core.security import hash_password
 from app.db.base import Base
 from app.db.session import SessionLocal, engine
+from app.engine.loan import calculate_emi
 from app.models import (
     ChatMessage,
     ChatSession,
@@ -31,6 +32,7 @@ from app.models import (
     HealthScoreSnapshot,
     IncomeRecord,
     JournalEntry,
+    Loan,
     User,
 )
 
@@ -123,6 +125,20 @@ def seed_demo_data():
                         "planned_monthly_contribution": Decimal("3000.00"),
                         "expected_annual_return_pct": Decimal("6.00"),
                         "status": "active",
+                    }
+                ],
+                "loans": [
+                    {
+                        "name": "SBI Scholar Education Loan",
+                        "lender": "State Bank of India",
+                        "loan_type": "education",
+                        "principal_amount": Decimal("180000.00"),
+                        "interest_rate_pct": Decimal("8.50"),
+                        "interest_type": "reducing_balance",
+                        "start_date": today - timedelta(days=240),
+                        "tenure_months": 36,
+                        "installments_paid": 8,
+                        "next_emi_date": today + timedelta(days=10),
                     }
                 ],
                 "chat": {
@@ -236,6 +252,20 @@ def seed_demo_data():
                         "status": "active",
                     },
                 ],
+                "loans": [
+                    {
+                        "name": "HDFC EV Four-Wheeler Loan",
+                        "lender": "HDFC Bank",
+                        "loan_type": "vehicle",
+                        "principal_amount": Decimal("450000.00"),
+                        "interest_rate_pct": Decimal("8.90"),
+                        "interest_type": "reducing_balance",
+                        "start_date": today - timedelta(days=360),
+                        "tenure_months": 48,
+                        "installments_paid": 12,
+                        "next_emi_date": today + timedelta(days=5),
+                    }
+                ],
                 "chat": {
                     "title": "Index Fund SIP Strategy",
                     "messages": [
@@ -336,6 +366,20 @@ def seed_demo_data():
                         "status": "active",
                     }
                 ],
+                "loans": [
+                    {
+                        "name": "Apple MacBook Studio Equipment Loan",
+                        "lender": "Bajaj Finserv",
+                        "loan_type": "personal",
+                        "principal_amount": Decimal("120000.00"),
+                        "interest_rate_pct": Decimal("11.50"),
+                        "interest_type": "reducing_balance",
+                        "start_date": today - timedelta(days=180),
+                        "tenure_months": 18,
+                        "installments_paid": 6,
+                        "next_emi_date": today + timedelta(days=15),
+                    }
+                ],
                 "chat": {
                     "title": "Irregular Income Buffer Planning",
                     "messages": [
@@ -362,10 +406,10 @@ def seed_demo_data():
 
         print("--- Seeding FinWise AI Demo Personas ---")
         for pdata in personas_data:
-            # Check if user already exists
-            user = db.execute(select(User).where(User.persona == pdata["persona"])).scalar_one_or_none()
+            # Check if user already exists by email
+            user = db.execute(select(User).where(User.email == pdata["email"])).scalar_one_or_none()
             if user:
-                print(f"[Exists] Persona '{pdata['persona']}' already exists. Updating records...")
+                print(f"[Exists] Persona '{pdata['persona']}' ({pdata['email']}) already exists. Updating records...")
                 # Remove child records to refresh cleanly
                 db.delete(user)
                 db.flush()
@@ -403,6 +447,16 @@ def seed_demo_data():
             # Create Goals
             for goal in pdata["goals"]:
                 db.add(Goal(user_id=user.id, **goal))
+
+            # Create Loans
+            for loan_data in pdata.get("loans", []):
+                emi = calculate_emi(
+                    principal=loan_data["principal_amount"],
+                    annual_rate_pct=loan_data["interest_rate_pct"],
+                    tenure_months=loan_data["tenure_months"],
+                    interest_type=loan_data["interest_type"],
+                )
+                db.add(Loan(user_id=user.id, emi_amount=emi, **loan_data))
 
             # Create Sample Chat
             chat_data = pdata["chat"]

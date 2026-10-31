@@ -22,6 +22,7 @@ from app.api.v1.health import router as health_router
 from app.api.v1.health_score import router as health_score_router
 from app.api.v1.income import router as income_router
 from app.api.v1.journal import router as journal_router
+from app.api.v1.loans import router as loans_router
 from app.api.v1.market import router as market_router
 from app.api.v1.profile import router as profile_router
 from app.api.v1.simulations import router as simulations_router
@@ -95,6 +96,7 @@ def create_app() -> FastAPI:
     application.include_router(coach_router, prefix="/api/v1")
     application.include_router(claims_router, prefix="/api/v1")
     application.include_router(journal_router, prefix="/api/v1")
+    application.include_router(loans_router, prefix="/api/v1")
     application.include_router(market_router, prefix="/api/v1")
 
     return application

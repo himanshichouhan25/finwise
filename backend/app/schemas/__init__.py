@@ -30,6 +30,19 @@ from app.schemas.income import (
     IncomeCreate,
     IncomeResponse,
 )
+from app.schemas.loan import (
+    AmortizationScheduleRowSchema,
+    LoanCreate,
+    LoanDetailResponse,
+    LoanPrioritizationResponse,
+    LoanRepaymentCreate,
+    LoanRepaymentResponse,
+    LoanResponse,
+    LoanSummaryOverview,
+    LoanUpdate,
+    PrepaymentSimulationRequest,
+    PrepaymentSimulationResponse,
+)
 from app.schemas.profile import (
     ProfileResponse,
     ProfileUpdate,
@@ -70,4 +83,15 @@ __all__ = [
     "BudgetBucketSummarySchema",
     "BudgetSummaryResponse",
     "DashboardResponse",
+    "LoanCreate",
+    "LoanUpdate",
+    "LoanResponse",
+    "LoanDetailResponse",
+    "LoanSummaryOverview",
+    "LoanRepaymentCreate",
+    "LoanRepaymentResponse",
+    "AmortizationScheduleRowSchema",
+    "PrepaymentSimulationRequest",
+    "PrepaymentSimulationResponse",
+    "LoanPrioritizationResponse",
 ]
