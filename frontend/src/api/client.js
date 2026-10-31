@@ -84,8 +84,13 @@ export const getActiveUserId = () => {
 // Initialize from storage if present
 getActiveUserId();
 
+// Base URL: in production, set VITE_API_BASE_URL to your Render backend URL
+// e.g. https://finwise-api.onrender.com
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
+
 export async function apiFetch(endpoint, options = {}) {
-  const url = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const path = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const url = `${API_BASE}${path}`;
   const token = getAuthToken();
 
   const headers = {
