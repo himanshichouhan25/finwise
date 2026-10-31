@@ -27,6 +27,7 @@ export default function Sidebar({ currentTab, setTab }) {
     { id: 'claims', label: 'Finfluencer Audit', icon: ShieldAlert, badge: 'SEBI' },
     { id: 'journal', label: 'Decision Journal', icon: Hourglass, badge: '24h Timer' },
     { id: 'health', label: 'Health Score', icon: Activity },
+    { id: 'profile', label: 'My Profile', icon: UserCircle2 },
   ];
 
   return (

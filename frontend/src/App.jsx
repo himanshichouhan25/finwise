@@ -11,6 +11,7 @@ import ClaimsAuditView from './views/ClaimsAuditView';
 import DecisionJournalView from './views/DecisionJournalView';
 import HealthScoreView from './views/HealthScoreView';
 import MarketView from './views/MarketView';
+import ProfileView from './views/ProfileView';
 
 const TAB_TITLES = {
   dashboard: 'Executive Financial Intelligence',
@@ -21,7 +22,8 @@ const TAB_TITLES = {
   coach: 'FinWise AI Financial Coach',
   claims: 'Finfluencer Claim Reality Check & SEBI Audit',
   journal: 'Impulse Decision Journal & 24h Cooling-Off',
-  health: 'Financial Health Diagnostics (0–100)',
+  health: 'Financial Health Diagnostics (0-100)',
+  profile: 'My Financial Profile',
 };
 
 export default function App() {
@@ -73,6 +75,7 @@ export default function App() {
           {currentTab === 'claims' && <ClaimsAuditView />}
           {currentTab === 'journal' && <DecisionJournalView />}
           {currentTab === 'health' && <HealthScoreView />}
+          {currentTab === 'profile' && <ProfileView onNavigateToTab={setCurrentTab} />}
         </main>
       </div>
 
