@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/banner.png" alt="FinWise AI banner: Plan Smarter. Live Freer." width="100%" />
+<img src="docs/assets/banner.gif" alt="FinWise AI banner: Plan Smarter. Live Freer." width="100%" />
 
 # 🪙 FinWise AI
 
@@ -60,6 +60,10 @@ FinWise AI is a personal finance platform for young Indian earners. It helps use
 
 **Problem.** Many first-time earners start investing from social-media promises and impulse spending, without a budget, an emergency fund, or a way to check whether a promised return is realistic.
 
+<p align="center">
+  <img src="docs/assets/decision-tradeoff.gif" alt="FinWise AI Trade-off: Saving vs Spending" width="340" />
+</p>
+
 **Solution.** FinWise combines two things:
 1. **Deterministic engines** written in pure Python do all financial math: budget split, SIP growth, goal timelines, health score and claim CAGR.
 2. **An LLM coach** (Groq, Llama 3.3 70B) explains the results in English or Hinglish. It receives verified numbers and is instructed not to invent figures or give individual stock tips.
@@ -67,7 +71,7 @@ FinWise AI is a personal finance platform for young Indian earners. It helps use
 This is the **Zero-Financial-Hallucination principle**: the model explains, the code calculates.
 
 <p align="center">
-  <img src="docs/assets/zero-hallucination.png" alt="Python engine calculates, LLM explains" width="90%" />
+  <img src="docs/assets/zero-hallucination.gif" alt="Python engine calculates, LLM explains" width="90%" />
 </p>
 
 ## 👥 Target Audience
@@ -99,10 +103,15 @@ This is the **Zero-Financial-Hallucination principle**: the model explains, the 
 | ✅ **AI Financial Coach** | Groq-powered, English and Hinglish, tool-calling, SEBI-style guardrails |
 | ✅ **Registration and Login** | User accounts, plus a seeded demo mode |
 
+<p align="center">
+  <img src="docs/assets/growth-chart.gif" alt="Compound Growth and SIP Projections" width="85%" />
+</p>
+
 <details>
 <summary><b>Feature details</b></summary>
 
-**Finfluencer Claim Reality Check.** Benchmarks used:
+### 🔍 Finfluencer Claim Reality Check
+Benchmarks used:
 
 <p align="center">
   <img src="docs/assets/benchmarks.png" alt="Benchmark annual returns: FD 7%, Gold 10.5%, Nifty 50 12.5%, Buffett 20%" width="75%" />
@@ -117,11 +126,20 @@ This is the **Zero-Financial-Hallucination principle**: the model explains, the 
 
 Red flags detected: promised "guaranteed" returns, urgency / FOMO language, and VIP Telegram or WhatsApp tip channels.
 
-**Impulse Decision Journal.** Users log a planned purchase, start a 24h or 48h cooling-off timer, and record the trigger (`fomo`, `excited`, `stressed`). The journal tracks cumulative money saved by avoiding purchases.
+### ⏳ Impulse Decision Journal & Savings Buffer
+Users log a planned purchase, start a 24h or 48h cooling-off timer, and record the trigger (`fomo`, `excited`, `stressed`). The journal tracks cumulative money saved by avoiding purchases.
 
-**Financial Health Score.** Factors: savings rate, emergency fund buffer, needs ratio, wants discipline and goal progress. Weights rescale so beginners are not penalised for not having investments yet.
+<p align="center">
+  <img src="docs/assets/wallet-cash.gif" alt="Cash flow tracking" width="340" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="docs/assets/money-bag.gif" alt="Emergency savings buffer" width="280" />
+</p>
 
-**AI Coach.** Automatic model fallback, multi-key rotation on rate limits, and an offline mode where calculators keep working without an API key.
+### 📊 Financial Health Score
+Factors: savings rate, emergency fund buffer, needs ratio, wants discipline and goal progress. Weights rescale so beginners are not penalised for not having investments yet.
+
+### 🤖 AI Coach
+Automatic model fallback, multi-key rotation on rate limits, and an offline mode where calculators keep working without an API key.
 
 </details>
 
@@ -134,14 +152,6 @@ Red flags detected: promised "guaranteed" returns, urgency / FOMO language, and 
 | Finfluencer Audit | Implied CAGR against benchmarks, with red flags |
 | Decision Journal | Live cooling-off countdown and money saved |
 | AI Coach | Hinglish chat that calls calculator tools |
-
-<!-- Add screenshots to docs/screenshots/ and uncomment:
-![Dashboard](docs/screenshots/dashboard.png)
-![Goals](docs/screenshots/goals.png)
-![Finfluencer Audit](docs/screenshots/claim-check.png)
-![Decision Journal](docs/screenshots/journal.png)
-![AI Coach](docs/screenshots/ai-coach.png)
--->
 
 ## 🏗 System Architecture
 
@@ -326,6 +336,10 @@ USERS
 FinWise supports user registration and login. For demos, three seeded personas can be selected with the `X-User-Id` header (`1`, `2`, `3`). Authentication endpoints are listed in the Swagger docs at `/docs`.
 
 <p align="center">
+  <img src="docs/assets/bank-3d.gif" alt="Banking foundation and persona security" width="320" />
+</p>
+
+<p align="center">
   <img src="docs/assets/auth-flow.png" alt="Authentication flow" width="90%" />
 </p>
 
@@ -393,7 +407,7 @@ finwise/
 ├── frontend/
 │   └── src/            # Views, components, API client, design tokens
 ├── docs/               # API.md, DECISIONS.md, FINANCE_SPEC.md, DOCUMENTATION_AUDIT.md
-│   └── assets/         # Banner, diagrams (PNG) and Mermaid sources
+│   └── assets/         # Banner, diagrams (PNG), motion graphics (GIF)
 ├── image/
 └── .env.example
 ```
