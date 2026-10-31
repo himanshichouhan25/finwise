@@ -121,9 +121,27 @@ export default function DecisionJournalView() {
 
       {/* Behavioral Finance: How It Works Guide Strip */}
       <div className="glass-card" style={{ background: '#FFFFFF', border: '1px solid #E0E7FF', padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--violet-primary)', fontWeight: 800, fontSize: '0.9rem' }}>
-          <Sparkles size={17} />
-          <span>How the 24h/48h Cooling-Off System Protects Your Wealth</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--violet-primary)', fontWeight: 800, fontSize: '0.9rem' }}>
+            <Sparkles size={17} />
+            <span>How the 24h/48h Cooling-Off System Protects Your Wealth</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setTitle('Sony ANC Headphones');
+              setAmount('14999');
+              setRationale('Saw a flash sale on Amazon, felt tempting but not strictly essential.');
+              setEmotionalState('fomo');
+              setCoolingHours('24');
+              setIsUrgent(true);
+              setShowLogModal(true);
+            }}
+            className="btn btn-outline"
+            style={{ fontSize: '0.75rem', padding: '0.3rem 0.65rem' }}
+          >
+            ⚡ Try Demo Spend (₹14,999)
+          </button>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginTop: '0.25rem' }}>
           <div style={{ padding: '0.75rem', background: '#F8FAFC', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>

@@ -346,7 +346,7 @@ export default function DashboardView({ onNavigateToCoach, onNavigateToTab }) {
                   const mo = Math.max(1, Math.round(diffDays / 30.4375));
                   reqMonthly = Math.ceil(rem / mo);
                   const planMo = Number(g.planned_monthly_contribution || 0);
-                  if (planMo > 0 && planMo < reqMonthly * 0.75 && rem > 0) {
+                  if (planMo > 0 && planMo < reqMonthly && rem > 0) {
                     isUnfeasible = true;
                   }
                 }

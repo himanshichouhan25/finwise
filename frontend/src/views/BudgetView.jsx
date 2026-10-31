@@ -153,6 +153,29 @@ export default function BudgetView() {
 
   return (
     <div style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '1240px', margin: '0 auto' }}>
+      {/* Top Banner with 3 Quick Actions */}
+      <div className="glass-panel" style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', borderLeft: '4px solid var(--teal-primary)' }}>
+        <div>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+            50/30/20 Budget & Cash-Flow Planner
+          </h2>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '0.2rem 0 0 0' }}>
+            50% Essential Needs • 30% Discretionary Wants • 20% Compounding Savings & SIPs
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
+          <button className="btn btn-outline" onClick={() => setShowAddIncome(true)} style={{ fontSize: '0.8rem', padding: '0.45rem 0.85rem' }}>
+            <Plus size={14} /> + Add Income
+          </button>
+          <button className="btn btn-outline" onClick={() => setShowAddExpense(true)} style={{ fontSize: '0.8rem', padding: '0.45rem 0.85rem' }}>
+            <Plus size={14} /> + Log Expense
+          </button>
+          <button className="btn btn-teal" onClick={() => setShowAddSavings(true)} style={{ fontSize: '0.8rem', padding: '0.45rem 0.95rem', fontWeight: 700 }}>
+            <Plus size={14} /> + Log 20% Savings / SIP
+          </button>
+        </div>
+      </div>
+
       {/* 50/30/20 Metric Cards */}
       {summary && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>

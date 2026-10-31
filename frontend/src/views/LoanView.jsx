@@ -1152,13 +1152,27 @@ export default function LoanView() {
                 >
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className="btn btn-teal"
-                  style={{ fontSize: '0.85rem', fontWeight: 700 }}
-                >
-                  Confirm Payment
-                </button>
+                {(() => {
+                  const selLoan = loans.find((l) => l.id === paymentLoanId);
+                  const schEmi = Number(selLoan?.emi_amount || selLoan?.monthly_emi || 0);
+                  const isUnderpaid = paymentData.payment_type === 'emi' && Number(paymentData.amount_paid) < schEmi;
+                  return (
+                    <button
+                      type="submit"
+                      disabled={isUnderpaid || !paymentData.amount_paid || Number(paymentData.amount_paid) <= 0}
+                      className="btn btn-teal"
+                      style={{
+                        fontSize: '0.85rem',
+                        fontWeight: 700,
+                        opacity: isUnderpaid ? 0.45 : 1,
+                        cursor: isUnderpaid ? 'not-allowed' : 'pointer',
+                      }}
+                      title={isUnderpaid ? `Regular EMI cannot be less than scheduled ₹${schEmi.toLocaleString('en-IN')}` : 'Confirm Payment'}
+                    >
+                      {isUnderpaid ? `Pay Full EMI (₹${schEmi.toLocaleString('en-IN')})` : 'Confirm Payment'}
+                    </button>
+                  );
+                })()}
               </div>
             </form>
           </div>

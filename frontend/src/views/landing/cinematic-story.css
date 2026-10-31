@@ -167,8 +167,10 @@
   box-shadow: var(--cs-shadow-card);
 }
 
-/* 3D Luminous Sphere & Orbit System */
-.cs-luminous-stage {
+/* -------------------------------------------------------------
+ * ARC-STYLE HOLOGRAPHIC STAGE & HUD TELEMETRY BADGES
+ * ------------------------------------------------------------- */
+.cs-arc-stage-container {
   position: relative;
   width: 100%;
   max-width: 520px;
@@ -179,45 +181,462 @@
   margin: 0 auto;
 }
 
-.cs-sphere-core {
-  width: 240px;
-  height: 240px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #C4B5FD 0%, #7C3AED 45%, #4C1D95 80%, #1E1B4B 100%);
+/* Glassmorphism HUD Telemetry Cards matching the ARC Screen */
+.cs-hud-card {
+  position: absolute;
+  padding: 0.55rem 0.85rem;
+  border-radius: 10px;
+  background: rgba(6, 11, 25, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 242, 254, 0.35);
   box-shadow: 
-    0 0 70px rgba(139, 92, 246, 0.6),
-    inset -25px -25px 50px rgba(0, 0, 0, 0.7),
-    inset 15px 15px 35px rgba(255, 255, 255, 0.5);
+    0 15px 35px -5px rgba(0, 0, 0, 0.7),
+    0 0 20px rgba(0, 242, 254, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  z-index: 10;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+  user-select: none;
+}
+
+.cs-hud-card:hover {
+  transform: translateY(-2px) scale(1.03);
+  border-color: #00F2FE;
+  box-shadow: 
+    0 20px 40px -5px rgba(0, 0, 0, 0.8),
+    0 0 30px rgba(0, 242, 254, 0.35);
+}
+
+.cs-hud-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.2rem;
+}
+
+.cs-hud-title {
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #94A3B8;
+}
+
+.cs-hud-value {
+  font-size: 0.85rem;
+  font-weight: 750;
+  color: #F8FAFC;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.cs-hud-led {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.cs-led-cyan {
+  background: #00F2FE;
+  box-shadow: 0 0 8px #00F2FE;
+  animation: csLedBlink 2s infinite ease-in-out;
+}
+
+.cs-led-red {
+  background: #EF4444;
+  box-shadow: 0 0 8px #EF4444;
+  animation: csLedBlink 1.4s infinite ease-in-out;
+}
+
+@keyframes csLedBlink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.cs-hud-badge-green {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: rgba(16, 185, 129, 0.2);
+  color: #34D399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.cs-hud-badge-cyan {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: rgba(0, 242, 254, 0.2);
+  color: #00F2FE;
+  border: 1px solid rgba(0, 242, 254, 0.4);
+}
+
+.cs-hud-badge-violet {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: rgba(139, 92, 246, 0.2);
+  color: #C4B5FD;
+  border: 1px solid rgba(139, 92, 246, 0.4);
+}
+
+/* Card Placements matching the exact ARC Screenshot */
+.cs-hud-top {
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.cs-hud-top-right {
+  top: 45px;
+  right: -10px;
+}
+
+.cs-hud-mid-left {
+  top: 140px;
+  left: -20px;
+}
+
+.cs-hud-mid-right {
+  top: 210px;
+  right: -25px;
+}
+
+.cs-hud-bottom-left {
+  bottom: 35px;
+  left: -15px;
+}
+
+@media (max-width: 960px) {
+  .cs-arc-stage-container {
+    width: 320px;
+    height: 320px;
+  }
+  .cs-arc-stage-container canvas {
+    width: 320px !important;
+    height: 320px !important;
+  }
+  .cs-hud-top-right,
+  .cs-hud-mid-left,
+  .cs-hud-mid-right {
+    display: none !important;
+  }
+  .cs-hud-top {
+    top: -15px;
+  }
+  .cs-hud-bottom-left {
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+/* -------------------------------------------------------------
+ * CYBER-FINANCE AMBIENT ENVIRONMENT & MARKET MATRIX BACKGROUND
+ * ------------------------------------------------------------- */
+.cs-hero-cyber-environment {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 3D Perspective Digital Floor Grid */
+.cs-cyber-grid-floor {
+  position: absolute;
+  bottom: -60px;
+  left: -25%;
+  width: 150%;
+  height: 420px;
+  background-image: 
+    linear-gradient(to right, rgba(15, 159, 154, 0.15) 1px, transparent 1px),
+    linear-gradient(to top, rgba(109, 74, 255, 0.15) 1px, transparent 1px);
+  background-size: 50px 50px;
+  transform: perspective(480px) rotateX(68deg);
+  transform-origin: bottom center;
+  mask-image: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 88%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 88%);
+  animation: csGridScroll 22s linear infinite;
+  opacity: 0.75;
+}
+
+@keyframes csGridScroll {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 100px;
+  }
+}
+
+/* Sweeping Neon Stock Candlestick & Trend Wave */
+.cs-bg-chart-wave {
+  position: absolute;
+  top: 18%;
+  left: -5%;
+  width: 110%;
+  height: 65%;
+  opacity: 0.65;
+  mix-blend-mode: screen;
+  animation: csChartWaveGlide 14s ease-in-out infinite alternate;
+}
+
+@keyframes csChartWaveGlide {
+  0% {
+    transform: translateX(-15px) translateY(0px) scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateX(10px) translateY(-8px) scale(1.02);
+    opacity: 0.75;
+  }
+  100% {
+    transform: translateX(20px) translateY(4px) scale(1);
+    opacity: 0.6;
+  }
+}
+
+/* Financial Bokeh Light Orbs (Cyan & Golden Amber) */
+.cs-bokeh-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(55px);
+  pointer-events: none;
+  opacity: 0.45;
+  animation: csBokehPulse 8s ease-in-out infinite alternate;
+}
+
+.cs-bokeh-cyan {
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(0, 242, 254, 0.35) 0%, rgba(15, 159, 154, 0.18) 55%, transparent 75%);
+}
+
+.cs-bokeh-amber {
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.32) 0%, rgba(217, 119, 6, 0.15) 50%, transparent 75%);
+  animation-delay: -3.5s;
+}
+
+.cs-bokeh-violet {
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, rgba(79, 70, 229, 0.12) 60%, transparent 80%);
+  animation-delay: -5s;
+}
+
+@keyframes csBokehPulse {
+  0% {
+    transform: scale(0.92) translate(0, 0);
+    opacity: 0.38;
+  }
+  100% {
+    transform: scale(1.08) translate(12px, -10px);
+    opacity: 0.58;
+  }
+}
+
+/* 3D Luminous Sphere & Orbit System */
+.cs-luminous-stage {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  height: 560px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  perspective: 1100px;
+  transform-style: preserve-3d;
+}
+
+.cs-globe-wrapper {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-style: preserve-3d;
+  z-index: 3;
+}
+
+/* Translucent Holographic Glass Globe with Internal Solar Core Burst */
+.cs-sphere-core {
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 45% 42%, #FFFBEB 0%, #FDE68A 8%, #F59E0B 18%, #7C3AED 42%, #311042 70%, #060913 95%);
+  box-shadow: 
+    0 0 45px rgba(245, 158, 11, 0.45),
+    0 0 100px rgba(0, 242, 254, 0.5),
+    0 0 160px rgba(139, 92, 246, 0.35),
+    inset -30px -30px 60px rgba(0, 0, 0, 0.85),
+    inset 18px 18px 45px rgba(255, 255, 255, 0.65),
+    inset 0 0 35px rgba(0, 242, 254, 0.4);
   position: relative;
   animation: csSpherePulse 8s ease-in-out infinite;
+  overflow: hidden;
+  border: 1px solid rgba(0, 242, 254, 0.4);
 }
 
-.cs-orbit-ring-1 {
+/* Specular Curved Reflection Crescent */
+.cs-sphere-specular {
   position: absolute;
-  width: 380px;
-  height: 380px;
+  top: 10px;
+  left: 25px;
+  width: 120px;
+  height: 70px;
   border-radius: 50%;
-  border: 1.5px dashed rgba(167, 139, 250, 0.35);
-  animation: csRotateCW 28s linear infinite;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.05) 75%);
+  transform: rotate(-32deg);
+  filter: blur(4px);
+  pointer-events: none;
+  z-index: 4;
 }
 
-.cs-orbit-ring-2 {
+/* Globe Financial Grid & Dotted Continents Overlay */
+.cs-globe-grid-svg {
   position: absolute;
-  width: 470px;
-  height: 470px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 2;
+  animation: csGlobeGridRotate 42s linear infinite;
+}
+
+/* Atmosphere Glow Rim */
+.cs-globe-atmosphere {
+  position: absolute;
+  top: -16px;
+  left: -16px;
+  right: -16px;
+  bottom: -16px;
   border-radius: 50%;
-  border: 1px solid rgba(15, 159, 154, 0.28);
-  animation: csRotateCCW 36s linear infinite;
+  background: radial-gradient(circle, transparent 58%, rgba(0, 242, 254, 0.35) 78%, rgba(245, 158, 11, 0.3) 92%, transparent 100%);
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+/* 3D Inclined Orbit Tracks */
+.cs-orbit-plane-1 {
+  position: absolute;
+  width: 460px;
+  height: 460px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(0, 242, 254, 0.4);
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.15);
+  transform: rotateX(66deg) rotateY(-18deg);
+  animation: csOrbitRingRotate 38s linear infinite;
+  pointer-events: none;
+}
+
+.cs-orbit-plane-2 {
+  position: absolute;
+  width: 540px;
+  height: 540px;
+  border-radius: 50%;
+  border: 1px solid rgba(245, 158, 11, 0.32);
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.12);
+  transform: rotateX(60deg) rotateY(20deg);
+  animation: csOrbitRingRotateRev 44s linear infinite;
+  pointer-events: none;
 }
 
 .cs-orbit-glow-disc {
   position: absolute;
-  width: 320px;
-  height: 320px;
+  width: 380px;
+  height: 380px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(109, 74, 255, 0.22) 0%, rgba(15, 159, 154, 0.15) 50%, transparent 75%);
-  filter: blur(40px);
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.28) 0%, rgba(0, 242, 254, 0.2) 42%, rgba(109, 74, 255, 0.15) 65%, transparent 80%);
+  filter: blur(60px);
   pointer-events: none;
+  z-index: 1;
+}
+
+/* 3D Financial Artifact Containers */
+.cs-3d-artifact {
+  position: absolute;
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+  user-select: none;
+}
+
+.cs-3d-artifact:hover {
+  filter: brightness(1.15) drop-shadow(0 0 20px rgba(167, 139, 250, 0.6)) !important;
+}
+
+/* Artifact 1: Glowing Coin Stack (Mid-Left Foreground) */
+.cs-artifact-coins {
+  top: 40%;
+  left: 10px;
+  z-index: 5;
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.65)) drop-shadow(0 0 16px rgba(245, 158, 11, 0.35));
+  animation: csFloatCoins 7s ease-in-out infinite;
+}
+
+/* Artifact 2: Isometric Bar Chart (Right Midground) */
+.cs-artifact-chart {
+  top: 32%;
+  right: -5px;
+  z-index: 5;
+  filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.65)) drop-shadow(0 0 18px rgba(45, 212, 191, 0.3));
+  animation: csFloatChart 7.8s ease-in-out infinite 0.5s;
+}
+
+/* Artifact 3: Luminous Rupee Symbol (Top-Left High-Orbit) */
+.cs-artifact-rupee {
+  top: 14%;
+  left: 65px;
+  z-index: 5;
+  filter: drop-shadow(0 14px 26px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 20px rgba(139, 92, 246, 0.4));
+  animation: csGyroRupee 8.5s ease-in-out infinite 1s;
+}
+
+/* Artifact 4: 3D Holographic Safety Shield (Bottom-Right Foreground) */
+.cs-artifact-shield {
+  bottom: 22%;
+  right: 40px;
+  z-index: 5;
+  filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.65)) drop-shadow(0 0 18px rgba(15, 159, 154, 0.4));
+  animation: csFloatShield 8s ease-in-out infinite 1.8s;
+}
+
+/* Subtle Background Beacon: Goal Target */
+.cs-artifact-beacon {
+  top: 12%;
+  right: 75px;
+  z-index: 2;
+  opacity: 0.55;
+  filter: drop-shadow(0 0 12px rgba(167, 139, 250, 0.3));
+  animation: csBeaconPulse 6s ease-in-out infinite;
+}
+
+/* Subtle Ambient Micro Particles */
+.cs-particle-dust {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #A78BFA;
+  box-shadow: 0 0 8px #A78BFA;
+  pointer-events: none;
+  opacity: 0.45;
+  animation: csDustFloat 9s ease-in-out infinite;
 }
 
 /* Floating Orbit Badges */
@@ -225,33 +644,126 @@
   position: absolute;
   padding: 0.65rem 1rem;
   border-radius: 14px;
-  background: rgba(15, 23, 42, 0.82);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   color: #FFFFFF;
-  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 18px 40px -5px rgba(0, 0, 0, 0.65), 0 0 20px rgba(109, 74, 255, 0.15);
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  z-index: 5;
-  transition: transform 0.3s ease;
+  z-index: 6;
+  transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
 .cs-orbit-pill:hover {
   transform: scale(1.04) translateY(-3px);
-  border-color: rgba(109, 74, 255, 0.4);
+  border-color: rgba(109, 74, 255, 0.5);
 }
 
-/* Keyframe Motions */
+/* Keyframe Motions for 3D Universe */
 @keyframes csSpherePulse {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 0 70px rgba(139, 92, 246, 0.6), inset -25px -25px 50px rgba(0, 0, 0, 0.7);
+    box-shadow: 
+      0 0 85px rgba(139, 92, 246, 0.55),
+      0 0 140px rgba(15, 159, 154, 0.2),
+      inset -28px -28px 55px rgba(0, 0, 0, 0.75),
+      inset 16px 16px 40px rgba(255, 255, 255, 0.45);
   }
   50% {
-    transform: scale(1.035);
-    box-shadow: 0 0 95px rgba(167, 139, 250, 0.75), inset -20px -20px 45px rgba(0, 0, 0, 0.6);
+    transform: scale(1.03);
+    box-shadow: 
+      0 0 110px rgba(167, 139, 250, 0.7),
+      0 0 160px rgba(45, 212, 191, 0.28),
+      inset -22px -22px 50px rgba(0, 0, 0, 0.65),
+      inset 18px 18px 45px rgba(255, 255, 255, 0.55);
+  }
+}
+
+@keyframes csGlobeGridRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes csOrbitRingRotate {
+  from {
+    transform: rotateX(66deg) rotateY(-18deg) rotateZ(0deg);
+  }
+  to {
+    transform: rotateX(66deg) rotateY(-18deg) rotateZ(360deg);
+  }
+}
+
+@keyframes csOrbitRingRotateRev {
+  from {
+    transform: rotateX(60deg) rotateY(20deg) rotateZ(0deg);
+  }
+  to {
+    transform: rotateX(60deg) rotateY(20deg) rotateZ(-360deg);
+  }
+}
+
+@keyframes csFloatCoins {
+  0%, 100% {
+    transform: translateY(0px) rotate(-6deg) scale(1);
+  }
+  50% {
+    transform: translateY(-12px) rotate(-2deg) scale(1.03);
+  }
+}
+
+@keyframes csFloatChart {
+  0%, 100% {
+    transform: translateY(0px) rotate(4deg) scale(1);
+  }
+  50% {
+    transform: translateY(-14px) rotate(8deg) scale(1.04);
+  }
+}
+
+@keyframes csGyroRupee {
+  0%, 100% {
+    transform: translateY(0px) rotateX(0deg) rotateY(0deg) rotateZ(-4deg);
+  }
+  50% {
+    transform: translateY(-10px) rotateX(12deg) rotateY(-10deg) rotateZ(3deg);
+  }
+}
+
+@keyframes csFloatShield {
+  0%, 100% {
+    transform: translateY(0px) rotate(3deg) scale(1);
+  }
+  50% {
+    transform: translateY(-11px) rotate(-2deg) scale(1.03);
+  }
+}
+
+@keyframes csBeaconPulse {
+  0%, 100% {
+    transform: scale(0.95);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.7;
+  }
+}
+
+@keyframes csDustFloat {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-16px) translateX(8px);
+    opacity: 0.65;
   }
 }
 
@@ -333,20 +845,46 @@
     justify-content: center !important;
   }
   .cs-luminous-stage {
-    width: 320px;
-    height: 320px;
+    width: 330px;
+    height: 330px;
   }
-  .cs-sphere-core {
+  .cs-globe-wrapper {
     width: 170px;
     height: 170px;
   }
-  .cs-orbit-ring-1 {
-    width: 260px;
-    height: 260px;
+  .cs-sphere-core {
+    width: 160px;
+    height: 160px;
   }
-  .cs-orbit-ring-2 {
-    width: 320px;
-    height: 320px;
+  .cs-orbit-plane-1 {
+    width: 290px;
+    height: 290px;
+  }
+  .cs-orbit-plane-2 {
+    width: 340px;
+    height: 340px;
+  }
+  .cs-3d-artifact {
+    transform: scale(0.72) !important;
+  }
+  .cs-artifact-coins {
+    left: -15px !important;
+    top: 45% !important;
+  }
+  .cs-artifact-chart {
+    right: -20px !important;
+    top: 36% !important;
+  }
+  .cs-artifact-rupee {
+    left: 10px !important;
+    top: 10% !important;
+  }
+  .cs-artifact-shield {
+    right: 10px !important;
+    bottom: 12% !important;
+  }
+  .cs-artifact-beacon {
+    display: none !important;
   }
   .cs-orbit-pill-desktop {
     display: none !important;

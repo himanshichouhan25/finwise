@@ -106,6 +106,17 @@ def extract_with_regex(claim_text: str) -> ExtractedClaimParameters:
     if pair_match:
         initial_amount = _parse_indian_currency_text(pair_match.group(1))
         claimed_amount = _parse_indian_currency_text(pair_match.group(2))
+    else:
+        # Check for free money / registration bonus / unearned reward claims (e.g. "register and get 5000")
+        single_reward_match = re.search(
+            r"(?:register|sign\s*up|free\s*cash|free\s*money|bonus|task)?\s*(?:and|to)?\s*(?:get|earn|win|bonus|receive|pao|le\s*jao|instant)\s*([₹$]?\s*\d+[,\d]*(?:\s*(?:k|lakh|crore|cr))?)",
+            text_lower,
+        )
+        if single_reward_match and single_reward_match.group(1):
+            extracted_reward = _parse_indian_currency_text(single_reward_match.group(1))
+            if extracted_reward and extracted_reward > Decimal("0.00"):
+                initial_amount = Decimal("0.00")
+                claimed_amount = extracted_reward
 
     return ExtractedClaimParameters(
         initial_amount=initial_amount,

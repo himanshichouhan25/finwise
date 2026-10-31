@@ -47,6 +47,9 @@ venv.bak/
 htmlcov/
 .mypy_cache/
 
+# Temporary Office Lock Files
+~$*
+
 # Node / Frontend (for Phase 8+)
 node_modules/
 .npm

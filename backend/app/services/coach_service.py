@@ -394,6 +394,22 @@ def send_coach_message(
         recorded_tools.extend(fb_tools)
         model_used = "finwise-deterministic-engine-v1"
 
+    # 7. Fallback check: if final_reply is empty, None, or generic boilerplate, synthesize authoritative reply
+    if not final_reply or not final_reply.strip() or 'could you clarify your question' in final_reply.lower():
+        logger.warning('AI completion gave empty/boilerplate content. Generating rich deterministic financial reply.')
+        fb_reply, fb_tools = _generate_deterministic_fallback_reply(
+            db=db,
+            user_id=user_id,
+            snapshot=snapshot,
+            user_message=request.message.strip(),
+            persona_name=persona_name,
+        )
+        final_reply = fb_reply
+        for ft in fb_tools:
+            if not any(rt.get('name') == ft.get('name') for rt in recorded_tools):
+                recorded_tools.append(ft)
+        model_used = model_used or 'finwise-deterministic-engine-v1'
+
     # 7. Apply SEBI compliance guardrails
     sanitized_content = sanitize_ai_response(final_reply)
 

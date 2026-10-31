@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Target, Plus, Calendar, Clock, AlertCircle, ArrowRight, Sparkles, X } from 'lucide-react';
-import { getGoals, createGoal, runGoalDelaySimulation } from '../api/client';
+import { Target, Plus, Calendar, Clock, AlertCircle, ArrowRight, Sparkles, X, Trash2, Check, AlertTriangle } from 'lucide-react';
+import { getGoals, createGoal, updateGoal, deleteGoal, runGoalDelaySimulation } from '../api/client';
 
 export default function GoalsView() {
   const [goals, setGoals] = useState([]);
@@ -41,6 +41,25 @@ export default function GoalsView() {
     window.addEventListener('finwise_persona_changed', handlePersonaChange);
     return () => window.removeEventListener('finwise_persona_changed', handlePersonaChange);
   }, []);
+
+  const handleUpdateMonthlyPlan = async (goalId, newAmt) => {
+    try {
+      await updateGoal(goalId, { planned_monthly_contribution: Number(newAmt) });
+      loadGoals();
+    } catch (err) {
+      alert(err.message || 'Failed to update monthly plan');
+    }
+  };
+
+  const handleDeleteGoal = async (goalId) => {
+    if (!window.confirm('Are you sure you want to delete this goal?')) return;
+    try {
+      await deleteGoal(goalId);
+      loadGoals();
+    } catch (err) {
+      alert(err.message || 'Failed to delete goal');
+    }
+  };
 
   const handleCreateGoal = async (e) => {
     e.preventDefault();
@@ -213,7 +232,7 @@ export default function GoalsView() {
                   yearsNeededAtCurrentRate = (remaining / (plannedMonthly * 12)).toFixed(1);
                 }
 
-                if (plannedMonthly < requiredMonthly * 0.75 && remaining > 0) {
+                if (plannedMonthly < requiredMonthly && remaining > 0) {
                   isUnfeasible = true;
                 }
               }
@@ -225,7 +244,16 @@ export default function GoalsView() {
                       <Target size={18} color="var(--teal-primary)" />
                       <h4 style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: '1.02rem', margin: 0 }}>{g.name}</h4>
                     </div>
-                    <span className="badge badge-teal">{progressPct.toFixed(1)}%</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span className="badge badge-teal">{progressPct.toFixed(1)}%</span>
+                      <button
+                        onClick={() => handleDeleteGoal(g.id)}
+                        style={{ background: 'transparent', border: 'none', color: '#94A3B8', cursor: 'pointer', padding: '2px' }}
+                        title="Delete Goal"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
                   </div>
 
                   <div>

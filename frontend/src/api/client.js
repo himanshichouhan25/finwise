@@ -217,6 +217,17 @@ export const createGoal = (goal) =>
     body: JSON.stringify(goal),
   });
 export const getGoalPlan = (goalId) => apiFetch(`/api/v1/goals/${goalId}/plan`);
+export const updateGoal = (goalId, payload) =>
+  apiFetch(`/api/v1/goals/${goalId}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+
+export const deleteGoal = (goalId) =>
+  apiFetch(`/api/v1/goals/${goalId}`, {
+    method: "DELETE",
+  });
+
 
 export const runSipSimulation = (payload) =>
   apiFetch("/api/v1/simulations/sip", {
