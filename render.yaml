@@ -20,3 +20,4 @@ services:
         sync: false
       - key: MARKET_DATA_PROVIDER
         value: demo
+
